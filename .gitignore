@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+.crunchdao/token
+Structural-break-adia-2026/
+*.tsv
+*.joblib
