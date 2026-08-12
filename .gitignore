@@ -6,3 +6,5 @@ __pycache__/
 Structural-break-adia-2026/
 *.tsv
 *.joblibdata/X_train.parquet
+data/X_train.parquet
+dataset/X_train.parquet
