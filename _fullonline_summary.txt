@@ -1,0 +1,7 @@
+E18 full-online-vs-history, 10 folds, paired vs champion ms_60_130_250@250 (2026-08-11 18:26)
+
+              name window  n_feat   mean   delta     t                     verdict
+ms_60_130_250_full    BIG      60 0.5829 +0.0035  0.51                       noise
+    ms_60_130_full    BIG      45 0.5788 -0.0007 -0.13                       noise
+       ms_130_full    BIG      30 0.5746 -0.0048 -0.72                       noise
+     ms_60_130_250    250      45 0.5795    +nan   NaN baseline(ms_60_130_250@250)

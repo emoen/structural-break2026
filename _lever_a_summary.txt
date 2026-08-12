@@ -1,0 +1,11 @@
+Lever A: per-series calibration @W=130 (2026-08-11 12:41)
+folds=10  base16 raw mean=0.5742
+
+variant        mean     delta       t  verdict
+raw          0.5742        --      --  baseline
+sub_b10      0.5608   -0.0133   -2.49  noise
+sub_b20      0.5611   -0.0131   -3.20  noise
+sub_b40      0.5556   -0.0186   -3.77  noise
+z_b40        0.5390   -0.0352   -5.07  noise
+z_b20        0.5456   -0.0286   -5.41  noise
+exp_med      0.5432   -0.0310   -6.49  noise

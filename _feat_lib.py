@@ -435,6 +435,98 @@ def f_lzc(w, ctx):
     return [c / (n / math.log2(n))]
 
 
+# --- Lever B: within-online max-split changepoint localisation -------------
+# Scan candidate split points k inside the trailing window; take the MAX standardized
+# contrast between the two sides (self-normalized within the window, NOT vs history).
+# Fires when a break lies INSIDE the recent window -> complements vs-history features
+# (which fire once the break is entirely before the window). MIN_SEG guards unstable tails.
+_MSPLIT_MIN_SEG = 5
+
+
+def _msplit_prefix(w):
+    """Return (n, ks, S1L, S1R, SSL, SSR) arrays over valid split points k=nl.
+
+    ks[i] = number of points on the left; segments are w[:k] and w[k:].
+    SSL/SSR are within-segment sums of squared deviations (numerically stable prefix form).
+    """
+    n = len(w)
+    lo, hi = _MSPLIT_MIN_SEG, n - _MSPLIT_MIN_SEG
+    if hi <= lo:
+        return None
+    c1 = np.cumsum(w)
+    c2 = np.cumsum(w * w)
+    tot1 = c1[-1]
+    tot2 = c2[-1]
+    ks = np.arange(lo, hi + 1, dtype=np.float64)          # nl
+    kidx = ks.astype(np.int64) - 1                        # index into cumsum for left seg
+    s1l = c1[kidx]
+    s2l = c2[kidx]
+    nl = ks
+    nr = n - ks
+    s1r = tot1 - s1l
+    s2r = tot2 - s1l  # placeholder, fixed below
+    s2r = tot2 - s2l
+    ssl = s2l - s1l * s1l / nl
+    ssr = s2r - s1r * s1r / nr
+    ssl = np.maximum(ssl, 0.0)
+    ssr = np.maximum(ssr, 0.0)
+    return n, nl, nr, s1l, s1r, ssl, ssr
+
+
+def f_max_split_t(w, ctx):
+    """Max over split k of |standardized mean contrast| (Chow / max-t changepoint stat)."""
+    pf = _msplit_prefix(w)
+    if pf is None:
+        return [0.0]
+    n, nl, nr, s1l, s1r, ssl, ssr = pf
+    meanl = s1l / nl
+    meanr = s1r / nr
+    pooled_var = (ssl + ssr) / np.maximum(n - 2.0, 1.0)
+    se = np.sqrt(np.maximum(pooled_var, 1e-12) * (1.0 / nl + 1.0 / nr))
+    tstat = np.abs(meanr - meanl) / np.maximum(se, 1e-12)
+    return [float(np.max(tstat))]
+
+
+def f_max_split_pos(w, ctx):
+    """Fraction position (k/n) of the max mean-contrast split -> localises the break."""
+    pf = _msplit_prefix(w)
+    if pf is None:
+        return [0.0]
+    n, nl, nr, s1l, s1r, ssl, ssr = pf
+    meanl = s1l / nl
+    meanr = s1r / nr
+    pooled_var = (ssl + ssr) / np.maximum(n - 2.0, 1.0)
+    se = np.sqrt(np.maximum(pooled_var, 1e-12) * (1.0 / nl + 1.0 / nr))
+    tstat = np.abs(meanr - meanl) / np.maximum(se, 1e-12)
+    return [float(nl[int(np.argmax(tstat))]) / n]
+
+
+def f_max_split_var(w, ctx):
+    """Max over split k of |log(var_right / var_left)| -> variance changepoint."""
+    pf = _msplit_prefix(w)
+    if pf is None:
+        return [0.0]
+    n, nl, nr, s1l, s1r, ssl, ssr = pf
+    varl = np.maximum(ssl / nl, 1e-12)
+    varr = np.maximum(ssr / nr, 1e-12)
+    return [float(np.max(np.abs(np.log(varr / varl))))]
+
+
+def f_max_split_lr(w, ctx):
+    """Max normal log-LR over split k for a mean+variance change (Gaussian max-LR stat)."""
+    pf = _msplit_prefix(w)
+    if pf is None:
+        return [0.0]
+    n, nl, nr, s1l, s1r, ssl, ssr = pf
+    # full-window variance (single-regime MLE), computed directly as a scalar
+    var0 = max(float(np.sum(w * w) / n - (float(np.sum(w)) / n) ** 2), 1e-12)
+    varl = np.maximum(ssl / nl, 1e-12)
+    varr = np.maximum(ssr / nr, 1e-12)
+    # log-LR = 0.5*[ n*log(var0) - nl*log(varl) - nr*log(varr) ]
+    llr = 0.5 * (n * math.log(var0) - nl * np.log(varl) - nr * np.log(varr))
+    return [float(np.max(np.maximum(llr, 0.0)))]
+
+
 # --- registry --------------------------------------------------------------
 EXTRA = {
     "median_shift": f_median_shift, "mad_ratio": f_mad_ratio, "trimmed": f_trimmed,
@@ -454,6 +546,9 @@ EXTRA = {
     "spec_spread": f_spec_spread, "spec_peak": f_spec_peak,
     "spec_entropy_diff": f_spec_entropy_diff, "spec_entropy_short": f_spec_entropy_short,
     "perm_entropy4": f_perm_entropy4, "higuchi": f_higuchi, "katz": f_katz, "lzc": f_lzc,
+    # Lever B: within-online max-split changepoint localisation
+    "max_split_t": f_max_split_t, "max_split_pos": f_max_split_pos,
+    "max_split_var": f_max_split_var, "max_split_lr": f_max_split_lr,
 }
 
 # Combos of related groups.

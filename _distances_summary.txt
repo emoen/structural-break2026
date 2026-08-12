@@ -1,0 +1,11 @@
+E20 distance-family sweep, 10 folds, paired vs champion ms_60_130_250@250 (2026-08-11 23:46)
+
+         name  n_feat   mean   delta     t                     verdict
+         maha      46 0.5816 +0.0022  0.73                       noise
+      seuclid      46 0.5800 +0.0005  0.26                       noise
+       family      50 0.5791 -0.0004 -0.15                       noise
+      qda_llr      46 0.5776 -0.0019 -0.70                       noise
+maha_perscale      48 0.5785 -0.0010 -0.88                       noise
+           l1      46 0.5775 -0.0019 -1.22                       noise
+         linf      46 0.5782 -0.0013 -1.89                       noise
+ms_60_130_250      45 0.5795    +nan   NaN baseline(ms_60_130_250@250)

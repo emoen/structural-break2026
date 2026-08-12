@@ -1,0 +1,9 @@
+E17 multi-scale features (base15 per nested scale), 10 folds, paired vs base15@130 (2026-08-11 17:06)
+
+         name  window  n_feat   mean   delta     t              verdict
+ms_60_130_250     250      45 0.5795 +0.0075  3.06                 SHIP
+ms_40_130_250     250      45 0.5796 +0.0075  2.27                 SHIP
+    ms_40_130     130      30 0.5739 +0.0018  2.02                 SHIP
+   ms_130_250     250      30 0.5761 +0.0041  1.45                noise
+ ms_20_60_130     130      45 0.5714 -0.0006 -0.60                noise
+       base15     130      15 0.5720    +nan   NaN baseline(base15@130)

@@ -1,0 +1,33 @@
+oppfølgingsspørsmål:
+what does each of these classifications do? Eg. what do you mean by group? 
+Group	Features
+Location	mean_z
+Scale	log_var_ratio, iqr_ratio, rng_ratio
+Distribution shape	ks, skew_diff, kurt_diff, tail2, tail3
+Dependence	ac1_diff, ac2_diff, zero_cross
+Trend / spectrum	slope_norm, spec_centroid_diff	
+
+What does this mean? Can we improve the training method - by training on all the data? 
+Training design: 6000 series × 10 randomly sampled online steps each ≈ 60k rows; label = 1 if step t ≥ tau. PREDICT_EVERY=15 (score held between recomputes)
+
+What does this mean? TS-AUC at step t ranks series against each other, cross-sectionally. So:
+-what do you mean by monotone transformation leavs AUC unchanged and what is platt scaling?
+-You say: What matters is that, at a fixed t, series where the break has happened score higher than those where it hasn't. All features are already normalized by each series' own history (ratios / z-scores) → good, comparable across series. Keep that discipline. Yes, I would say that if the model predicts that the break happened at t then any t+n for n>=0 should predict the break too. But in the example in archtecture.md I see that probability goes down further along time - which is not monotone. Also what do you mean features are normalized for each series own history?
+- Staleness hurts directly: with PREDICT_EVERY=15,  -What are we only predicting every 15 steps? Why?
+
+*******************
+1. Lower PREDICT_EVERY (cheap, low-risk). We now have compute headroom. Going 15 → 5 (or 1) removes staleness. Pure inference-shape win, no model change. Measure the TS-AUC delta.
+
+2. More & denser training signal (cheap, low-risk). Currently only 10 steps/series and 6000 series. Options: use all/most online steps, raise MAX_TRAIN_SERIES toward 10000, and sample more densely near tau where the signal is subtle. More rows → better boundary.
+
+3. Multi-scale + recent-vs-older windows (medium effort, high upside). Today it's one window (75) vs. all history. Add:
+
+a short window (e.g. 25) alongside 75 → catches abrupt vs. gradual breaks;
+recent-half vs. earlier-half of the online window contrast → sensitive to a break that just occurred within the online stream, independent of the long history.
+4. Robust / rank-based stats (medium effort). Add median/MAD location-scale and a rank-based two-sample stat (Mann–Whitney) and a variance-specific test (Levene/Brown–Forsythe). More robust to heavy tails than mean/var, which the current set leans on.
+
+5. Model tuning (low upside, do last). More trees / depth / lr — marginal, and it re-raises per-step predict cost. Only worth a quick sweep after features settle.
+
+************************
+Start with 1 and 2 (nearly free, measurable immediately on _exp_fast.py), then 3, then 4, validating TS-AUC on ≥800 series each time (the 100-series set is too noisy). Model tuning last.
+
