@@ -1,0 +1,9 @@
+E24 variance two-sample tests, 10 folds, paired vs champion ms_60_130_250@250 (2026-08-12 18:12)
+HARDENED bar: only t>=2.5 worth an LB slot.
+
+         name  n_feat   mean   delta    t                     verdict
+   vt_fligner      48 0.5808 +0.0013 0.42                       noise
+    vt_levene      48 0.5802 +0.0007 0.32                       noise
+   vt_lev_fli      51 0.5798 +0.0003 0.13                       noise
+     vt_ftest      48 0.5797 +0.0002 0.10                       noise
+ms_60_130_250      45 0.5795    +nan  NaN baseline(ms_60_130_250@250)

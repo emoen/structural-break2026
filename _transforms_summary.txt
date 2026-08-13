@@ -1,0 +1,10 @@
+E23 series-transform two-sample, 10 folds, paired vs champion ms_60_130_250@250 (2026-08-12 15:42)
+HARDENED bar: only t>=2.5 worth an LB slot (0-for-2 on t<2).
+
+         name  n_feat   mean   delta     t                     verdict
+      tf_diff      54 0.5813 +0.0018  1.40                       noise
+    tf_cumsum      54 0.5805 +0.0010  0.53                       noise
+       tf_all      81 0.5818 +0.0023  0.53                       noise
+      tf_mstd      54 0.5788 -0.0006 -0.21                       noise
+    tf_absdev      54 0.5787 -0.0008 -0.32                       noise
+ms_60_130_250      45 0.5795    +nan   NaN baseline(ms_60_130_250@250)

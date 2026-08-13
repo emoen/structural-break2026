@@ -1,0 +1,9 @@
+E21 two-sample distances, 10 folds, paired vs champion ms_60_130_250@250 (2026-08-12 11:22)
+
+         name  n_feat   mean   delta    t                     verdict
+      ts_wass      48 0.5821 +0.0026 1.83                   promising
+    ts_energy      48 0.5819 +0.0024 1.81                   promising
+       ts_cvm      48 0.5814 +0.0019 1.44                       noise
+       ts_all      57 0.5819 +0.0024 1.07                       noise
+       ts_mmd      48 0.5808 +0.0014 0.87                       noise
+ms_60_130_250      45 0.5795    +nan  NaN baseline(ms_60_130_250@250)

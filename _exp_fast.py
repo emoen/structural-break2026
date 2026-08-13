@@ -94,11 +94,12 @@ def hist_context(x_h, hist_cap):
         sample = x_h[::stride][:hist_cap]
     else:
         sample = x_h
-    sample_sorted = np.sort(np.asarray(sample, dtype=np.float64))
+    sample_ordered = np.asarray(sample, dtype=np.float64)
+    sample_sorted = np.sort(sample_ordered)
     return {
         "mu": mu, "sd": sd, "var": var, "skew": sk, "kurt": ku,
         "ac1": ac1, "ac2": ac2, "iqr": iqr, "rng": rng, "sc": sc,
-        "sample_sorted": sample_sorted,
+        "sample_sorted": sample_sorted, "sample_ordered": sample_ordered,
     }
 
 
