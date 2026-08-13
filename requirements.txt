@@ -1,0 +1,27 @@
+# Structural-break 2026 — validation environment
+# Python 3.13.7 (match the training box; 3.11+ should also work)
+#
+# Install (GPU box):
+#   python -m venv .venv && source .venv/bin/activate
+#   pip install -U pip
+#   pip install -r requirements.txt          # scientific stack (pinned)
+#   pip install torch==2.13.0                 # default PyPI wheel = CUDA build on Linux
+#   python check_env.py                       # verify everything, incl. GPU
+#
+# NOTE on torch: it is intentionally NOT pinned in this file because the wheel
+# differs by platform. On a Linux GPU box, `pip install torch==2.13.0` from the
+# default PyPI index pulls the CUDA-enabled build. For an explicit CUDA build use:
+#   pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu124
+# (Only the CNN in _seqmodel.py uses torch/GPU; HGB/LightGBM run on CPU.)
+
+numpy==2.5.1
+pandas==3.0.5
+scikit-learn==1.9.0
+scipy==1.18.0
+joblib==1.5.3
+threadpoolctl==3.6.0
+lightgbm==4.7.0
+matplotlib==3.11.1
+
+# Submission CLI (only needed to download data / test / submit; not for validation):
+crunch-cli==11.10.0
