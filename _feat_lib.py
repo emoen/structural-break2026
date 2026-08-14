@@ -176,6 +176,23 @@ def f_ljung(w, ctx):
     return [sum(_autocorr(w, k) ** 2 for k in range(1, 6))]
 
 
+def f_arch(w, ctx):
+    """Volatility-clustering / ARCH effect: autocorrelation of SQUARED residuals.
+
+    All existing variance features measure the LEVEL of variance (window-vs-history or a
+    one-shot variance changepoint). This measures whether volatility is AUTOCORRELATED
+    (GARCH-style persistence) -- a distinct DGP property that can change at a break.
+    Returns [lag-1 autocorr of r^2, Ljung-Box-style sum of squared autocorrs of r^2 over
+    lags 1..5]. Autocorrelation is scale-free so no history normalisation is needed.
+    """
+    r = w - w.mean()
+    r2 = r * r
+    ac1 = _autocorr(r2, 1)
+    lb = sum(_autocorr(r2, k) ** 2 for k in range(1, 6))
+    return [ac1, lb]
+
+
+
 def f_turning(w, ctx):
     if len(w) < 3:
         return [0.0]
@@ -537,7 +554,7 @@ EXTRA = {
     "down_up_vol": f_down_up_vol, "acmore": f_acmore, "acf_decay": f_acf_decay,
     "ljung": f_ljung, "turning": f_turning, "runs": f_runs, "longest_run": f_longest_run,
     "median_cross": f_median_cross, "spec_entropy": f_spec_entropy,
-    "spec_bands": f_spec_bands, "hjorth": f_hjorth, "hurst": f_hurst,
+    "spec_bands": f_spec_bands, "hjorth": f_hjorth, "hurst": f_hurst, "arch": f_arch,
     "perm_entropy": f_perm_entropy, "maxabs_z": f_maxabs_z, "tail_asym": f_tail_asym,
     "short_scale": f_short_scale, "short_ks": f_short_ks, "short_shape": f_short_shape,
     "range_recent": f_range_recent,
