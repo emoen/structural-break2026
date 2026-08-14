@@ -69,6 +69,12 @@ if SMOKE:
     SINGLES = SINGLES[:3]
     COMBO_NAMES = COMBO_NAMES[:1]
 
+# FEAT_ONLY=arch,ljung -> restrict the battery to a targeted subset (one-off paired tests).
+_ONLY = [c.strip() for c in os.environ.get("FEAT_ONLY", "").split(",") if c.strip()]
+if _ONLY:
+    SINGLES = [c for c in _ONLY if c in EXTRA and c not in BASE_KEYS]
+    COMBO_NAMES = [c for c in _ONLY if c in COMBOS]
+
 
 def cand_keys(name):
     """Return the tuple of EXTRA keys for a candidate name (single group or combo)."""
