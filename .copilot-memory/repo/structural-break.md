@@ -6,7 +6,11 @@
 
 ## Environment
 - Python venv: `.venv/bin/python` (system `python` not on PATH). Use absolute path.
-- Available: scipy, sklearn, numpy, pandas, joblib, crunch. NOT: lightgbm, nbformat.
+- Available: scipy, sklearn, numpy, pandas, joblib, crunch, nbformat(5.11.0, since 2026-08-12). NOT: lightgbm.
+- nbformat NOW installed -> create/edit notebooks via nbformat.read/write (validates on write); no longer
+  need raw-JSON generator scripts. Still re-read notebook right before editing (auto-revert). nbformat
+  validates STRUCTURE not cell CONTENTS -> won't fix byte-corruption inside a cell (e.g. baseline.ipynb
+  `import joblib6ø+` garbage; fix via git checkout / crunch setup-notebook / surgical line replace).
 - Terminal sandbox sometimes strips `cd`; use absolute interpreter path.
 
 ## Key facts
@@ -141,6 +145,297 @@
   (4) SIMPLEST: prefer launching the next harness DIRECTLY when the machine is free rather than chaining.
 - E21 RELAUNCH (2026-08-12 08:35): killed both zombies, launched _twosample.py DIRECTLY (PID 216895,
   full 10-fold). RESULT PENDING -> read _twosample_summary.txt.
+- E21 RESULT (2026-08-12, full 10-fold, 167min): BEST NON-CHAMPION SIGNAL SINCE E17 but BELOW ship bar.
+  vs champion 0.5795: ts_wass (W1) 0.5821 d=+0.0026 t=+1.83 promising; ts_energy 0.5819 d=+0.0024 t=+1.81
+  promising; ts_cvm 0.5814 d=+0.0019 t=+1.44; ts_all(57f) 0.5819 d=+0.0024 t=+1.07; ts_mmd 0.5808 t=+0.87.
+  READS: (1) Wasserstein-1 & energy are ~COLLINEAR (both CDF-gap integrals: W1=int|F-G|, energy=2int(F-G)^2)
+  -> give the SAME +0.0025 signal; stacking them (ts_all) DILUTES (cvm/mmd noise drags t to 1.07). (2) Real
+  distribution-SHAPE signal beyond mean/var exists but sits at t~1.8 (10 folds) = just under user bar
+  t>=1.9-to-LB-test and |t|>=2-to-ship. (3) cvm/mmd weaker. NOT shipped yet. TWO-SAMPLE distance IS the
+  first live lever since champion -> worth sharpening, NOT abandoning.
+- E21 FOLLOW-UP OPTIONS (pick before spending LB slot): (a) confirm ts_wass at 20 folds -> if t firms
+  >=1.9 ship to LB; (b) E22 = ISOLATE pure-shape W1: standardize BOTH window & history (subtract mean,
+  /sd) before W1 so it's orthogonal to champion's mean/var feats -> may strengthen; (c) ts_wass single
+  best scale only (drop redundant scales). Avoid stacking (collinear). Champion still stands.
+- DECISION (2026-08-12): user chose to spend 2 LB slots rather than more slow local runs. Test the two
+  DISTINCT signals on LB: E22a ts_wass first (strongest), then E22b ts_cvm (rank-based, orthogonal).
+  Skip energy (collinear w/ wass). If ts_cvm doesn't help, drop it. NO config switch (hardcode per sub).
+- E22a WIRED (2026-08-12): added _w1(a_sorted,b_sorted,sd) to notebook feature cell (ported EXACT from
+  _twosample.py) + compute_features_ms now appends `_w1(np.sort(ws), ctx["sample_sorted"], ctx["sd"])`
+  per scale -> 48 feats. VERIFIED: notebook compute_features_ms == harness ts_feat(...,dist_keys=("wass",))
+  bit-exact (maxdiff 0.00e+00 over 20 trials, all finite, nfeat=48). Config unchanged (WINDOW=250,
+  MS_SCALES=(60,130,250)). Shared by train+infer. READY TO SUBMIT. LB champion still 57.50%/214; CV
+  expectation +0.0026 (~+0.25pt) IF it transfers (marginal t=1.83, could reverse like E14 perm_entropy).
+  AWAITING LB RESULT for E22a.
+- E22b RESULT (2026-08-12, sub #16): ts_cvm LB = 57.40% rank 218 = WORSE than champion 57.50%/214
+  (-0.10pt). REVERSED as predicted (CV t=1.44 < hardened bar). Now 0-for-3 on marginal features
+  (perm_entropy t=1.93, wass t=1.83, cvm t=1.44 all reversed). Two-sample distances FULLY DEAD as ship
+  candidates. streaming_detector_cvm.ipynb should be treated as abandoned. Champion 57.50%/214 STANDS.
+- E22b PARALLEL (2026-08-12): user may submit 2 notebooks concurrently. DECIDED: keep them INDEPENDENT
+  (A=streaming_detector.ipynb champion+wass; B=streaming_detector_cvm.ipynb champion+cvm), NOT a
+  wass+cvm STACK. Rationale: E21 ts_all (all 4 distances stacked) DILUTED to t=1.07 < ts_wass 1.83 =>
+  GBT does not benefit from correlated distance features; LB can't resolve cvm's ~+0.15pt increment on
+  top of wass (< LB noise). Only CV-validate a stack if BOTH beat champion on LB.
+  streaming_detector_cvm.ipynb = copy of champion+wass with _w1 swapped for _cvm (rank-based, scale-free,
+  no sd; append `_cvm(np.sort(ws), h)`), 48 feats. VERIFIED bit-exact vs harness ts_feat(dist_keys=("cvm",))
+  (maxdiff 0.00e+00, all finite). BOTH notebooks ready to submit. AWAITING LB for E22a(wass) + E22b(cvm).
+- E22a RESULT (2026-08-12, sub #15): ts_wass LB = 57.37% rank 217 = WORSE than champion 57.50%/214
+  (-0.13pt, -3 ranks). REVERSED despite CV t=1.83. Notebook REVERTED to champion (45 feats, verified).
+  *** HARDENED SHIP RULE ***: we are now 0-for-2 on marginal features (E14 perm_entropy t=1.93 reversed;
+  E22a wass t=1.83 reversed). EVERYTHING that transferred had CV t>=3 (E13 spec_entropy 4.67, E17
+  multiscale 3.06); everything t<2 reversed. => CV cannot resolve a +0.0026 edge (inside CV<->LB gap).
+  NEW BAR: do NOT spend an LB slot unless CV t>=~2.5 (ideally >=3). The old "t>=1.9 = LB-testable" rule
+  is RETIRED. E22b cvm (t=1.44) is BELOW even the old bar -> RECOMMEND HOLD, do NOT submit (will almost
+  certainly reverse too); if already submitted in parallel just read it, expect failure. wass/cvm/energy
+  two-sample distances = marginal, DEAD as ship candidates. Champion ms_60_130_250 57.50%/214 STANDS.
+- IMPLICATION FOR NEXT LEVERS: marginal feature nibbles (t<2.5) are a waste of LB slots. Need levers big
+  enough to clear t>=2.5-3 in CV (like WINDOW=130 and multiscale did). E23 transforms must be judged by
+  this hardened bar before any submission.
+- *** GOTCHA: data/X_train.parquet (218,514,418 bytes) is GITIGNORED and got deleted (disk 98% full,
+  ~9.6G free -> likely cleanup). RESTORE with `.venv/bin/crunch download` (uses .crunchdao/token; needs
+  network). Direct S3 URL 403s (needs auth). Other parquets (y_train, y_train_index, X_test.reduced,
+  y_test*) persisted. If a harness dies with FileNotFoundError on X_train.parquet -> re-run crunch download.
+- E23 series-transforms harness `_transforms.py` BUILT + smoke-OK (45->54 feats) + LAUNCHED full 10-fold
+  (pid 240701, log _transforms.log, results _transforms_results.tsv). Added ctx["sample_ordered"] to
+  _exp_fast.hist_context (additive; notebook has own hist_context so submission unaffected). Candidates:
+  tf_cumsum/tf_diff/tf_mstd/tf_absdev/tf_all; each appends 3 discriminators (mean_z, log_var_ratio, KS)
+  between transform(window) and transform(history) per scale, on z=(x-mu_h)/sd_h. Verdict thresholds
+  hardened: SHIP(hard) only t>=2.5. AWAITING full results.
+- E23 RESULT (2026-08-12, 81min, FULL 10-fold, baseline champion 0.5795): ALL NOISE, dead lever.
+  tf_diff +0.0018 t=1.40 (best single); tf_cumsum +0.0010 t=0.53; tf_mstd -0.0006 t=-0.21;
+  tf_absdev -0.0008 t=-0.32; tf_all(81f) +0.0023 t=0.53 (dilution again). Nothing near t>=2.5.
+  CONFIRMS representation saturation (E19): cumsum/diff/mstd/absdev views add nothing the champion's
+  base15 x 3 scales doesn't already capture. Series-transforms = DEAD. Do NOT submit. Champion STANDS.
+- 2ND-PLACE REVIEW (2026-08-12, read full README): their 6 transforms = z-score/cumsum/dense-rank/abs/
+  moving-avg/moving-std = EXACTLY our E23 transforms (which were noise for us). Their tests = KS(+have)
+  + F-test/Levene(=our queued E24). Pipeline: ~2408 feats -> SHAP + LightGBM-gain SELECTION -> LightGBM
+  (+1 TabPFN feat). CONCLUSION: no hidden feature magic; we converged. Their edge is STRUCTURAL, not a
+  secret feature: (1) EASIER problem (2025 offline, KNOWN boundary -> clean before/after split; ours is
+  real-time unknown boundary so same transforms wash out), (2) SCALE+SELECTION not hand-picked adds
+  (we dilute when adding 3-9; they let SHAP/LGBM pick from 2408), (3) TabPFN meta-feat (heavy, dubious
+  in per-step budget). IMPLICATION: chasing last-year pipeline = wrong problem structure. The 7pt gap to
+  leaders (57.5->64.9) is a PARADIGM gap, not a feature-nibble gap. lightgbm NOT installed (would need it
+  or use HGB importance/permutation for a large-bank+selection experiment).
+- LINK REVIEW 2 (2026-08-12): user gave 2 more repos. emoen/...-Best-Solution = FORK of 2nd-place
+  (identical, "4th public LB", nothing new). emoen/structural-break-challenge (fork of secabird) = DIFFERENT
+  solution with NEW boundary-agnostic feature families we HAVE NOT tried, good for Option A bank:
+  * Hurst exponent (long-memory/mean-reversion) - new signal type
+  * AR(5) coefficients (richer than our ac1/ac2)
+  * Anderson-Darling test (tail-sensitive dist test, > KS in tails)
+  * Fligner-Killeen + Mood's median tests (robust variance/location; Option B cousins)
+  * Sample entropy (we only have spectral/perm entropy)
+  * (also: variance-ratio dynamics, wavelet db4, tsfresh, CatBoost/LGBM/XGB - some boundary-dependent, skip)
+  Their boundary-relative feats (local window around known boundary, distance-to-true-boundary) DO NOT port
+  (we're real-time unknown boundary). But the dist/complexity feats above port to window-vs-history.
+  => Option A (E25) bank = champion base15 + {Hurst, AR(p) coefs, Anderson-Darling, Fligner-Killeen,
+  Mood, sample entropy} x scales, window-vs-history, then permutation/importance SELECT top-K, validate
+  subset vs champion at hardened t>=2.5. Option B (E24) = F-test + Levene (+Fligner) variance two-sample.
+- TASKS IN FLIGHT (2026-08-12 ~17:06): (A) exp_bank_selection.ipynb CREATED (9 cells, valid, code cells
+  compile OK, NOT executed per user) = E25 bank+ExtraTrees-importance-selection; keeps base45, selects
+  NEW feats (hurst/AR4/anderson-darling/levene/fligner/mood/sampen x3 scales) with importance>=weakest
+  base, validates subset vs champion at t>=2.5. (B) _vartests.py (E24) DONE 10-fold (66.8 min):
+  ALL NOISE. vt_fligner d=+0.0013 t=0.42, vt_levene d=+0.0007 t=0.32, vt_lev_fli t=0.13, vt_ftest t=0.10
+  (baseline ms_60_130_250 mean 0.5795). => NO winner, nothing wired into champion, nothing new submitted.
+- E25 (Option A) LAUNCHED full 10-fold 2026-08-12 19:10 (pid 259387, runner _run_exp_a.py execs notebook
+  code cells headless, log _exp_a.log, PYTHONWARNINGS=ignore to mute anderson_ksamp flood). SMOKE OK
+  (EXIT0, 2.2min): bank=75 (45 base+30 new), ExtraTrees ranks AR coefs high alongside base; 2-fold verdict
+  d=+0.0125 t=0.80 (unreliable). Selection threshold (imp>=weakest base) selected ALL 30 new at smoke.
+  Expensive feats (anderson_ksamp, sampen O(n^2)) -> expect ~2-3h. AWAIT _exp_a.log final verdict; if
+  selected subset clears t>=2.5 wire into champion, else bank champion (paradigm saturated).
+- E25 FINAL VERDICT (2026-08-12, 71.7 min, _exp_a.log): NOISE / slightly WORSE. Selection kept ALL 30 new
+  feats (weakest base imp=0.0073; ar4/ar3/fligner/levene/sampen_250 all rank in top-20 alongside base).
+  75-feat model mean=0.5759 vs champion 45-feat 0.5795, delta=-0.0036, t=-1.04. The winners' structural
+  recipe (large bank + importance selection) does NOT beat champion here -> trailing-window paradigm is
+  SATURATED for feature-bank approaches. Option A = DEAD lever. Bank the champion on the feature axis.
+  This is the 4th independent confirmation (perm_entropy/wass/cvm marginal + reversed, now bank=noise)
+  that adding features to the stateless window snapshot is exhausted. Remaining hope = PARADIGM levers
+  E26-E29 (target / data-scale / stateful-detector / model), especially E28 (stateful online detector).
+- README BACKFILL (2026-08-12): E19-E25 rows added to experiment-log table (were only in memory). Table
+  now current through E25.
+- SEARCH STEP-UP (2026-08-12): created 4 NEW paradigm-lever notebooks (NOT executed; E25 still running,
+  one 15-job harness at a time). All self-contained, reuse _overnight/_exp_fast/_feat_lib, compare vs
+  champion on same folds at hardened t>=2.5, have SMOKE toggle, code cells compile. Built via nbformat
+  generator _make_search_notebooks.py (run then deleted). To run each detached later: nohup runner or
+  jupyter; they're notebooks so use a headless runner like _run_exp_a.py pattern or execute in VS Code.
+  * E26 exp_hazard_target.ipynb - change TRAINING TARGET (frozen champion feats): ramp regression
+    clip((t-tau)/H,0,1) + deweight-near-tau sample weights. Custom evaluate_tgt (regressor/weighted clf).
+  * E27 exp_more_data.ipynb - scale TRAINING DATA breadth vs depth (E7: breadth wins). load_pool_n keeps
+    val folds FIXED (reserved from END), varies N_TRAIN {6k,10k,MAX} x10 steps + depth control 6k x20.
+    Cheapest lever - if breadth clears t>=2.5 just retrain champion on more series, no code change.
+  * E28 exp_sequential_detector.ipynb - stateful UNSUPERVISED online detectors: CUSUM, Page-Hinkley,
+    BOCPD (Gaussian const-hazard, score=1-P(r==t)). Real paradigm shift. If beats champion=huge; if
+    weaker-but-complementary -> add detector score as a champion FEATURE (follow-up).
+  * E29 exp_lightgbm_pipeline.ipynb - winners' toolchain. NEEDS `pip install lightgbm` (guarded HAS_LGBM).
+    A) LGBM vs HGB on champion feats (model swap). B) bank(champion+Hurst+AR4) -> LGBM gain>0 select -> LGBM.
+    Reuses _overnight build_training/fold_auc (LGBM has predict_proba). If both noise -> gap is problem
+    structure not toolchain, bank champion.
+- RECOMMENDED ORDER when cores free (after E25): E27 (cheapest, data-only) -> E26 (target) -> E28 (BOCPD)
+  -> E29 (needs lightgbm install). Only ONE 15-job harness at a time.
+- OVERNIGHT SEARCH LAUNCHED 2026-08-12 22:26 (pid 267600, runner _run_overnight.py, log _overnight_search.log,
+  PYTHONWARNINGS=ignore). Runs E27->E26->E28->E29 SEQUENTIALLY in one process (fresh namespace each, try/except
+  so a crash doesn't abort the rest, gc between) => only ONE Parallel(n_jobs) harness active at a time, no
+  oversubscription. Full 10-fold (SMOKE unset). lightgbm 4.7.0 confirmed in venv.
+  SMOKE=1 plumbing pass (2026-08-12 22:08, ALL 4 ran clean end-to-end, 4.5 min total). Smoke hints (UNRELIABLE
+  per E24 lesson, confirm at full 10-fold):
+    * E27 more_data breadth_MAX_x10 delta=+0.0697 t=+6.21 SHIP -- but smoke champ baseline was only 0.5160
+      (300 series) vs breadth 9920 series, so effect is literally more-data not a fold artifact => genuinely
+      promising. depth_6k_x20 control = noise (matches E7).
+    * E26 hazard_target: all noise/worse (ramp/deweight).
+    * E28 detectors standalone all BELOW champion (cusum/page_hinkley/bocpd) -- expected; follow-up = add as feature.
+    * E29 lightgbm: A model-swap noise; B bank(60)+gain-select -> LGBM delta=+0.0109 t=+2.68 SHIP at smoke.
+  NEXT: read _overnight_search.log final summary block in the morning; for any SHIP(hard) t>=2.5 at FULL folds,
+  wire into champion + user local-test + submit; else mark dead. Expect E27 could be the free win (retrain on
+  more series, no code change). Verify done: pgrep -af "[_]run_overnight\.py"; grep -A6 "SEARCH DONE" log.
+- OVERNIGHT SEARCH FINAL VERDICTS (2026-08-13, done 120.9 min, _overnight_search.log). ALL FOUR = NOISE/WORSE.
+  Champion baseline mean=0.5795 on all. NONE cleared bar. The smoke SHIP signals (E27 breadth, E29 bankB) BOTH
+  evaporated at full folds -- textbook "never trust smoke" (E24 lesson) reconfirmed.
+  * E27 more_data: breadth GENUINELY IMPOSSIBLE, not a bug. Dataset = 10000 total series; 10-fold x 400 val
+    reserves 4000 => MAX_TRAIN = 6000 = exactly what champion already uses. breadth_10k/MAX both capped to 6000
+    (delta=+0.0000 t=+inf artifact). Smoke's 9920 was artifact of tiny 2-fold(x40) val reservation + unfair
+    300-vs-9920 champ compare. depth_6k_x20 (2x steps/series) delta=+0.0026 t=+0.82 NOISE (matches E7). To get
+    more "breadth" you'd have to shrink val = trade reliability. DATA-SCALE LEVER = DEAD/exhausted.
+  * E26 hazard_target: ramp20 t=+0.68, deweight20 t=+0.59, ramp40 t=-0.50. ALL NOISE. Target-shaping = DEAD.
+  * E28 sequential_detector standalone: cusum 0.5227 (t=-11.60), page_hinkley 0.5202 (t=-10.23), bocpd 0.5427
+    (t=-6.82) -- all FAR below champion 0.5795. Stateful online detectors as standalone rankers = DEAD. (Could
+    add bocpd score as a champion feature, but 0.54-alone is weak + everything else saturated => not worth it.)
+  * E29 lightgbm: A model-swap champion-feats nf=45 t=-2.18 (WORSE), B bank(60)+gain-select t=-1.03 NOISE.
+    Toolchain swap = DEAD => gap is problem-structure not toolchain (confirms hypothesis).
+  CONCLUSION: E26-E29 + E25(bank noise) + 3 reversed marginal feats = OVERWHELMING evidence the trailing-window
+  real-time paradigm is at its CEILING as implemented. Champion E17 ms_60_130_250 (LB 57.50%/214) STANDS as the
+  final submission on this approach. The ~7pt gap to leaders (~64.9%) is the fundamental problem framing (2025
+  known-boundary offline vs 2026 real-time unknown-boundary), NOT any feature/target/data/model tweak. All
+  local levers explored & exhausted. Runner _run_overnight.py + _run_exp_a.py can be deleted (kept for now).
+- NEW DIRECTION (2026-08-13): ENSEMBLE + TUNING + VALIDATION FIX. User rejects "paradigm saturated"; believes
+  a single HGB under-extracts the tested features. Plan: add a DECORRELATED 2nd model (logistic regression;
+  RandomForest later), tune both, blend by weighted proba-average (rank-lift under TS-AUC). Also fix validation.
+- VALIDATION DESIGN (confirmed from _overnight.load_pool): NOT k-fold CV. ONE fixed train set (6000), the
+  held-out 4000 cut into 10 DISJOINT val chunks of 400 => 40% held out (NOT 10%; the 10 is #folds). Train does
+  NOT rotate. Fold assignment = seeded random shuffle, NOT stratified => folds differ in difficulty; the PAIRED
+  t-test (champion+cand on SAME folds) cancels that for comparisons, but absolute AUC is noisy fold-to-fold.
+  SERIES LABEL = (yi.tau_index >= 0) i.e. has a structural break (tau_index=-1 => no break). Enables stratified folds.
+- _ensemble_tune.py (built 2026-08-13): the new harness. Config: train 8000 / val 2000 (20%, down from 40%),
+  10 STRATIFIED folds by break-rate (round-robin pos/neg => each fold break-rate identical, verified 0.500/0.500
+  in smoke). champion_feat = base15 x (60,130,250) = 45 feats, WINDOW=250 (parity with E17 champion). Members:
+  make_hgb(**over) + make_lr(C,class_weight)=Pipeline(StandardScaler,LogisticRegression). Sections: baselines
+  (HGB, LR) -> blend weight-sweep w_lr in {.2,.3,.4,.5} (proba-avg, cached) -> HGB tuning grid (7) -> LR grid (5)
+  -> best-HGB (x) best-LR blend sweep. Reports paired-t vs champion, hardened SHIP bar t>=2.5.
+  KEY EFFICIENCY: precompute_fold computes the 45 val features ONCE per fold (cached); every model only does a
+  cheap predict_proba on the cache => whole run (baselines+grids+blends) is short (feature precompute dominates,
+  ~half an E-series streaming since val=2000). NOT an overnighter.
+  CORRECTNESS PROVEN: fixed an off-by-one (warm-up scores from idx==MIN_N-1, matching _stream_one, not MIN_N).
+  Parity check vs canonical _overnight.fold_auc => max abs diff = 0.0 (EXACT). Smoke ran all sections OK.
+  DO NOT TRUST SMOKE NUMBERS: 300-series smoke gave champion HGB 0.4253 (below random) and LR "beating" it
+  t=+17.59 -- pure undertraining artifact (canonical streaming reproduced same 0.44/0.41). LR is linear on
+  engineered contrast feats; expect it MUCH weaker than HGB at full scale. Only full 10-fold t counts.
+  NEXT: launch full `env PYTHONWARNINGS=ignore .venv/bin/python -u _ensemble_tune.py > _ensemble_tune.log 2>&1`.
+  User constraint: daytime = no big runs; run is short but saturates 15 jobs briefly -> queue for evening or on ok.
+- E30 ENSEMBLE+TUNE FINAL VERDICT (2026-08-13, 5.7 min, _ensemble_tune.log): ALL NOISE/WORSE. Champion HGB
+  mean=0.5674 on the new 80/20 stratified val (2000 val; different design from 0.5795 40%-val, only within-run
+  paired-t comparable). Results vs champion: LR alone 0.5322 t=-4.91 (much weaker); LR grid C{0.1,0.3,1,3}+bal
+  all ~0.531 t~-4.9; HGB grid 7 configs best hgb_msl40 +0.0004 t=+0.33 (DEAD-FLAT, all within +/-0.0004);
+  HGB+LR blend weight-sweep w_lr{.2,.3,.4,.5} ALL <=0 and MONOTONICALLY worse (best w=.2 -0.0006 t=-0.68);
+  best-HGB(msl40) x best-LR(C3.0) blend also <=0 (w=.2 t=-0.01). NOTHING reached even t>=1.5.
+  READ: (1) LR adds NO orthogonal signal -- any blend weight only degrades, so HGB already captures the
+  linearly-separable structure. (2) HGB is at its tuning plateau (flat hill, not under/over-fit). MODEL +
+  ENSEMBLE axis EXHAUSTED. The ceiling is the FEATURE SIGNAL, not the model. RandomForest deferred but
+  expected same (tree ensemble, correlated with HGB). Champion E17 ms_60_130_250 (LB 57.50%/214) STANDS.
+  Logged to README E30 row. This is the LAST untried classical lever on this paradigm.
+- E31 (2026-08-13): SEQUENCE MODEL + PROPER JOINT TUNING. Built _seqmodel.py (torch 2.13.0+cpu installed,
+  CPU). (A) 1D-CNN over raw history-standardized trailing window: window_vec(w,ctx)=clip((w-mu_h)/sd_h,+-8)
+  left-padded to 250 + validity-mask channel => (2,250); trained BCE 14 epochs (loss 0.568->0.418), scored
+  via SAME precompute_fold/score_fold cache path (CNNProba.predict_proba reshapes (N,500)->(N,2,250)) =>
+  apples-to-apples paired-t vs champion HGB on identical folds. RESULT: CNN alone 0.5048 t=-6.62 (WORSE than
+  champion 0.5674); every HGB+CNN blend NEGATIVE (w=.2 t=-2.09 ... w=.6 t=-5.29). Learned-representation lever
+  DEAD: raw short online window is noisier than the 45 engineered window-vs-history contrasts; CNN can't
+  out-extract them. (B) randomized JOINT HGB search (24 configs sampling lr/max_iter/leaves/msl/l2/max_features
+  jointly, reusing champion cache). Best hgb#11 (lr0.047,it300,leaves31,msl40,l2=5.0,mf0.5) hit +0.0035 t=+3.51
+  SHIP(hard) on SEED=42 -- but that was BEST-OF-24 selection bias. _confirm_tune.py re-validated hgb#11 vs
+  champion on 5 INDEPENDENT pool seeds (42/7/123/2024/31337, model random_state fixed): seed42 +0.0035 t=3.51
+  (reproduces), seed7 -0.0006 t=-0.41, seed123 +0.0014 t=0.96, seed2024 +0.0031 t=1.66, seed31337 +0.0004 t=0.26.
+  SUMMARY mean delta +0.0016, positive 4/5, t>=2.5 on 1/5 => VERDICT NOT ROBUST (fold/search luck). Confirms the
+  E30 flat-tuning verdict: no HGB config robustly beats champion. *** LESSON: a best-of-K random search t is
+  SELECTION-BIASED; a single re-run at the SAME seed just reproduces it (deterministic) -- must re-validate the
+  chosen config on INDEPENDENT fold seeds. Proper way to tune = select on MULTI-SEED MEAN delta, not single-seed
+  max. *** Champion E17 STANDS. torch now in venv. _seqmodel.py has a latent bug: precompute_fold empty-fold
+  fallback uses FEAT_DIM=45 so a fold with a <=14-len online series breaks vstack of 500-wide window rows (hit
+  on first launch; avoided when no ultra-short series in folds). Files: _seqmodel.py, _confirm_tune.py.
+  Also SEED-ENSEMBLE test (_seed_ens.py, K=5 champions rs={42,7,123,2024,31337}, avg proba) on 3 pool
+  seeds: seed42 +0.0039 t=2.52, seed7 -0.0011 t=-1.11, seed123 +0.0049 t=4.10. mean +0.0026, positive 2/3
+  => HOLD (not clean across seeds; dips negative on seed7). Principled variance-reduction, best mean of the
+  ship options but still not robust. NOTHING shipped -- champion E17 stands.
+- GPU-VALIDATION SETUP (2026-08-13): user moving validation to a separate GPU box for speed (only torch/CNN
+  benefits; HGB+LGBM are CPU). Added requirements.txt (pinned: numpy2.5.1 pandas3.0.5 scikit-learn1.9.0
+  scipy1.18.0 joblib1.5.3 threadpoolctl3.6.0 lightgbm4.7.0 matplotlib3.11.1 crunch-cli11.10.0; torch NOT
+  pinned there -- install torch==2.13.0 from default PyPI = CUDA build on Linux, or --index-url .../cu124).
+  Added check_env.py (PASS/WARN/FAIL checker: python ver, pkg versions vs baseline, torch build+CUDA+GPU
+  tensor op, data/ files X_train/y_train/y_train_index, harness imports _exp_fast/_overnight/_ensemble_tune;
+  exit0 unless FAIL). Data lives in ./data (DATA=os.path.join(HERE,"data") in _overnight & _exp_fast).
+  Current laptop torch is 2.13.0+CPU so checker WARNs on GPU there -- flips to PASS on the CUDA box.
+- E31 (2026-08-13) SEQUENCE MODEL + PROPER JOINT HGB TUNING. User pushed back on E30's shallow one-axis grid
+  ("tuning should help") + wanted a sequence model. Built _seqmodel.py (1D-CNN over raw std window) + a
+  RANDOMISED JOINT HGB search (24 configs sampling lr x max_iter x max_leaf_nodes x min_samples_leaf x l2 x
+  max_features jointly). Installed torch 2.13.0+cpu (venv). Reuses _ensemble_tune load_pool_strat/folds/
+  precompute_fold/score_fold (same 8000/2000 stratified 10x200 folds, champion baseline 0.5674) for apples-
+  to-apples paired-t. CNN input = std trailing window z=(x-mu_h)/sd_h clipped +/-8, left-padded to 250 +
+  mask channel -> (2,250); reused precompute_fold by passing window_vec as the "feat_fn" (returns flat 500 =
+  2x250), CNNProba wrapper exposes predict_proba so score_fold works unchanged. Labels/warm-up identical.
+  *** KEY RESULT (joint HGB search): hgb#11 mean=0.5709 delta=+0.0035 t=+3.51 SHIP(hard) vs champion 0.5674!
+  Config: learning_rate=0.047, max_iter=300, max_leaf_nodes=31, min_samples_leaf=40, l2=5.0, max_features=0.5.
+  The STANDOUT is max_features=0.5 (per-split COLUMN SUBSAMPLING, champion never used it -> decorrelates trees
+  RF-style) + stronger l2=5.0 + max_iter=300. E30's one-axis grid NEVER tested max_features. Coherent pattern
+  across 24: every high-lr/aggressive config LOST, every low-lr/high-reg config gained -> not obviously a
+  multiple-comparison fluke, but MUST confirm on independent fold seed before spending LB slot (24-way search
+  = multiple testing; hardened rule requires t>=2.5 AND we've been burned by CV->LB before). CAUTION: this t
+  is on the 20%-val stratified design at 8000-train; deployed trains on ALL ~10000 so should transfer >= this.
+  *** BUG FOUND+FIXED: precompute_fold empty-fold fallback hard-coded np.zeros((0,FEAT_DIM=45)); a val series
+  with < MIN_N online points emits 0 rows -> (0,45) block can't vstack with 500-wide window rows -> CNN arm
+  crashed (champion arm never tripped it, rows are 45-wide). FIX (in _ensemble_tune.precompute_fold): infer
+  width from first non-empty part, coerce empty parts to (0,width). Benign for champion (width=45). Re-launched
+  _seqmodel with SKIP_HGB=1 env (skip already-captured 24-config search) to get CNN + HGB-CNN blend. AWAITING.
+  NEXT: (1) read CNN + blend verdict; (2) CONFIRM hgb#11 on independent fold seed(s) -> if t holds >=2.5, wire
+  params into champion streaming_detector.ipynb (trivial: add max_features=0.5,l2=5.0,max_iter=300,msl40 to the
+  HGB config) + user local-test + submit. This is the FIRST clear SHIP-bar signal since E17 multiscale.
+- CAVEAT DISCOVERED (2026-08-13, user pushback): the "saturated" verdict rests on a LOCAL harness that
+  FIXES 6000 train / 4000 val (40% holdout). But deployed train() uses ALL ~10000 series (no val split).
+  => every candidate was validated at 6000-train while production runs at ~10000-train. Features that only
+  earn signal near full data (AR/Hurst/sampen/variance families - high E25 importance but scored noise) get
+  a SYSTEMATIC FALSE-NEGATIVE. So feature levers may NOT actually be dead; the harness may have masked them.
+- FIX 1 (done): streaming_detector.ipynb MAX_TRAIN_SERIES 10000 -> 10**9 (consume ALL platform series, no cap).
+- E30 = true k-fold CV re-validation (_cv_search.py + _bank_feats.py). Real 10-fold CV over ALL ~10000 series:
+  each fold trains on ~9000 (approx deployed) + validates ~1000, rotating (every series validated once).
+  Efficient: per-step feats identical on train/val paths & each series is val in exactly ONE fold -> build
+  cheap sampled training rows once per candidate, refit HGB 10x on row subsets (secs), stream each series once.
+  _bank_feats.py holds IMPORTABLE named builders (champion_feat, feat_ar/hurst/ar_hurst/levene/fligner/mood/
+  sampen/bank_all) - MUST be importable, NOT partials in __main__ (loky workers can't un-pickle __main__ funcs
+  or partials-of-__main__ -> BrokenProcessPool; first attempt failed exactly this way, fixed by moving to module).
+  Candidates: champion(45) vs +ar4/+hurst/+levene/+fligner/+mood/+ar4_hurst/+bank_all/+sampen, paired-t over
+  10 fold TS-AUCs, hardened bar t>=2.5. Incremental _cv_results.tsv (crash-safe), log _cv_search.log.
+  SMOKE (800 series/2 folds) plumbing PASSED for 7/9 (t-values meaningless on 2 folds as always). Champion
+  CV mean lower (~0.52) simply because SMOKE uses tiny data. If any family clears t>=2.5 at FULL 10-fold ->
+  it was masked by the 6000-train harness => wire into champion + user local-test + submit. If all still noise
+  at ~9000-train => feature axis genuinely saturated (verdict then TRUSTWORTHY). NEXT after E30: model tuning
+  (never done - fixed HGB config) then ensembling (seed-average safest, then feature-subset/model diversity).
+  Champion E17 (57.50%/214) stands. LESSON REINFORCED: 2-fold smoke vt_fligner t=15.33 -> 10-fold t=0.42
+  (smoke deltas WORTHLESS; only large-fold t counts). Variance two-sample = DEAD lever (add to list).
+- LOCAL HW: i7-1360P, nproc=16 LOGICAL but only 12 physical cores (4 P hyperthreaded=8thr + 8 E-cores).
+  N_JOBS=15 saturates; NEVER run two 15-job harnesses (30 procs/16thr oversubscribes, skews results).
+- exp_bank_selection.ipynb (Option A) is a RESEARCH/CV notebook (uses _overnight/load_pool on local
+  parquet, NO train()/infer()) -> NOT cloud-submittable. Only streaming_detector.ipynb (champion) is.
+- 2ND-PLACE SOLN ANALYSIS (2026-08-12, Farukcan Saglam aParsecFromFuture, LAST YEAR OFFLINE challenge):
+  pipeline = 6 series TRANSFORMS (z-score, CUMSUM, DENSE RANK, abs, moving avg, moving std) -> stat
+  features (mean/median/std/min/max/skew/autocorr/coeffvar/Q25/Q75) global+periodic + HYPOTHESIS TESTS
+  comparing segments (F-test, LEVENE, KS) + 1 TabPFN feat = 2408 feats -> SHAP top200/500 + LGBM-gain
+  top500 select -> LightGBM. CONVERGENCE: their "most critical part" = TWO-SAMPLE tests (KS/F/Levene)
+  comparing segments = EXACTLY our E21/E22 lever (KS shipped; wass/energy/cvm now). Validates direction.
+  KEY DIFFERENCE: they are OFFLINE with KNOWN boundary -> before-seg vs after-seg tests + ONE pred/series;
+  we are REAL-TIME per-step AUC, unknown boundary -> trailing-window vs history (online analog). Cannot
+  copy pipeline verbatim. UNTAPPED LEVERS THAT FIT US (feature-based, do before models, from their playbook):
+  (E23) SERIES TRANSFORMS before feature extraction = apply our window-vs-history tests on transformed
+  views (CUMSUM amplifies mean shift; DENSE RANK = robust/scale-free; z-score; abs; moving std) -- biggest
+  new representational lever, cheap, straight from winning soln. (E24) proper F-test / LEVENE variance
+  two-sample tests (we only have crude log_var_ratio). (minor) median/coeffvar/min/max descriptors.
+  QUEUE these after E22 LB results. NOTE: TabPFN + SHAP-select + 2408-feat scale is their offline luxury;
+  our per-step streaming budget is tighter but transforms+tests are affordable.
 - E21 BUILT = _twosample.py: champion base15-multiscale (45f, scales 60/130/250) + NONPARAMETRIC
   TWO-SAMPLE distances (trailing sub-window vs history sample ctx["sample_sorted"], std by ctx["sd"]),
   all pure-numpy. Families: wass (W1), energy (2*int(F-G)^2), cvm (mean sq CDF gap, rank-free), mmd
