@@ -615,3 +615,28 @@
 - GPU is useless here: sklearn HGB is CPU-only; infer is single-row streaming predict
   (latency-bound) so GPU boosters (xgb/lgbm/catboost) would be slower, not faster.
   Speed levers are all CPU-side: threadpool_limits(1) + more cores + PREDICT_EVERY.
+
+## GRU 3rd-member line — CLOSED FOR GOOD (2026-08-16). DO NOT REOPEN.
+(README experiment log = E45 GRU, E47 stronger GRU, E48 gating diagnostic, E49 lookahead gate,
+E50 causal gate. Session notes used older provisional numbers E44/E46/E47/E48/E49 for the same work.)
+Champion stays the 2-member ENSEMBLE (tuned HGB + LGBMRanker, BLEND_W=0.6, LB 58.78%). A GRU
+sequence model was explored at length as a 3rd blend member; three independent tests all conclude
+its value is REAL but CAUSALLY UNEXPLOITABLE:
+- (E44/E46) Fixed global weight: GRU as a fixed-weight 3rd member nets ~0. Diagnostic (E47) shows
+  why — the GRU helps ~58% of series (sum +0.098) and hurts ~42% (sum -0.098); winners/losers
+  near-perfectly annihilate, so any single global weight is ~net-zero.
+- (E48) Gated blend with a per-series gate scored +0.0044 and passed fresh-seed confirm (6/6),
+  BUT its separators (onl_len, full-series onl_std, whole-trajectory GRU/agreement stats, AR over
+  full online) use FUTURE points. The task reveals x_online one point at a time (infer yields one
+  score per online point), so scoring step t may use only x_online[:t+1]. The gate was LOOKAHEAD ->
+  not deployable. Caught in-harness before building the notebook (contract check before build).
+- (E49) Causal per-step gate (_gru_gate_causal.py): per-step w_gru(t) from EXPANDING causal
+  separators (member disagreement + GRU confidence, etc.). The causal separators predict the
+  per-step marginal sign BETTER than the lookahead ones (OOF-AUC 0.71 vs 0.66), yet the gate is
+  net-NEGATIVE at every threshold and positive on only 2/6 seeds (thr 0.50 mean_d -0.0010). Reason:
+  the per-row marginal (one series flipped, others held) is a poor proxy for a hard per-step gate
+  that flips MANY series simultaneously — the winner/loser interactions annihilate the gain.
+- LESSON: verify the deployment/causality contract BEFORE building a notebook from a promising
+  harness result; and a good row-level classifier does not imply a good gate under a cross-sectional
+  rank metric. RevIN + AR separators were also dead (scope out). GRU files (_gru_*, _seqtraj.py,
+  _gru_gate*.py, _gru_diag.py) are archival — do not resurrect the GRU as a member.
