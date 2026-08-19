@@ -46,15 +46,44 @@ FRESH_SEEDS = [31337, 2025] if SMOKE else [31337, 2025, 555, 99]
 DENSE_K = 30 if SMOKE else 60
 RESULTS = "_wide_select_results.log"
 
-SPEC = dict(name="ctrl_ar1234", model="ar", orders=[1, 2, 3, 4], scales=[WINDOW])
-NX = _nextra(SPEC)                 # 4
-BASE_NCOL = NCHAMP + NX            # 49  (champion + residual)
+# Re-baselined vs the CURRENT LB champion (E54): multi-scale AR8 residual var-ratio on
+# trailing sub-windows 60/130/250 (not the superseded single-scale AR{1,2,3,4}).
+RESID_SCALES = [60, 130, 250]
+SPEC = dict(name="ar8_ms", model="ar", orders=[8], scales=RESID_SCALES)
+NX = _nextra(SPEC)                 # 3
+BASE_NCOL = NCHAMP + NX            # 48  (champion + multi-scale AR8 residual)
 NLENS = 11                         # transform-lens
 NLOC = 9                           # local-reference
 NEXTRA = NLENS + NLOC              # 20
-NCOMB = BASE_NCOL + NEXTRA         # 69
+NCOMB = BASE_NCOL + NEXTRA         # 68
 
 _EPS = 1e-12
+
+# --- human-readable names for every bank column (for selection reporting) ---
+_BASE15 = ["mean_z", "log_var_ratio", "ks", "skew_diff", "kurt_diff",
+           "ac1_diff", "ac2_diff", "iqr_ratio", "tail2", "tail3",
+           "zero_cross", "slope_norm", "spec_centroid_diff", "rng_ratio", "spec_entropy"]
+_LENS11 = ["cusum_maxabs", "cusum_end", "cusum_range", "pit_mean_dev", "pit_std", "pit_ks",
+           "abs_mean_ratio", "abs_var_ratio", "rollstd_level", "rollstd_cv", "levene_f"]
+_LOC9 = [f"loc{L}_{s}" for L in (30, 60, 120) for s in ("mz", "lvr", "ks")]
+
+
+def _build_names():
+    names = []
+    for s in (60, 130, 250):
+        names += [f"ch{s}_{k}" for k in _BASE15]      # 0-44 champion
+    names += [f"ar8res_s{s}" for s in RESID_SCALES]   # 45-47 multi-scale AR8 residual
+    names += _LENS11                                   # 48-58 transform-lens
+    names += _LOC9                                     # 59-67 local-reference
+    return names
+
+
+FEATURE_NAMES = _build_names()
+assert len(FEATURE_NAMES) == NCOMB, (len(FEATURE_NAMES), NCOMB)
+
+
+def _names(cols):
+    return [FEATURE_NAMES[c] for c in cols]
 
 
 def log(msg):
@@ -165,20 +194,32 @@ def _configs(gain, shap):
         return np.array(sorted(set(a.tolist()) | set(b.tolist())))
 
     return {
-        "all69":      np.arange(NCOMB),
+        "all68":      np.arange(NCOMB),
         "gain40":     np.sort(order_g[:40]),
         "gain55":     np.sort(order_g[:55]),
         "shap40":     np.sort(order_s[:40]),
         "shap55":     np.sort(order_s[:55]),
         "union_40":   uni(order_g[:40], order_s[:40]),
+        "champ_ex4":  uni(champ, eg[:4]),
         "champ_ex8":  uni(champ, eg[:8]),
         "champ_ex15": uni(champ, eg[:15]),
     }
 
 
+def _extras_by_gain(gain):
+    """Indices of the 20 extra (lens+local) columns ranked by descending gain."""
+    extras = np.arange(BASE_NCOL, NCOMB)
+    return extras[np.argsort(-gain[extras])]
+
+
 def run_phase(seeds, phase):
+    from collections import Counter
     store = {}
     base_cols = np.arange(BASE_NCOL)
+    sel_rows = []                 # (seed, top4_names, top8_names)
+    cnt8 = Counter()              # how often each extra lands in the gain-top-8
+    cnt4 = Counter()              # ... and in the gain-top-4
+    gain_accum = {}               # extra name -> list of gain values across seeds
     for seed in seeds:
         t0 = time.time()
         ET.SEED = seed
@@ -199,15 +240,27 @@ def run_phase(seeds, phase):
         base = _eval(base_cols, Xtr, ytr, Rr, Rl, Rt, caches, y_val, seed)
         gain, shap = _importances(Xtr, ytr, seed)
         cfgs = _configs(gain, shap)
+
+        eg = _extras_by_gain(gain)
+        top8, top4 = _names(eg[:8]), _names(eg[:4])
+        sel_rows.append((seed, top4, top8))
+        for nm in top8:
+            cnt8[nm] += 1
+        for nm in top4:
+            cnt4[nm] += 1
+        for c in np.arange(BASE_NCOL, NCOMB):
+            gain_accum.setdefault(FEATURE_NAMES[c], []).append(float(gain[c]))
         log(f"[{phase} seed {seed}] champion base={base.mean():.4f} ({time.time()-t0:.0f}s, "
-            f"{BASE_NCOL} cols); extras-by-gain top5={np.argsort(-gain)[:5].tolist()}")
+            f"{BASE_NCOL} cols)")
+        log(f"    gain-top4 extras = {top4}")
+        log(f"    gain-top8 extras = {top8}")
 
         for name, cols in cfgs.items():
             store.setdefault(name, [])
             try:
                 aug = _eval(np.asarray(cols), Xtr, ytr, Rr, Rl, Rt, caches, y_val, seed)
-                md, _s, t, _ = paired(aug, base)
-                store[name].append((md, t))
+                md, _s, t, d = paired(aug, base)
+                store[name].append((md, t, np.asarray(d)))
                 log(f"  [{phase} s{seed}] {name:<11} {len(cols):>2}c aug={aug.mean():.4f} "
                     f"d={md:+.4f} t={t:+.2f}")
             except Exception:
@@ -217,11 +270,29 @@ def run_phase(seeds, phase):
     for name, dt in store.items():
         if not dt:
             continue
-        ds = [d for d, _t in dt]
-        ts = [t for _d, t in dt]
+        ds = [d for d, _t, _a in dt]
+        ts = [t for _d, t, _a in dt]
+        dd = np.concatenate([a for _d, _t, a in dt])          # pooled per-fold diffs
+        sd = float(dd.std(ddof=1))
+        t_agg = float(dd.mean() / (sd / np.sqrt(len(dd)))) if sd > 0 else float("inf")
         out[name] = (float(np.mean(ds)), float(min(ds)), sum(1 for d in ds if d > 0),
-                     float(min(ts)), len(ds))
-    return out
+                     float(min(ts)), len(ds), t_agg, [float(t) for t in ts])
+    sel = {"rows": sel_rows, "cnt8": cnt8, "cnt4": cnt4, "gain": gain_accum, "nseeds": len(seeds)}
+    return out, sel
+
+
+def _log_selection(phase, sel):
+    ns = sel["nseeds"]
+    log(f"\n----- {phase}: extras selected per seed -----")
+    for seed, e4, e8 in sel["rows"]:
+        log(f"  s{seed:<6} top4={e4}")
+        log(f"  s{seed:<6} top8={e8}")
+    mean_gain = {nm: float(np.mean(v)) for nm, v in sel["gain"].items()}
+    log(f"\n----- {phase}: extra representation across {ns} seeds (times in gain-top-K) -----")
+    log(f"  {'feature':<16} {'top4':>5} {'top8':>5}  {'mean_gain':>10}")
+    for nm in sorted(mean_gain, key=lambda n: -mean_gain[n]):
+        log(f"  {nm:<16} {sel['cnt4'][nm]:>5} {sel['cnt8'][nm]:>5}  {mean_gain[nm]:>10.1f}")
+
 
 
 def verdict(mean_d, min_d, npos, min_t, n):
@@ -230,34 +301,45 @@ def verdict(mean_d, min_d, npos, min_t, n):
     return "pos" if npos == n and mean_d > 0 else "noise"
 
 
+def _fmt_ts(tlist):
+    return "[" + ", ".join(f"{t:+.2f}" for t in tlist) + "]"
+
+
+def _summary(title, res, only=None):
+    log(f"\n----- {title} -----")
+    for name in sorted(res, key=lambda n: -res[n][0]):
+        if only is not None and name not in only:
+            continue
+        md, mind, npos, mint, n, tagg, tlist = res[name]
+        v = verdict(md, mind, npos, mint, n)
+        log(f"{name:<11} mean_d {md:+.4f} min_d {mind:+.4f} pos {npos}/{n} "
+            f"t_agg {tagg:+.2f} min_t {mint:+.2f} t_seeds {_fmt_ts(tlist)} -> {v}")
+
+
 def main():
     log(f"\n===== WIDE-BANK+SELECT campaign {datetime.now():%F %T} (smoke={SMOKE}) =====")
-    log(f"bank={NCOMB} cols (champ49 + lens11 + local9); re-baselined vs champion ({BASE_NCOL}); "
+    log(f"bank={NCOMB} cols (champ{BASE_NCOL} [45 champion + AR8-ms residual {NX}] + lens{NLENS} "
+        f"+ local{NLOC}); re-baselined vs NEW multi-scale AR8 champion ({BASE_NCOL}); "
         f"screen {SEARCH_SEEDS}")
-    screen = run_phase(SEARCH_SEEDS, "SCREEN")
+    screen, sel_s = run_phase(SEARCH_SEEDS, "SCREEN")
+    _log_selection("SCREEN", sel_s)
 
-    log("\n----- SCREEN SUMMARY (search seeds) -----")
-    promising = []
-    for name in sorted(screen, key=lambda n: -screen[n][0]):
-        md, mind, npos, mint, n = screen[name]
-        v = verdict(md, mind, npos, mint, n)
-        log(f"{name:<11} mean_d {md:+.4f} min_d {mind:+.4f} pos {npos}/{n} min_t {mint:+.2f} -> {v}")
-        if npos == n and md >= 0.0015:
-            promising.append(name)
+    _summary("SCREEN SUMMARY (search seeds)", screen)
+    promising = [name for name in screen
+                 if screen[name][2] == screen[name][4] and screen[name][0] >= 0.0015]
 
     if promising:
-        log(f"\nfresh-confirming {len(promising)} configs on {FRESH_SEEDS}: {promising}")
-        fresh = run_phase(FRESH_SEEDS, "FRESH")
-        log("\n----- FRESH CONFIRM SUMMARY -----")
-        for name in sorted(fresh, key=lambda n: -fresh[n][0]):
-            if name not in promising:
-                continue
-            md, mind, npos, mint, n = fresh[name]
-            log(f"{name:<11} mean_d {md:+.4f} min_d {mind:+.4f} pos {npos}/{n} min_t {mint:+.2f} "
-                f"-> {verdict(md, mind, npos, mint, n)}")
+        log(f"\nfresh-confirming {len(promising)} configs on {FRESH_SEEDS}: {sorted(promising)}")
+        fresh, sel_f = run_phase(FRESH_SEEDS, "FRESH")
+        _log_selection("FRESH", sel_f)
+        _summary("FRESH CONFIRM SUMMARY", fresh, only=set(promising))
     else:
         log("\nno config screened promising; nothing to fresh-confirm.")
     log(f"===== WIDE-BANK+SELECT DONE {datetime.now():%F %T} =====")
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":
