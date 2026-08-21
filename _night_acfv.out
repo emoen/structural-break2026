@@ -1,0 +1,12 @@
+
+===== TASK1 ACF-VECTOR gate 2026-08-21 11:13:17 smoke=False =====
+[SCREEN seed 42] b_no_accf base=0.6216 (432s)
+  [SCREEN s42] acfv  aug=0.6195  d=-0.0021  t=-1.71
+[SCREEN seed 7] b_no_accf base=0.6211 (357s)
+  [SCREEN s7] acfv  aug=0.6169  d=-0.0042  t=-2.13
+[SCREEN seed 123] b_no_accf base=0.6307 (361s)
+  [SCREEN s123] acfv  aug=0.6273  d=-0.0034  t=-1.02
+
+----- SCREEN: acfv mean_d=-0.0032 min_d=-0.0042 npos=0/3 min_t=-2.13 -> noise -----
+
+===== TASK1 VERDICT: noise =====

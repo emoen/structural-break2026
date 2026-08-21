@@ -1,0 +1,10 @@
+Persistence @W=130  folds=10  raw mean=0.5742
+variant          mean     delta       t  verdict
+raw            0.5742        --      --  baseline
+half_ewma30    0.5757   +0.0015   +9.06  SHIP
+ewma30         0.5763   +0.0021   +7.57  SHIP
+ewma10         0.5782   +0.0040   +4.98  SHIP
+half_cummax    0.5852   +0.0110   +1.82  promising
+ph_eviden      0.5794   +0.0053   +0.90  noise
+cummax         0.5758   +0.0016   +0.18  noise
+expmean        0.5733   -0.0008   -0.22  noise
