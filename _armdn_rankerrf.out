@@ -1,0 +1,20 @@
+=== AR-RESIDUAL DENSITY-RATIO 3rd-member probe on ranker+rf base79  2026-08-29 07:11:03  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship_scales=(40, 100, 250)
+NCOL=79 KQ=32 mlp={'hidden_layer_sizes': (64, 32), 'activation': 'relu', 'alpha': 0.001} max_iter=300  arms=[0.1, 0.2, 0.3]
+[affine-check] qrow maxdiff under x->3.7x+5.2: 3.89e-13  (nonzero 32/32)
+  [cache] seed 42 built in 1067s  Xtr(79037, 79) Qtr(79037, 32) Rr(311156, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_armdn_cache/seed_42.pkl
+[seed 42] base79 (w_mdn=0) ranker+rf = 0.6323  (228s)
+[seed 42] wmdn0.10 0.6306  d=-0.0017  (1s)
+[seed 42] wmdn0.20 0.6265  d=-0.0058  (1s)
+[seed 42] wmdn0.30 0.6196  d=-0.0126  (1s)
+  [cache] seed 7 built in 506s  Xtr(79113, 79) Qtr(79113, 32) Rr(311442, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_armdn_cache/seed_7.pkl
+[seed 7] base79 (w_mdn=0) ranker+rf = 0.6247  (245s)
+[seed 7] wmdn0.10 0.6238  d=-0.0009  (1s)
+[seed 7] wmdn0.20 0.6209  d=-0.0039  (1s)
+[seed 7] wmdn0.30 0.6155  d=-0.0092  (1s)
+  [cache] seed 123 built in 510s  Xtr(79068, 79) Qtr(79068, 32) Rr(311143, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_armdn_cache/seed_123.pkl
+[seed 123] base79 (w_mdn=0) ranker+rf = 0.6389  (232s)
+[seed 123] wmdn0.10 0.6380  d=-0.0010  (1s)
+[seed 123] wmdn0.20 0.6343  d=-0.0046  (1s)
+[seed 123] wmdn0.30 0.6273  d=-0.0116  (1s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_armdn_rankerrf_summary.txt

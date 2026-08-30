@@ -1,0 +1,32 @@
+=== SCALE re-sweep on ranker+rf ship base  2026-08-26 08:56:44  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=73 NCOL=149 ship_scales=(60, 130, 250) probe_scales=[40, 90, 160, 190]
+candidates=['add40_ship', 'add90_ship', 'add160_ship', 'add190_ship', 'add40_full', 'add90_full', 'add160_full', 'add190_full']
+[seed 42] base73 ranker+rf = 0.6263  (162s)
+[seed 42] add40_ship       0.6266  d=+0.0003  (171s)
+[seed 42] add90_ship       0.6267  d=+0.0004  (172s)
+[seed 42] add160_ship      0.6261  d=-0.0002  (174s)
+[seed 42] add190_ship      0.6266  d=+0.0003  (180s)
+[seed 42] add40_full       0.6256  d=-0.0007  (205s)
+[seed 42] add90_full       0.6268  d=+0.0005  (204s)
+[seed 42] add160_full      0.6261  d=-0.0002  (218s)
+[seed 42] add190_full      0.6257  d=-0.0006  (222s)
+[seed 7] base73 ranker+rf = 0.6228  (171s)
+[seed 7] add40_ship       0.6226  d=-0.0002  (182s)
+[seed 7] add90_ship       0.6207  d=-0.0021  (181s)
+[seed 7] add160_ship      0.6221  d=-0.0008  (183s)
+[seed 7] add190_ship      0.6218  d=-0.0011  (170s)
+[seed 7] add40_full       0.6223  d=-0.0006  (205s)
+[seed 7] add90_full       0.6228  d=-0.0000  (202s)
+[seed 7] add160_full      0.6218  d=-0.0010  (198s)
+[seed 7] add190_full      0.6200  d=-0.0028  (196s)
+[seed 123] base73 ranker+rf = 0.6361  (156s)
+[seed 123] add40_ship       0.6353  d=-0.0008  (169s)
+[seed 123] add90_ship       0.6344  d=-0.0017  (186s)
+[seed 123] add160_ship      0.6344  d=-0.0017  (182s)
+[seed 123] add190_ship      0.6338  d=-0.0022  (168s)
+[seed 123] add40_full       0.6349  d=-0.0011  (214s)
+[seed 123] add90_full       0.6346  d=-0.0015  (222s)
+[seed 123] add160_full      0.6344  d=-0.0017  (222s)
+[seed 123] add190_full      0.6360  d=-0.0001  (220s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_scalesweep_rankerrf_summary.txt

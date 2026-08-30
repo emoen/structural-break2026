@@ -1,0 +1,9 @@
+# repr bank on ranker+rf ship base  2026-08-25 16:20:02
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+# base73 UNCHANGED; cep=IFFT(log|FFT|^2) low-quefrency, higuchi=fractal-dim, vs full-history
+# RELAXED gate: any mean_d>0 is a candidate; rank by mean_d
+
+candidate             mean_d     min_d     max_d   npos
+higuchi             -0.00022  -0.00058  +0.00040   1/3
+cep                 -0.00083  -0.00237  +0.00146   1/3
+repr_all            -0.00253  -0.00362  -0.00095   0/3

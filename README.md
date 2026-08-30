@@ -128,7 +128,23 @@ decisively **noise**. The harness would have rejected split *before* submitting 
 | E68 | **Cross-sectional calibration bank (lever #2) — studentize / rank every champion feature against the series' own null** *(laptop lane, `_night_calib.py` + `_night_banks.py` calib bank; the checkpoint below's lever #2)* — the TS-AUC metric ranks series **against each other** at every online step, so a raw champion feature only helps in so far as a fixed value means the same thing across series; a noisy series has a wider null band of `mean_z`/`log_var_ratio` than a clean one, so a fixed GBT threshold is not comparable. Generalizes the E62 studentized AR8-residual win (+0.90 LB — one instance of exactly this idea) to the **full 51-col champion base row**: for each series build a null band of each feature from 20 sliding **pre-break** windows (same `champ_base_row`, window-vs-full-history, as online), then emit two calibrated readouts of the online row — a studentized **z** `(val−null_μ)/null_σ` ("k-σ above THIS series' own null") and an empirical **null-CDF rank** in [0,1] (rank-normalized, null-shape robust). 7 configs on top of the shipped 61-col champion: `z_scaleshift`(6)/`z_core`(15)/`z_resid`(6)/`z_all`(51), `rank_core`(15), `zr_core`(30), `all`(102). Screen {42,7,123} → fresh {31337,2025,555,99}, shipped 0.6/0.4 blend (`_eval`). No new per-step compute — calib readouts re-use the already-computed base row. | **NO ship — directionally positive but sub-threshold (first all-7-seed-positive since E62)** | `g_z_all` (all 51 **studentized** features) is positive on **7/7 seeds** (SCREEN +0.0037 3/3 min_t +1.15; FRESH +0.0019 4/4 min_t +0.03) — the first lever since E62 to hold sign on every seed, so per-series z-calibration has *real* merit. But magnitude is nibble-scale (~+0.0028 avg → ~+0.3 pt) with min_t ≈ 0, **far below the hardened t≥2.5 ship bar** (marginal features are 0-for-3 on LB reversals: perm_entropy/wass/cvm). Two clean sub-findings: (1) the **rank** readout *hurts* — adding it drops `g_all` to 3/4 noise and every rank/`zr` config is noise; the studentized **z** carries all the signal. (2) The **whole beats the parts** — `z_all`(51) > every curated subset (`z_core`/`z_scaleshift`/`z_resid` all noise on fresh), so the calibration helps broadly-but-weakly per feature, not as a concentrated new statistic. Calib bank + `champ_calib` mode retained in `_night_banks.py`/`_night_stack.py` for the refinement pass. || E69 | **Robust z-only calibration refinement (lever #2, E68 follow-up)** *(laptop lane, `_night_calibz.py` + `_night_banks.py` calibz bank)* — E68's studentized-z was positive 7/7 but sub-threshold; two refinements aimed to lift `t` over the bar by cutting per-seed noise (not adding features): (1) **z-only** (drop the null-CDF rank readout, E68-confirmed harmful); (2) a **better null estimate** — 32 sliding pre-break windows (up from 20) and a **robust** center/scale (median / 1.4826·MAD instead of mean/sd) that the heavy-tailed champion features don't drag. The bank emits both readouts (`z_meansd` and `z_robust`) so one run isolates the estimator. 5 configs on the 61-col champion: `zms_all`(51 mean/sd z @32w), `zr_all`(51 robust z), `zr_core`(15)/`zr_scaleshift`(6), `zms_zr`(102). Screen {42,7,123} → fresh {31337,2025,555,99}, shipped 0.6/0.4 blend. | **NO ship — both refinements failed; calibration confirmed at the noise floor** | SCREEN: only `g_zms_all` (mean/sd z @32w) passed (+0.0018 3/3, min_t +0.01); **every robust `g_zr_*` config is noise** (2/3) — median/MAD is *worse*, not better. FRESH: `g_zms_all` +0.0011 **3/4** (flips −0.0014 on seed 555), min_t −0.32 → noise — *worse* than E68's 20-window z (which held 4/4 fresh +0.0019), so more windows did not stabilize it. **Conclusion:** the per-series calibration signal is genuinely at the noise floor and cannot be lifted over the t-bar by estimator tweaks (robustness, more windows). Calibration (lever #2) is real-but-unshippable; axis closed for shipping. |
 | E70 | **Hyperparameter + blend-weight search on the champion** *(laptop lane, `_night_hp.py`)* — the shipped HGB params (`TUNED`) were fixed at E32 on the *old* 45-col feature set, and `w=0.6` predates the residual + dependence features; re-open both on the current 61-col set. Search a 9-config HGB grid (one-knob perturbations of lr / iter / leaves / min-leaf / l2 / max-features) × blend weight `w∈{0.50…0.70}` on two column sets — `base61` (pure re-tune) and `aug` (base61 + the `z_meansd` calib block) — ranker fit once per set, each HGB fit once, w-sweep free over cached fixed-CDF percentiles; every cell paired vs the shipped champion. Screen {42,7,123} → fresh {31337,2025,555,99}. | **NO ship — champion HGB + blend weight already near-optimal** | (1) **Pure HGB re-tune is dead** — not a single `base61` cell made the screen top-20; the E32 `TUNED` params are still best on the 61-col set. (2) **Blend weight**: `w=0.50–0.55` edged 0.60 on screen but fresh survivors span 0.55/0.60 within noise → keep `w=0.6`. (3) The only 4/4-fresh cells are all `aug` (base61 + calib): `l2_3\|w0.55` +0.0020, `leaf31\|w0.50` +0.0019, `l2_3\|w0.60` +0.0019 — all **min_t ≈ 0.01–0.07**, the same sub-threshold calib nibble as E68 (+0.0019 4/4), reproduced independently 2×. ~+0.2 pt directional at t≈0, far below the t≥2.5 bar. Re-tune axis closed. |
 | E71 | **Architecture exploration — calib-specialist member, model diversity, meta-learners** *(laptop lane, `_night_arch.py`, `eval_stack` leak-free series-CV OOF)* — open-ended search for an architecture that beats the shipped 2-member fixed-CDF blend, using the E69/E70 `z_meansd` calib block. 5 stacks vs the shipped champion: `A` {hgb, rank, hgb-on-calib} + mean (calib **specialist** member), `B` same + logit (meta-learner), `C` {hgb, rank}@aug + mean (feature-fusion), `D` {hgb, rank} + logit (learn the blend weight), `E` {hgb, rank, extratrees@aug} + logit (model diversity + meta). Screen {42,7,123} → fresh. | **NO ship — all architectures underperform the fixed blend (clean negative)** | Every stack failed screen, none promising → no fresh run. `C_fuse_aug_mean` +0.0003 2/3 (best, = the known calib nibble); `A_calib_spec_mean` −0.0025 0/3 (calib specialist **hurts**); `E_diverse_logit` −0.0039 0/3; `B_calib_spec_logit` −0.0053 0/3; **`D_blend_logit` −0.0055 0/3, min_t −4.11** — the strongest signal in the run: replacing the fixed 0.6/0.4 blend with a *learned* logit meta is decisively worse. Reconfirms **meta-learners hurt vs the fixed-CDF blend** (also E63/E64) and that the 2-member blend is near-optimal. Architecture / stacking / meta axis closed. |
-| E72 | **Target / aggregation head (lever #3) — reshape the learning target around the break onset** *(laptop lane, `_night_head.py`; the checkpoint's last open lever)* — every prior experiment reshaped **features**; this one leaves the shipped 61-col champion features UNCHANGED and reshapes the **training target / sample-weighting** so the per-step classifier concentrates decision capacity on the early post-break offsets where the metric is still movable. 7 heads vs the shipped unit-weight classifier (`ctrl`): **sample-weight early-emphasis** `we_a{2,4,1}s{20,12,40}` (positives weighted `1+A·exp(−o/S)`, `o=t−τ`), **boundary-emphasis** `wb_a2s15` (`1+A·exp(−|o|/S)`), **soft hazard target** `haz_s20` (HGB-regressor on `1−exp(−max(o,0)/20)`), **linear ramp** `ramp_h40` (regressor on `clip(o/40,0,1)`, E26 re-baseline). No-break series get a `−1e9` offset sentinel (excluded from early up-weight). Screen {42,7,123}, shipped 0.6/0.4 blend. Companion EDA `eda_score_improvement.ipynb §6c` swept the detectability curve at **every** post-break offset 1–50 (pooled champion 5-fold OOF AUC) to locate the elbow the head should center on. | **NO ship — the target-head axis is saturated; last lever closed, champion stays 62.48%** | On full data **no head clears the promote gate** (≥0.0015 & all-pos): best `haz_s20` mean_d **+0.0007, 3/3 pos but min_t +0.04** (basically zero); `ramp_h40` +0.0003 2/3; every sample-weight early-emphasis head is **negative** (`we_a2s20` −0.0016 0/3, `we_a4s12` −0.0023 0/3 — up-weighting just-after-τ rows *hurts*, echoing E26). (SMOKE's +0.008 deltas were reduced-100-series artifacts — meaningless.) **Independent convergence:** the §6c elbow EDA (K_PER=80, smoothed) puts the detectability elbow at **~21 post-break points** (AUC ~0.55→0.80 by ~20, plateau ~0.89 by ~38) — and `haz_s20` (hazard scale S=20, sitting exactly on that elbow) was the *only* head positive on all 3 seeds. So the geometry analysis and the harness agree on *where* the information is, but there is **no exploitable head-room there**: the fixed-CDF blend on the shipped features already extracts what the early offsets afford. Lever #3 (target/aggregation head) **CLOSED** — all three checkpoint levers now exhausted; champion `b_no_accf` remains at LB **62.48%** (rank 61). |
+| E72 | **Target / aggregation head (lever #3) — reshape the learning target around the break onset** *(laptop lane, `_night_head.py`; the checkpoint's last open lever)* — every prior experiment reshaped **features**; this one leaves the shipped 61-col champion features UNCHANGED and reshapes the **training target / sample-weighting** so the per-step classifier concentrates decision capacity on the early post-break offsets where the metric is still movable. 7 heads vs the shipped unit-weight classifier (`ctrl`): **sample-weight early-emphasis** `we_a{2,4,1}s{20,12,40}` (positives weighted `1+A·exp(−o/S)`, `o=t−τ`), **boundary-emphasis** `wb_a2s15` (`1+A·exp(−|o|/S)`), **soft hazard target** `haz_s20` (HGB-regressor on `1−exp(−max(o,0)/20)`), **linear ramp** `ramp_h40` (regressor on `clip(o/40,0,1)`, E26 re-baseline). No-break series get a `−1e9` offset sentinel (excluded from early up-weight). Screen {42,7,123}, shipped 0.6/0.4 blend. Companion EDA `eda_score_improvement.ipynb §6c` swept the detectability curve at **every** post-break offset 1–50 (pooled champion 5-fold OOF AUC) to locate the elbow the head should center on. | **NO ship — the target-head axis is saturated; last lever closed, champion stays 62.48%** | On full data **no head clears the promote gate** (≥0.0015 & all-pos): best `haz_s20` mean_d **+0.0007, 3/3 pos but min_t +0.04** (basically zero); `ramp_h40` +0.0003 2/3; every sample-weight early-emphasis head is **negative** (`we_a2s20` −0.0016 0/3, `we_a4s12` −0.0023 0/3 — up-weighting just-after-τ rows *hurts*, echoing E26). (SMOKE's +0.008 deltas were reduced-100-series artifacts — meaningless.) **Independent convergence:** the §6c elbow EDA (K_PER=80, smoothed) puts the detectability elbow at **~21 post-break points** (AUC ~0.55→0.80 by ~20, plateau ~0.89 by ~38) — and `haz_s20` (hazard scale S=20, sitting exactly on that elbow) was the *only* head positive on all 3 seeds. So the geometry analysis and the harness agree on *where* the information is, but there is **no exploitable head-room there**: the fixed-CDF blend on the shipped features already extracts what the early offsets afford. Lever #3 (target/aggregation head) **CLOSED** — all three checkpoint levers now exhausted; champion `b_no_accf` remains at LB **62.48%** (rank 61). *(Probe, user override of the gate: `haz_s20` shipped into `streaming_detector_depearly.ipynb` — HGB member swapped classifier→**regressor on the soft hazard target `1−exp(−max(t−τ,0)/20)`**, ranker/blend/features unchanged; harness says ~parity (base 0.6216 → 0.6217/0.6216/0.6321). Awaiting LB read; revert = classifier on binary label if it regresses.)* |
+
+| E73 | **Stack consolidation to ranker+rf, then relaxed-gate feature re-screen on that base** *(laptop lane, `_rankerrf_vs_champ.py` + `_night_rankerrf.py` + new families `_screen_feats.py`)* — post-mortem of the 4-member stack4 (sub 75175, **LB 62.59% ~73rd**, only +0.11 pt over depearly 62.48%): on cached 7-seed OOF the **2-member ranker+rf (0.45/0.55) = 0.6251, +0.0016 vs champ, 7/7 seeds — equals the full 4-member stack**; hgb weight→0, xgb/catboost add nothing, **rf carries the whole gain** (broad plateau ranker .30–.55 / rf .70–.45). So drop hgb/xgb/catboost. Then re-screen the **entire `_feat_lib` battery + new families on the ranker+rf blend** (a different base than the HGB every feature was rejected on), RELAXED gate (rank by mean_d, flag any mean_d>0, no t>2), reduced recipe (rf 500, dense_k 40), seeds {42,7,123}, winners to re-confirm at full recipe on fresh seeds. New families (`_screen_feats.py`, real-time-legal `(w,ctx)->list`, multiscale): `cov` (std/mean), **`magic` = std²/mean** (the ADIA25 Hong&Gu "magic feature" `mul_cv_whole_std_whole`, LB 88.62% offline — a `mul` interaction GBDTs can't synthesize from axis splits), `lz` (LZ76 vs history), `mosum` (moving-variance burst), `ssa` (top singular-mode share). | **NO ship — relaxed-gate re-screen is a WASH; the ranker+rf *consolidation* (drop hgb/xgb/catboost) is the only keeper** — first run crashed on a `combo_spectral`→`spec_entropy` KeyError (base-resident key had no slice); fixed `cand_cols` to skip base keys + added the `std²/mean` `magic` family (the earlier `cov`=std/mean was the *wrong* form). **3-seed aggregate (final, seeds {42,7,123}):** the whole battery is saturated on ranker+rf just like on HGB — only **`perm_entropy4` (+0.00055, 3/3)** and **`max_split_lr` (+0.00014, 3/3)** are positive on all seeds, both far below the ~`+0.008→+1 pt` ship bar and inside our 0-for-3 marginal-feature LB-reversal record → not shippable. `mosum` collapsed to +0.00107 (2/3; the seed-42 +0.0034 was an outlier). **The `magic` std²/mean feature is NOISE here (−0.00032, 1/3, signs flip ±0.004)** — an offline known-boundary interaction that does not transfer to the real-time unknown-boundary task; `cov` (−0.0034), `ssa` (−0.0027), `lz` (−0.0009), `new_all` (−0.0017) all negative. **Keeper = the 2-member ranker+rf blend (== full stack, +0.0016 7/7); next step is rf→ONNX + ship the 2-member notebook, no new features.** |
+
+| E74 | **Ship the 2-member ranker+rf with the joint-confirmed `perm_entropy4`+`max_split_lr`+`mosum` block** *(laptop lane, `_rankerrf_ship.py` joint-confirm + isolation, `_build_rankerrf_nb.py` → `streaming_detector_rankerrf.ipynb`)* — E73 judged the re-screen a wash on **individual** deltas, but features are **not additive**: a joint confirm on the ranker+rf blend (0.45/0.55, full recipe, seeds {42,7,123}) shows the three weak/inconsistent singles combine into the strongest, most consistent gain found. 3-seed isolation vs base=0.62503: `+perm4` +0.00055 (t=4.39, 3/3); `+mosum` +0.00107 (t=0.92, **2/3** — the seed-42 +0.0034 spike drives it, negative on seed 123, so unreliable alone); `+perm4+mosum` +0.00139 (t=1.67, 3/3); **`+perm4+maxlr+mosum` = 0.62725, +0.00222 (t=5.88, 3/3)** — highest score/mean/t, all seeds positive. `maxlr` (weak +0.00014 alone, and it *dilutes* perm4 when mosum is absent) becomes the piece that lights up seeds 7 & 123 once mosum is present. Built the ship notebook as a TRIM of stack4 (drop hgb/xgb/catboost, keep the ONNX-rf plumbing) + the +12-col ship block (3 families × 3 MS scales), blend ranker .45 / rf .55. | **SHIP candidate (not yet submitted) — `streaming_detector_rankerrf.ipynb`, expected ~+0.25 pt over the 62.503 ranker+rf base** — smoke (`_smoke_rankerrf.py`): feature dim **73** (61 champ + 12 ship), 2 members (ranker + rf→ONNX 14.7 MB), infer valid (0 NaN), **deterministic** (max\|Δ\| pass1-pass2 = 0), **2.22 ms/point**. Lesson: confirm feature sets **jointly**, never by summing individual deltas — mosum (untrustworthy solo) is essential in-combo, and the "top" single-feature winners (perm4/maxlr) are weaker than the trio. Awaiting manual submit for LB confirmation of the +0.0022 offline gain. **[2026-08-25 UPDATE — first cloud submit FAILED with an OOM during `infer` (worker exit 1).** Root cause (`_measure_rf_mem.py`, full-data 73-feat 800-tree RF): each ONNX-RF worker transiently spikes to **~11–12.5 GB PEAK RSS while onnxruntime builds the TreeEnsemble session** (settling to ~3 GB steady). crunch spawns all workers at once so their build peaks coincide; the inherited `_PER_WORKER_GB=3.7` (a *steady-state* figure) over-provisioned 15 workers → 15×~12 GB → OOM-kill. Peak is ~11 GB regardless of tree count (500 vs 800), so shrinking the forest doesn't help the peak. **Fix:** size `INFER_PARALLELISM` to the build PEAK — `_PER_WORKER_GB=12.5` → **4 workers on 64 GB** (was 15). Rebuilt + re-verified (train/infer intact, INFER_PARALLELISM=2 on the 30.5 GB laptop / 4 on 64 GB). Re-submit pending.]** |
+
+| E75 | **Reference-span mining on the ranker+rf 73-col ship base → ship `trail60`+`trail200`** *(laptop lane, `_refspan_rankerrf.py`; parallel nulls `_scalesweep_rankerrf.py`, `_asym_rankerrf.py`)* — the residual lens fits AR8 on a history slice and reports `log(var(window_resid)/refvar)` per MS scale; the **span** = which slice the reference is fit on. Ship base already carried 2 spans (full history + `trail120`, E54). E58 swept span length on the OLD HGB base and found saturation — re-opened on the ranker+rf base (different RF split geometry). Each span adds +3 cols (one per scale 60/130/250). RELAXED gate, seeds {42,7,123}, rf500/dense40. **Results:** `trail60+trail200` **+0.00282 mean_d, 3/3** (min +0.00136) `<== WIN`; `gap120+trail60` +0.00236 3/3; `trail300` +0.00228 3/3; single spans weak/negative (`trail160` −0.00283 0/3 worst) — the gain comes from **pairing a short + long recency reference**, not any single length. Parity arms `ar6/ar10/ar12` (odd/even AR-order Q) came out **flat** (ar6 +0.0004 2/3, ar10 −0.0009 0/3, ar12 +0.0005 2/3) → no odd/even wiggle, that intuition is dead. Companion `_scalesweep_rankerrf.py` (add a 4th MS scale {40,90,160,190}) = **NULL**, every arm negative (best add40_ship −0.00026 1/3) → the (60,130,250) grid is saturated. | **SHIP (not yet submitted) — `REF_TRAILS = (None,120) → (None,120,60,200)` in the residual block, base 73 → 79 (+6 cols).** Byte-exact reuse: the probe's `_span_feats`/`_fit_span` are identical to the notebook's `_resid_stats` (min mode) / `_fit_ar_ref`, so the winning arm ships as a one-line config change (no new code path). First real additive gain found post-saturation. **CONFIRMED ON LB (2026-08-27): S-AUC 62.61%, +0.11 pt over the 62.50% pre-E75 ranker+rf base** — local isolation predicted ~+0.002 (ship features + trails), LB realized ~+0.0011; positive and directionally consistent. Biggest LB step since the ranker+rf consolidation. |
+| E76 | **Port the base79 discovery (ship block + E75 trails) onto the 4-member stack** *(`streaming_detector_stack4.ipynb`: ranker .45 / rf .40 / xgb .10 / cat .05)* — the ship-feature block (`perm_entropy4`+`max_split_lr`+`mosum`, +12) and the E75 residual trails (`REF_TRAILS = (None,120,60,200)`, +6) had only ever been LB-scored on the 2-member ranker+rf (62.61%). Re-added the exact same 79-col contract to the 4-member ensemble (xgb/cat see the new cols for the first time) to get a clean 4-member LB read. Feature blocks byte-identical to the rankerrf notebook (late-binding `compute_features_ms` chain); only `INFER_PARALLELISM` pinned to 5 (4 models/step OOM'd at higher counts). | **SHIPPED — LB 62.70% (sub #40, run:109248, 3h37m on 16 vCPU/64 GB) — NEW CHAMPION.** +0.09 pt over rankerrf base79 (62.61%) and +0.11 pt over the old 61-col stack4 (62.59%). The ensemble both **transfers** the base79 gain and **adds** on top of the 2-member blend → the xgb/cat/hgb members contribute again once they're fed the ship+E75 columns. First clean 4-member LB read on the new features; best score to date. |
+| E77 | **Spearman rank-autocorrelation contrast** *(`_spearac_rankerrf.py`, base79)* — 3rd survivor of a 2-agent ideation (leverage/time-irrev were the E-asym null); a *robust* (rank-based) autocorrelation `sac_k(window) − sac_k(history)` for lags k∈{1,2,3} × 3 scales, isolated on base79. Rationale: every base AR/residual feature is Pearson (variance-driven, outlier-sensitive under fat tails); rank-AC is the heavy-tail-robust complement. Affine-invariant *exactly* (rank-based, affine-check 0.00e+00). RELAXED gate, seeds {42,7,123}, rf500/dense40. | **NULL — no arm 3/3.** `sac1` +0.00050 mean but **2/3** and entirely seed-42-driven (+0.0027 s42, **−0.0153 s7**); `sac2` −0.00006 2/3; `sac_all` −0.00029 2/3; `sac3` −0.00109 **0/3** (dead). Rank-dependence adds nothing vs the metric's real negatives — consistent with the dependence axis being capped ~0.57 at late offset. **Closes the rank-dependence axis; also stands down the gated `_predgain` probe (A4, same conditional-mean dependence axis).** |
+| E78 | **Window-scale switch (40,100,250)** *(`streaming_detector_stack4.ipynb`; probe `_winsearch`)* — the overnight winsearch window-length sweep found the shipped grid (60,130,250) saturated; only `t_50_120_250` was 3/3-positive, while the *highest-mean* arm `t_40_100_250` was +0.00076 but **2/3** (positive s42/s7, negative s123). Took the higher-mean gamble: set `MS_SCALES` **and** `RESIDUAL_SCALES` = (40,100,250) on the 62.70% stack4 champion (a pure config change, no new columns). | **SHIPPED — LB 62.76% (sub #41, run:109551, 5h01m on 16 vCPU/64 GB) — NEW CHAMPION.** +0.06 pt over the 62.70% base79 stack4. The 2/3-seed marginal arm *reversed the campaign's 0-for-N marginal-feature LB history* and held on the LB — the shorter scales sharpen the transition-onset detectors. Best score to date. |
+| E79 | **Prewhitened residual shape/tail** *(`_rshape_rankerrf.py`, base79; from 2-agent ideation #2, critic KEEP #1)* — audit found every base residual column is a log-variance-ratio; the AR(8) residual's *shape* (skew/kurt/tail) is never read (base skew/kurt/tail are on the dependence-contaminated raw window = dead E59). Prewhiten by the history AR8, then contrast the window residual's shape vs history: `rkurt`@{130,250}, robust quantile-kurtosis `rqkurt`@{60,130,250}, Hill tail-index `rhill`@{250}. Targets tdist/garch/skew; persistent (doesn't decay). Affine-invariant (affine-check 2.5e-14). | **NULL — no arm 3/3, robust arms flat.** `rqkurt` +0.00017 **2/3** (≈zero); `rhill` −0.00032 1/3; `rshape_all` −0.00115 1/3; `rkurt` −0.00118 **0/3** (dead, exactly the predicted outlier-driven transition artifact). Believe-rule (robust arm must move) fails → residual shape/tail axis **closed**. Companion `_predgain` probe (A4) stood down after E77. Both 2-agent-ideation-#2 survivors null → the round's only gain was the E78 window switch, not a new feature. |
+| E80 | **Metric-weighted loss** *(`_wloss_rankerrf.py`, base79 byte-identical, NCOL=79 — no new features; from 2-agent ideation #3, critic KEEP #1, target-side lever)* — the TS-AUC weight is dominated by LATE offsets, but training weights every row equally. Re-weight each training row by its *actual metric pairing count* at its absolute online step `t` (positive row → `n_neg(t)`, negative → `n_pos(t)`), raised to `gamma`, mean-normalized (so `gamma=0` == the champion). The empirical `w(t)` is **humped** (peaks then falls as `n_neg→0` at large offset), not the monotone-increasing profile the proposer assumed — the theoretically-correct AUC surrogate weight. Applied to *both* members: RF `sample_weight` + LGBMRanker rank_xendcg within-group weights (via `fit_ranker_w`/`sort_into_groups_w`). Arms `gamma∈{0.5,1.0,1.5}`, screen {42,7,123}. | **NULL — monotone DAMAGE, no arm positive.** `gamma=0.5` mean_d **−0.00169** (1/3); `1.0` −0.00650 (0/3); `1.5` −0.01695 (0/3, min −0.0289) — the more the loss is tilted toward the metric weight, the *worse* the cross-sectional AUC. Weighting toward high-pairing (late) steps starves the early-offset rows that carry the separable signal (per-offset AUC peaks 0.755@5-10, decays to 0.644@200), so the ranker/RF fit the near-ceiling late regime at the expense of the discriminable early one. Believe-rule fails outright → **metric-weighted-loss (target-side) lever closed.** |
+| E81 | **Two-head early/late specialist** *(`_twohead_rankerrf.py`, base79, shared `_struct79_cache`; from 2-agent ideation #3, critic KEEP #2, model-side lever)* — offset is unknown at inference, so fit two full ranker+rf blends on offset-split positives (early head = neg + pos(off<K); late head = neg + pos(off≥K)), each with its own train-CDF refs, and blend `lam*early+(1-lam)*late` (both score every step). Arms `(K,lam)` K∈{40,60}×lam∈{0.4,0.6}; degenerate-head guard skips single-class heads. Screen {42,7,123}. | **NULL — all 4 arms negative, tight across seeds (robust null).** Best `K60_l0.4` mean_d **−0.00611** (0/3, min −0.0064 max −0.0059); `K40_l0.4` −0.00689; `K60_l0.6` −0.01555; `K40_l0.6` −0.01848 — heavier early-head weight monotonically worse. Splitting the positives halves each head's training signal and neither specialist beats the generalist that sees all offsets; the seed-tight negatives confirm it's structural, not noise. Mirrors E63 (model-diversity over the same features hurts). Both ideation-#3 survivors NULL → target-side and model-side re-weighting of the SAME features didn't move it; the untested axis is a learned REPRESENTATION (matched-filter / density-ratio). |
+| E82 | **Learned residual-shape member (AR-MDN density-ratio), built + reviewed by agents** *(`_armdn_rankerrf.py` + `_armdn_diag.py`, own `_armdn_cache`)* — the smallest honest test of the learned-representation fork: a 3rd ensemble member = sklearn MLP(64,32) on a **32-quantile embedding** of the history-standardized AR(8) window residuals (an affine-invariant summary of residual *shape* the base79 variance-ratio columns never read), blended `W_RANK*(1-w)*pct(rk)+W_RF*(1-w)*pct(rf)+w*pct(mlp)`, arms `w∈{0.1,0.2,0.3}`. Build/review 2-agent loop: review verdict GO after a full empirical audit (proved `w=0` reproduces the TRUE champion — the RF no-`sample_weight` path; incidentally showed `_wloss` gamma=0 passes all-ones weights → a *different* sklearn RF path, 0.5431 vs the champion's 0.5384, so E80's baseline was itself slightly off but its deltas stay internally valid). Affine-check 3.89e-13. | **NULL, and the diagnostic says WHY (report absolute TS-AUC).** Screen {42,7,123} base2 TS-AUC 0.6323/0.6247/0.6389; adding the member: `w=0.10` → 0.6306/0.6238/0.6380 (mean_d −0.0012, 0/3), monotone worse to `w=0.30` (−0.0112). Decorrelation diagnostic `_armdn_diag.py` (all 3 seeds identical story): MLP **standalone TS-AUC ~0.54** (weak but >random), Spearman(mlp,blend) ~0.31 / OLS R²~0.18 (looks decorrelated), **but the ORTHOGONAL residual TS-AUC = 0.504/0.511/0.511 ≈ 0.50** — after projecting out ranker+rf, what's left is **noise**; blending the orthogonalized part helps at no weight. Verdict **REDUNDANT ON THIS EMBEDDING**: the ~0.54 of standalone signal is almost entirely the ~18% shared with RF; the residual-*shape* quantile vector carries no break-discriminative info beyond variance. Note quantiles are **sort-order-invariant** → they discard the residual's temporal structure entirely. Third independent line to indict residual shape (E59 hand shape, E79 prewhitened shape/tail, E82 learned) → a bigger *model* on the same embedding is pointless; the INPUT must change (raw residual/window *sequence* → 1-D CNN, restoring the temporal structure quantiles destroy). Champion unchanged, **LB 62.76%**. |
+| E83 | **Learned raw-sequence member (1-D CNN), built + reviewed by agents** *(`_seqcnn_rankerrf.py`, own `_seqcnn_cache`, torch 2.13 CPU)* — the E82 diagnostic's prescription: change the INPUT, restore temporal order. A 3rd member = small **2-channel 1-D CNN** (value + validity mask) over the raw, **history-standardized trailing-window SEQUENCE** `z=(w−μ_h)/√(σ_h²+ε)`, `L_SEQ=128`, left-padded — affine-invariant (self-test maxdiff **0.00e+00**) yet keeps mean/variance breaks visible AND preserves temporal ordering. This lets the net learn its *own* whitening + matched filter end-to-end from the normalized series, **not** constrained to AR(8) residuals — deliberately sidestepping the "residual shape is uninformative" finding (E59/E79/E82) rather than re-testing it. `Conv1d 2→16(k7)→32(k5)→MaxPool→32(k3)→AdaptiveAvgPool→FC→1`, BCEWithLogitsLoss `pos_weight=n_neg/n_pos`, Adam, 12 epochs. Blended `W_RANK*(1-w)*pct(rk)+W_RF*(1-w)*pct(rf)+w*pct(cnn)`, arms `w∈{0.1,0.2,0.3}`. 2-agent build/review: review GO, zero P0/P1, `w=0` reproduces the TRUE champion (seed42 base 0.5384). | **NULL — a near-exact replay of E82's signature (absolute TS-AUC).** Screen {42,7,123} base79 TS-AUC 0.6323/0.6247/0.6389; `w=0.10` → 0.6307/0.6230/0.6379 (mean_d **−0.0014**, 0/3), monotone worse `w=0.20` −0.0044, `w=0.30` −0.0077. Negative on every seed, tight. Letting the CNN learn its representation end-to-end from the raw sequence produced the *same* redundant-member profile as the hand quantile embedding — tiny negative at low weight, monotone damage as you lean on it. The temporal structure a per-step CNN can extract is already captured by base79's ACF/CUSUM/supF/mosum columns; the net found no orthogonal break signal the hand features miss. **Fourth independent line** converging on the same conclusion (E59 hand-shape, E79 prewhitened, E82 learned-quantile, E83 learned-raw-CNN): a per-step learned representation over one series' recent window does not add rank-discriminative information beyond the saturated base79 statistics. Champion unchanged, **LB 62.76%**. |
+| E84 | **Multi-scale learned raw-sequence member (3-branch 1-D CNN), built + reviewed by agents** *(`_seqcnnms_rankerrf.py`, own `_seqcnnms_cache`, torch 2.13 CPU)* — the E83 follow-up: E83 tested one window length (L=128); this adds a **short (40)** and **long (250)** scale to see if break structure lives at a scale the single 128-window missed. One conv **branch per scale** (`SEQ_SCALES=(40,128,250)`, each history-normalized `z=(w−μ_h)/√(σ_h²+ε)`, own length, `2→16(k7)→32(k5)→MaxPool→32(k3)→AdaptiveAvgPool→32d`), the 3 branch vectors concatenated → `96→48→1` head, else identical to E83 (BCEWithLogitsLoss `pos_weight`, 12 epochs, blend `W_RANK*(1-w)*pct(rk)+W_RF*(1-w)*pct(rf)+w*pct(cnn)`, arms `w∈{0.1,0.2,0.3}`). 2-agent build/review: review GO zero P0/P1, per-scale affine-check **0.00e+00** on all three, `w=0` reproduces the TRUE champion (seed42 base 0.5384). | **NULL — but the least-damaging learned member yet (absolute TS-AUC).** Screen {42,7,123} base79 0.6323/0.6247/0.6389; `w=0.10` → 0.6318/0.6239/0.6382 (mean_d **−0.0006**, 0/3), monotone worse `w=0.20` −0.0021, `w=0.30` −0.0045. Still negative on every seed, but adding the 40+250 scales roughly **halved** the low-weight damage vs single-scale E83 (−0.0006 vs −0.0014) — so the extra scales *do* carry marginally more complementary info, yet not enough to cross zero. **Fifth converging line**: an end-to-end learned window representation — single- or multi-scale — does not beat the saturated base79 hand features (E59/E79/E82/E83/E84). The learned-representation-over-one-series'-recent-window axis is empirically exhausted at the nibble level. Champion unchanged, **LB 62.76%**. |
+| E85 | **Alternate residual-lens variance-ratio features (AR orders + robust AR), built + reviewed by agents** *(`_altlens_rankerrf.py`, own `_altlens_cache`)* — tests whether AR(8) is *special* or just one of many equivalent residual lenses. The champion's residual channel is a log variance-ratio `log((var(window_resid)+ε)/(ref_resid_var+ε))` per scale `(40,100,250)` computed from an **AR(8)** fit; this probe adds the SAME var-ratio computed from a **different lens** and refits ranker+rf in isolation vs base79: `ar2`/`ar4`/`ar16` (OLS orders), `rob8` (robust **Huber-IRLS AR(8)**: OLS-init, 3 reweights `w=min(1,1.345/max(|r/s|,ε))`, `s=1.4826·MAD`, degrades to OLS if scale collapses), and `armix` (2+4+16 combined). Affine-invariant by construction (log of a variance ratio), per-scale check **4.85e-14**. 2-agent build/review: review GO; **P1 caught+fixed** — the file inherited a stale `(60,130,250)` window from its `_rshape` template, realigned to the shipped `(40,100,250)`. | **NULL — the smoke signal was a sampling artifact.** At smoke resolution (`dense_k=20`/`rf120`) every arm looked strongly positive on both seeds (+0.015…+0.023), but at full `dense_k=40`/`rf500` it collapsed: base79 {42,7,123} 0.6323/0.6247/0.6389; best arm `rob8` mean_d **+0.00030** (2/3: −0.0010/+0.0016/+0.0004), then `ar16` +0.00008 (1/3), `armix` +0.00001 (2/3), `ar4` −0.00021, `ar2` −0.00088 (0/3, monotone worst at lowest order). Nothing clears the +0.0015 believe threshold or goes 3/3. **AR(8) is not special — but no alternate lens (lower/higher order, or robust) adds orthogonal info either**: the residual-variance-ratio channel is saturated regardless of which AR fit produces the residuals. Reinforces that base79 already captures the extractable residual-dispersion signal. Champion unchanged, **LB 62.76%**. |
 
 ### Strategy checkpoint — 2026-08-18: the statistical-feature axis is saturated; the head-room is early-detection
 
@@ -183,6 +199,10 @@ training set the champion already trains on) reframed where that 2.5 pt is:
 4. **Matched-filter model for skew/ma/garch** *(backlog, low priority / negative precedent)* — the only
    place a learned density/sequence model could beat statistics, but the GRU line (E45–E50) proved a
    sequence model's per-step signal, though real, does *not* convert to causal cross-sectional TS-AUC.
+5. **Expensive representation lenses** *(backlog, deferred on cost)* — higher-order spectra (bispectrum /
+   bicoherence non-Gaussianity index, O(N²) in frequency) and sample/approximate entropy (O(N²)) as
+   window-vs-history contrasts. Deferred behind the cheap cepstral + Higuchi-FD probe (E-repr); only worth
+   the per-point budget if the cheap lenses show any signal.
 
 **Takeaways:** instantaneous window-vs-history comparison beats any accumulating score
 under TS-AUC; the local 100-series reduced set is noisy/optimistic (use ≥800 series to
@@ -198,6 +218,263 @@ larger/multi-fold val or treat the leaderboard as ground truth for small changes
 **On features (E9):** robust/rank-based restatements (median/MAD, Mann–Whitney,
 Brown–Forsythe) add nothing over the existing KS + `mean_z` + `log_var_ratio` — they
 measure the same location/scale/distribution shift, so they are redundant, not additive.
+
+### What the real data actually looks like — measurement + detectability (2026-08-20)
+
+We measured the **real 10k-series** training set directly and then re-ran the early-detection
+sweep on a **generator recalibrated to match it**. Three things came out of it, and together they
+explain *why* streaming TS-AUC sits at ~0.62 and where it cannot be pushed.
+
+**(1) Series geometry (real data).** Each series has a `historical` segment (`period==1`, the
+pre-break reference we get in full) and an `online` segment (`period==2`, revealed one step at a
+time and scored). Numbers below are **counts of time steps** (observations), as percentiles across
+the ~10k series:
+
+| quantity | p5 | p25 | p50 (median) | p75 | p95 | reading |
+| --- | --- | --- | --- | --- | --- | --- |
+| `historical` length | 1188 | 1961 | **2970** | 4029 | 4808 | median series carries ~2970 reference steps; the *long* tail (p95≈4808) is the notable end — even the short end (p5≈1188) is ample reference. |
+| `online` length | **59** | 256 | 506 | 752 | 951 | the *short* tail (p5≈59) is the notable end — some series give only ~59 steps to ever detect a break (the hard low-data regime). |
+| `tau_abs` (break step in online) | **11** | 66 | 178 | 370 | 698 | p5≈11 ⇒ 5% of breaks land within ~11 online steps, i.e. breaks can occur almost immediately, with near-zero online context. |
+| `tau_rel` (= `tau_abs / online_len`) | 0.04 | 0.23 | 0.47 | 0.74 | 0.94 | break location is ~**uniform** over the online segment. |
+
+(For `historical` the binding tail is p95=long, for `online` it is p5=short — hence we quote
+opposite ends; both full percentile rows are above.)
+
+**(2) Real breaks are *subtle* — most are near the noise floor.** Measuring each break's post-vs-pre
+effect size (in historical-std units):
+
+| effect | p5 | p50 | p95 | fraction subtle |
+| --- | --- | --- | --- | --- |
+| `|mean_shift|` | 0.003 | **0.050** | 0.282 | **90%** of breaks shift the mean by < 0.2 std |
+| `var_ratio` | 0.55 | **0.99** | 2.37 | **57%** of breaks keep variance within 0.8–1.25× |
+
+So the *typical* real break barely moves the mean (median 0.05 std) and barely moves the variance
+(median ratio ≈ 1.0). This is corroborated by a direct real-data probe (**Step 0**): at low offset
+(10–20 online steps past τ) the best single mean/variance/drift contrast scores AUC ≈ **0.51**
+(`mean_z` 0.510, `log_var_ratio` 0.514, `drift_z40` 0.514), and the full 61-col champion contrasts
+reach only **0.510** OOF (+drift adds a marginal +0.003). **There is no recoverable mean/variance/drift
+signal at low offset in the real data — it is a genuine information floor, not a modelling gap.**
+
+This retires an earlier red herring. On the *old* (miscalibrated) synthetic generator the `trend`
+family scored **AUC 0.43 @ offset 10 — below random** (the champion's mean/variance contrasts
+systematically *mis-ranked* a slow linear drift). That "below-random trend" was a **synthetic-only
+artifact** caused by the old generator drawing trend slopes ~10× too large (`0.004–0.02`/step); the
+real data has *no* detectable linear-drift break at low offset (Step 0, `drift_z40` ≈ 0.514). So there
+was never a "fix the trend detector" opportunity there — the signal simply does not exist in real data.
+
+**(3) Detectability re-run on the real-calibrated generator (extended offsets).** With the generator
+recalibrated so its break effect sizes match the real distributions above, the per-family pooled-champion
+5-fold OOF AUC (`K_PER=80`) now looks like this — and matches the real-data behaviour instead of the old
+too-easy synthetic:
+
+| family | @5 | @10 | @15 | @20 | @25 | @30 | @40 | @50 | @65 | @80 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gauss_mean` | 0.44 | 0.46 | 0.53 | 0.44 | 0.52 | 0.39 | 0.50 | 0.58 | 0.56 | 0.55 |
+| `gauss_var` | 0.51 | 0.51 | 0.61 | 0.54 | 0.49 | 0.51 | 0.63 | 0.67 | 0.69 | 0.62 |
+| `trend` | 0.42 | 0.52 | 0.45 | 0.51 | 0.52 | 0.48 | 0.57 | 0.52 | 0.54 | 0.51 |
+| `ar_coef` | 0.54 | 0.58 | 0.59 | 0.62 | 0.67 | 0.68 | 0.72 | 0.69 | 0.72 | 0.74 |
+| `ma` | 0.53 | 0.63 | 0.59 | 0.61 | 0.60 | 0.62 | 0.69 | 0.66 | 0.71 | 0.67 |
+| `arma` | 0.65 | 0.64 | 0.59 | 0.65 | 0.69 | 0.72 | 0.75 | 0.71 | 0.86 | 0.81 |
+| `ar_var` | 0.62 | 0.66 | 0.53 | 0.53 | 0.62 | 0.68 | 0.72 | 0.67 | 0.77 | 0.68 |
+| `skew` | 0.63 | 0.67 | 0.69 | 0.74 | 0.58 | 0.71 | 0.65 | 0.69 | 0.79 | 0.75 |
+| `garch` | 0.67 | 0.71 | 0.76 | 0.74 | 0.74 | 0.81 | 0.83 | 0.86 | 0.87 | 0.88 |
+| `tdist` | 0.68 | 0.75 | 0.71 | 0.75 | 0.71 | 0.74 | 0.80 | 0.80 | 0.88 | 0.95 |
+| `spectral` | 0.64 | 0.78 | 0.81 | 0.76 | 0.89 | 0.86 | 0.86 | 0.89 | 0.91 | 0.90 |
+| **pooled** | **0.57** | **0.62** | **0.62** | **0.63** | **0.64** | **0.65** | **0.70** | **0.69** | **0.75** | **0.73** |
+
+Reading it:
+
+* **The pure location/scale/trend families collapse to the noise floor.** `gauss_mean`, `gauss_var` and
+  `trend` now hover at ~0.5 across *all* offsets — exactly the real Step-0 result (real mean/var breaks
+  are undetectable at low offset). On the old synthetic these families climbed fast to 0.84–1.00 by
+  offset ~10; that was the generator being far too easy, not the task.
+* **The remaining detectable signal is distributional / dependence *shape*** — `spectral`, `tdist`,
+  `garch`, `skew`, `arma` — changes that do **not** require a large magnitude to separate, so a short
+  window can still catch them. This is where the model's real edge over 0.5 comes from.
+* **No sharp elbow anymore, and it needs long windows.** Pooled AUC climbs *slowly and monotonically*
+  (0.57→0.62→0.65→0.70→0.75 over offsets 5→80, still rising at 80). Under the old too-clean synthetic the
+  elbow looked like ~21 points (AUC ~0.55→0.80 by 20); on real-calibrated data that "elbow" is an artifact
+  of oversized breaks. **Real subtle breaks accumulate evidence gradually — you genuinely need many online
+  steps to detect them, which is precisely why TS-AUC (which averages over the many low-post steps right
+  after τ) is capped around ~0.62.**
+
+**Net for strategy:** all three checkpoint levers being closed is consistent with this — the low-offset
+head-room the head-side (E72) and calibration (E68–E71) were chasing is a *real information floor*, not a
+modelling gap. The only families with residual separation are shape/dependence, which the champion's
+Wasserstein/energy/AD + AR/PACF/residual features already largely capture.
+
+### New synthetic vs real — calibration check (2026-08-20)
+
+The generator was recalibrated so synthetic marginals match the measured real distributions above
+(lengths, τ placement, and — most importantly — break *effect sizes*, which were previously ~10× too
+large). Post-fix agreement on an independent 4000-series synthetic sample:
+
+| property | synthetic (new) | real | match |
+| --- | --- | --- | --- |
+| `historical` length p50 | 2943 | 2970 | ✓ |
+| `online` length p50 (p5) | 527 (99) | 506 (59) | ✓ (short tail slightly thin) |
+| `tau_rel` p50 | 0.476 | 0.473 | ✓ |
+| `|mean_shift|` p50 / p95 | 0.045 / 0.304 | 0.050 / 0.282 | ✓ |
+| `var_ratio` p50 / p95 | 1.00 / 3.29 | 0.99 / 2.37 | ✓ (upper tail a touch heavy) |
+| frac breaks `|mean_shift|`<0.2 | 0.897 | 0.900 | ✓ |
+| frac breaks 0.8<`var_ratio`<1.25 | 0.603 | 0.570 | ✓ |
+| `kurtosis(online)` p50 / p95 | 0.09 / 10.8 | 0.08 / 17.08 | ✓ (heavy tails now present; extreme tail still a touch lighter) |
+
+Everything that drives break **detectability** — effect sizes, series lengths, τ placement — now matches
+real within noise, so the synthetic is representative of the real *difficulty* (previously it was far too
+easy, which had made every synthetic-guided detectability/elbow read optimistic). The heavy-tail regime is
+reproduced by a clustered stochastic-volatility overlay on a minority of series (median/`p75` kurtosis now
+match real exactly; the most extreme `p95≈17` tail is approximated at `p95≈11`).
+
+### Per-offset head-room on real data — the champion is a *transition* detector, and the residual lever (cross-step memory) is marginal (2026-08-20)
+
+To find *where* the ~0.62 metric loses ground, we measured the champion's detection AUC **as a function
+of offset past the break** (`offset = t − τ`) on real data, under fully controlled conditions: fixed
+250-length windows for both classes, `τ ≥ 250`, and negatives = **pre-break windows from the same break
+series** (so positive@offset and negative differ *only* in how many post-break points sit in the window —
+the confound-free real analog of the synthetic per-family test). Two earlier framings were discarded first:
+comparing against *no-break series* lets the model cheat on series type (flat ~0.70 at every offset), and
+letting positives have longer windows than negatives leaks window length — both inflate and flatten the curve.
+
+The clean result overturns the synthetic intuition:
+
+| post-break pts in window | champion AUC (real) |
+| --- | --- |
+| @0 (1 pt) | 0.692 |
+| @2 (3) | 0.742 |
+| @5 (6) | 0.754 |
+| **@8 (9)** | **0.757** ← peak |
+| @10 (11) | 0.751 |
+| @20 (21) | 0.734 |
+| @40 (41) | 0.703 |
+| @60 (61) | 0.685 |
+| @80 (81) | 0.678 |
+| @120 (121) | 0.659 |
+| @200 (201) | 0.644 |
+
+**The champion is a *transition* detector, not a *level* detector.** Detection **peaks 5-10 steps after the
+break (AUC ≈ 0.755) and then decays** the longer the break persists, down to ~0.64 by 200 steps. This is the
+*opposite* of the synthetic per-family curves (which rose monotonically — a generator artifact of oversized,
+persistent breaks). The mechanism: features contrast the trailing 250 online window against history; real
+breaks are subtle (mean shift p50≈0.05, var ratio≈1), so right after τ the window is mostly the *old* regime
+with a few *fresh* post-break points at the edge — a strong local transition — but as the window fills with
+the new regime it *forgets* the pre-break baseline and only the tiny persistent contrast remains. So the
+head-room is the **post-break decay**, not early detection, and pushing toward a purer *level* detector chases
+the weakest signal (the persistent contrast is near the floor).
+
+We screened two levers against this (pooled 5-fold OOF HGB on the 61-col champion base, per-offset AUC):
+
+* **Empirical-Bayes shrinkage of `mean_z`/`log_var_ratio`** (shrink strongly at small `n`, fade as the online
+  window grows — targeting *early* offsets): **dead.** +0.0002 overall, nothing in any bucket, slightly
+  *worse* at offset [0,2]. `mean_z` already studentizes by `se = sd/√n`, so it is already `n`-aware; shrinking
+  further just biases the estimate toward the historic null, which blunts true breaks exactly where sensitivity
+  is needed. Dropped.
+* **Cross-step memory — a null-calibrated CUSUM + decayed running-max of short-window mean/variance evidence**
+  (carry the early-detection peak forward instead of letting the trailing window forget it — targeting *late*
+  offsets). This is a genuinely new axis: the champion is otherwise **fully stateless per step**. Against
+  *pre-break* negatives it looked strong (+0.008 overall, +0.027 at offset [121,260]); but against the metric's
+  real *no-break* negatives a naive CUSUM **hurts** the high-weight early offsets (−0.009 at [0,2]) because with
+  its drift below the null mean it degenerates into a "how long have I been online" counter that accumulates
+  false alarms on genuine no-break series (its value grew unbounded 11→125 over the online stream). Null-calibrating
+  the evidence (studentize against each series' *own* historical null) and using a bounded leaky-CUSUM removed the
+  early-offset damage, but under a **strong 8-seed gate** (all seeds positive & mean ΔAUC-vs-no-break ≥ 0.0015 &
+  t ≥ 2.0) it **FAILS**: mean +0.0016, t = 2.91, but only **7/8 seeds positive**, and the late-offset gain that
+  motivated it **evaporates** (late mean +0.0003, 5/8 seeds). A **running-max-only** variant (drop the CUSUM
+  entirely, keep two decayed-running-max scales — inherently bounded and drift-free) failed the gate even harder
+  (mean **−0.0003**, t = −0.33, 5/8 seeds). The reason is a genuine trade-off — the persistence that lifts late
+  offsets is the *same* mechanism that accumulates false alarms on no-break series; making it no-break-safe throttles
+  exactly the signal it was meant to add. Net: another **closed** lever.
+
+**Reframing "describe the historical data more richly."** The history is *already* described richly — not the 14
+prototype statistics but: ~10 moments **+ a 200-point empirical CDF** (KS), **an AR(8) model**, per-series **null
+bands** from 24-32 sliding windows (dependence + calibration banks), historical ACF at lags {1,2,5,10} and an
+ARCH proxy. Crucially, "describe history more" *is* the calibration-bank axis (E68-E71) — and those closed. The
+per-offset diagnostic explains why: the residual head-room is **not** in the reference/null (which is already
+well-estimated) but in **cross-step persistence**, an orthogonal axis that history description cannot touch — and
+that axis, too, turns out to be marginal once held to a no-break-safe, multi-seed bar. All of this is consistent
+with the strategy checkpoint: the low-offset gap is a real **information floor**, not a modelling gap.
+
+### Where the metric weight actually lives, and why late detection is at a floor (2026-08-21)
+
+The previous subsection asked *"is there head-room at late offset?"* using the champion's AUC. That AUC was
+measured against **within-series pre-break negatives** — an easy, confound-free way to ask "did a transition
+happen", but *not* the negatives the competition metric uses. Two follow-up questions decide whether late-offset
+work is worth doing at all: (1) **how much of the score actually depends on late offsets**, and (2) **what AUC is
+even achievable there against the metric's *real* negatives** (other no-break series).
+
+**Definitions used below.** The competition score is a time-step AUC. At each absolute online step `t` it forms
+every (positive, negative) pair among the series alive at `t` — a *positive* is a series that has already broken
+(`t ≥ τ`), a *negative* is a no-break (or not-yet-broken) series — and the score is the fraction of those pairs
+ranked correctly. So each positive occurrence at step `t` participates in `n_neg(t)` pairwise comparisons.
+
+* **Weight** of an offset bucket = the **number of pairwise comparisons** that fall in it, i.e. `Σ n_neg(t)` over
+  all positive occurrences at offset `k = t − τ`. It is a property of the *data/label geometry only* (no model):
+  it says how much each offset can move the final score. A long-lived broken series is re-counted as a positive at
+  *every* step it survives, so its weight piles up at **large** offsets.
+* **Head-room** of a bucket = `weight × (1 − AUC)` = the **currently-misranked pairs a perfect detector could still
+  win**. High weight with low AUC ⇒ large recoverable head-room.
+* **Floor / ceiling** here are **AUC values (discrimination), not losses.** *Ceiling* = the best AUC any detector
+  could reach given the information present; *floor* = the AUC the signal is stuck near because the information
+  simply is not there. `AUC = 0.5` is random; `1.0` is perfect. When we say "late offset is at a floor of ~0.57"
+  we mean *no feature we tried separates broken from no-break series better than ≈0.57 there*, regardless of the
+  model — an information limit, not an optimization loss.
+
+**(1) The weight is overwhelmingly late.** Decomposing the metric's total pairwise weight by offset
+(`_offset_weight.py`, data-only, no model):
+
+| offset bucket | weight % | cumulative head-room % |
+| --- | --- | --- |
+| 0–20 | 11 % | 9 % |
+| 21–60 | 18 % | 16 % |
+| 61–160 | 31 % | 31 % |
+| 161–250 | 17 % | 18 % |
+| 251+ | 23 % | 26 % |
+
+**Offset ≥ 60 carries 71 % of the metric weight and 75 % of the recoverable head-room; offset ≥ 250 alone is
+23 % / 26 %.** Late detection is not a side-quest — it *is* the game. (This also overturns an earlier worry that
+late offsets barely matter.)
+
+**(2) But against the *real* negatives the late ceiling is low.** Re-measuring per-offset AUC against the metric's
+actual cross-series no-break negatives (`_late_families.py`), not the easy within-series ones, the achievable
+discrimination is far below the 0.64–0.76 of the previous table:
+
+| offset | mean-shift | variance (`lvr`) | distribution (`ks`) | dependence (`Δac1`) | 6-feat HGB |
+| --- | --- | --- | --- | --- | --- |
+| 60 | 0.53 | 0.53 | 0.51 | 0.51 | 0.53 |
+| 200 | 0.53 | 0.56 | 0.55 | 0.54 | 0.56 |
+| 400 | 0.53 | 0.56 | 0.57 | **0.57** | 0.57 |
+
+Three things fall out: **mean-shift is dead** at late offset (~0.53 flat, and `_late_pool.py` confirms pooling
+more post-break samples does not help it); the live families are **variance, distribution shape and dependence**,
+which get *slightly* stronger with offset purely from standard-error reduction (more post-break points sharpen the
+estimate); and they are **mutually correlated** — a 6-feature HGB (0.57) does not beat the best single family, so
+combining them adds essentially nothing. Testing whether **pooling** more post-break samples (change-point-localized
+window instead of the trailing-250 cap) beats the champion's window (`_late_pool2.py`) gave only a sliver at offset
+100–200 (`lvr`/`Δac1` +0.005…+0.017) that **washes out by offset 400**.
+
+**Conclusion — this family of late-offset levers is closed, but the wall is empirical, not proven.**
+Across every feature family we tried (mean-shift, variance, distribution shape, lag-1 dependence), the
+achievable per-family AUC against real negatives caps around **0.57**, the families are mutually correlated,
+and pooling buys only a sliver that overlaps what the champion's trailing features already capture. This is
+why *every* late-oriented lever tried previously reads as global noise — the change-point/sup-F scan
+(`_night_supf2`), full-online-vs-history (`E18`), local reference windows, and the CUSUM/running-max
+cross-step memory above; even the campaign's learned GRU sequence member plateaued in the same region.
+
+**This 0.57 is a *ceiling of the representations tried so far, not a proven information-theoretic limit.*** A
+fundamentally different view of the window — spectral / cepstral, higher-order or nonlinear dependence,
+entropy / fractal (Hurst) measures, or a learned representation trained *specifically* on the late-offset
+regime — could in principle separate broken from no-break series better than 0.57; nothing here rules that
+out. What the diagnostics *do* establish is that (a) the recoverable head-room is concentrated at late offset,
+and (b) the obvious moment/contrast features are exhausted there, so further gains require a genuinely new
+representation rather than another variant of the same window statistics.
+
+The one axis that is *structurally* closed (not merely unexplored) is **cross-sectional / relative-rank
+information**: the metric ranks series against *each other*, yet the champion scores each series independently.
+Per the CrunchDAO real-time runner, a forward-only summary of *already-completed* series is technically
+allowed, but under `INFER_PARALLELISM > 1` the runner interleaves series and only ever exposes previously
+finished ones *timing-dependently* (and the determinism dataset uses unique offsets), so a "rank against the
+other series alive at step `t`" feature is **not deterministically available at inference** and is unsafe to
+ship. That axis stays shut; the representation axis does not.
 
 ## Experiment details
 

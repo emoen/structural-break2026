@@ -1,0 +1,25 @@
+{
+  "members": [
+    "hgb",
+    "ranker",
+    "rf",
+    "xgb",
+    "catboost"
+  ],
+  "step": 0.05,
+  "champ_weights": {
+    "hgb": 0.4,
+    "ranker": 0.6,
+    "rf": 0.0,
+    "xgb": 0.0,
+    "catboost": 0.0
+  },
+  "best_search_weights": {
+    "hgb": 0.0,
+    "ranker": 0.45,
+    "rf": 0.4,
+    "xgb": 0.1,
+    "catboost": 0.05
+  },
+  "champ_all": 0.6235502008437742
+}

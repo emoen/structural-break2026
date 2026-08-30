@@ -1,0 +1,11 @@
+# raw-window sequence / 1-D CNN 3rd-member probe on ranker+rf base79  2026-08-29 19:31:45
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) L_SEQ=128 cnn_epochs=12
+# 3rd member = torch 1-D CNN on the raw history-standardized trailing window sequence
+# (temporal structure the E82 quantile embedding discards); w_mdn=0 == the champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior LOW: learned-rep E31/E45/E47 + shape E59/E79/E82 died.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00143  -0.00177  -0.00100   0/3
+wmdn0.20      -0.00442  -0.00505  -0.00341   0/3
+wmdn0.30      -0.00930  -0.01010  -0.00772   0/3

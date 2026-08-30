@@ -1,0 +1,44 @@
+=== REF-SPAN mining on ranker+rf ship base  2026-08-26 10:22:25  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=73 NCOL=100 scales=(60, 130, 250) spans=['trail60', 'trail90', 'trail160', 'trail200', 'trail300', 'gap120', 'ar6', 'ar10', 'ar12']
+candidates=['trail60', 'trail90', 'trail160', 'trail200', 'trail300', 'gap120', 'ar6', 'ar10', 'ar12', 'trail60+trail200', 'gap120+trail60']
+  [cache] seed 42 built in 694s  Xtr(79037, 100) Rr(311156, 100) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_refspan_cache/seed_42.pkl
+[seed 42] base73 ranker+rf = 0.6263  (174s)
+[seed 42] trail60          0.6281  d=+0.0018  (185s)
+[seed 42] trail90          0.6256  d=-0.0007  (184s)
+[seed 42] trail160         0.6253  d=-0.0010  (187s)
+[seed 42] trail200         0.6274  d=+0.0010  (188s)
+[seed 42] trail300         0.6326  d=+0.0062  (187s)
+[seed 42] gap120           0.6257  d=-0.0006  (190s)
+[seed 42] ar6              0.6284  d=+0.0021  (186s)
+[seed 42] ar10             0.6261  d=-0.0002  (190s)
+[seed 42] ar12             0.6279  d=+0.0016  (190s)
+[seed 42] trail60+trail200 0.6304  d=+0.0041  (168s)
+[seed 42] gap120+trail60   0.6288  d=+0.0025  (166s)
+  [cache] seed 7 built in 586s  Xtr(79113, 100) Rr(311442, 100) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_refspan_cache/seed_7.pkl
+[seed 7] base73 ranker+rf = 0.6228  (147s)
+[seed 7] trail60          0.6227  d=-0.0001  (157s)
+[seed 7] trail90          0.6210  d=-0.0018  (157s)
+[seed 7] trail160         0.6187  d=-0.0041  (158s)
+[seed 7] trail200         0.6216  d=-0.0012  (157s)
+[seed 7] trail300         0.6229  d=+0.0001  (155s)
+[seed 7] gap120           0.6228  d=-0.0001  (156s)
+[seed 7] ar6              0.6228  d=+0.0000  (157s)
+[seed 7] ar10             0.6214  d=-0.0014  (158s)
+[seed 7] ar12             0.6224  d=-0.0004  (156s)
+[seed 7] trail60+trail200 0.6242  d=+0.0014  (163s)
+[seed 7] gap120+trail60   0.6246  d=+0.0018  (162s)
+  [cache] seed 123 built in 594s  Xtr(79068, 100) Rr(311143, 100) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_refspan_cache/seed_123.pkl
+[seed 123] base73 ranker+rf = 0.6361  (180s)
+[seed 123] trail60          0.6387  d=+0.0027  (188s)
+[seed 123] trail90          0.6353  d=-0.0007  (178s)
+[seed 123] trail160         0.6327  d=-0.0034  (179s)
+[seed 123] trail200         0.6361  d=-0.0000  (185s)
+[seed 123] trail300         0.6366  d=+0.0005  (186s)
+[seed 123] gap120           0.6353  d=-0.0008  (188s)
+[seed 123] ar6              0.6353  d=-0.0008  (190s)
+[seed 123] ar10             0.6349  d=-0.0011  (175s)
+[seed 123] ar12             0.6364  d=+0.0003  (185s)
+[seed 123] trail60+trail200 0.6391  d=+0.0030  (199s)
+[seed 123] gap120+trail60   0.6388  d=+0.0027  (188s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_refspan_rankerrf_summary.txt

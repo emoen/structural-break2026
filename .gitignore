@@ -2,6 +2,8 @@
 __pycache__/
 *.pyc
 *.log
+*.pkl
+*.npz
 .crunchdao/token
 Structural-break-adia-2026/
 *.tsv

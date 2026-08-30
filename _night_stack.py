@@ -40,10 +40,11 @@ FRESH_SEEDS = [31337, 2025] if SMOKE else [31337, 2025, 555, 99]
 DENSE_K = 30 if SMOKE else 60
 
 from _night_banks import (
-    NCHAMP_BASE, NDEP, NDEP2, NSUPF2, NSEQ, NCALIB, NCALIBZ, NALPHA,
+    NCHAMP_BASE, NDEP, NDEP2, NSUPF2, NSEQ, NCALIB, NCALIBZ, NALPHA, NBAYESCP,
     fit_champ_refs, champ_base_row, fit_dep_refs, dep_feats,
     fit_dep2_refs, dep2_feats, fit_supf2_refs, supf2_feats, seq_feats,
     fit_calib_refs, calib_feats, fit_calibz_refs, calibz_feats, alpha_full,
+    bayescp_feats,
 )
 
 MODE_NCOL = {"champ": NCHAMP_BASE, "champ_dep": NCHAMP_BASE + NDEP,
@@ -52,6 +53,7 @@ MODE_NCOL = {"champ": NCHAMP_BASE, "champ_dep": NCHAMP_BASE + NDEP,
              "champ_seq": NCHAMP_BASE + NDEP + NSEQ,
              "champ_calib": NCHAMP_BASE + NDEP + NCALIB,
              "champ_calibz": NCHAMP_BASE + NDEP + NCALIBZ,
+             "champ_bayescp": NCHAMP_BASE + NDEP + NBAYESCP,
              "wide": NCHAMP_BASE + NDEP + NALPHA}
 
 
@@ -68,6 +70,8 @@ def _row(w, ctx, refs, mode):
         out = np.concatenate([out, np.asarray(supf2_feats(w, ctx, refs["supf2"]), dtype=np.float64)])
     if mode == "champ_seq":
         out = np.concatenate([out, np.asarray(seq_feats(w, ctx, refs["dep"]), dtype=np.float64)])
+    if mode == "champ_bayescp":
+        out = np.concatenate([out, np.asarray(bayescp_feats(w), dtype=np.float64)])
     if mode == "champ_calib":
         out = np.concatenate([out, np.asarray(calib_feats(out[:NCHAMP_BASE], refs["calib"]), dtype=np.float64)])
     if mode == "champ_calibz":

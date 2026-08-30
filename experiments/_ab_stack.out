@@ -1,0 +1,30 @@
+residual block: mode=min, AR(8,) x trails(None, 120) x scales(60, 130, 250) -> +6 feats; STEPS_PER_SERIES=30
+dependence block (b_no_accf): +10 feats (studentized resid + early-onset CUSUM + arch contrast + sup-F; ACF-lag block dropped)
+=== AB STACK  2026-08-22 23:19:54 ===
+loading data ...
+train series=10000  test series=100  test rows=50983
+pointwise matrix (293313, 61) from 9934 series, 0.267 positive
+  trained hgb
+  trained rf
+  trained xgb
+  trained catboost
+ranker matrix (577605, 61), 981 query groups (online steps)
+saved 5 members; active blend = {'ranker': 0.45, 'rf': 0.37, 'xgb': 0.11, 'catboost': 0.06, 'hgb': 0.01}
+trained 5 members in 1738s
+member percentile inference in 37s; rows=50983
+
+-- single-member TS-AUC (X_test.reduced) --
+   ranker     0.5805
+   rf         0.5458
+   xgb        0.5446
+   catboost   0.5524
+   hgb        0.5478
+
+-- blends TS-AUC (X_test.reduced, real held-out) --
+   depearly (hgb.40/ranker.60)                  0.5700   d_vs_depearly +0.0000
+   stack4  (rk.45/rf.40/xgb.10/cat.05)          0.5684   d_vs_depearly -0.0016
+   stack5  (rk.45/rf.37/xgb.11/cat.06/hgb.01)   0.5685   d_vs_depearly -0.0014
+
+   stack5 - stack4 = +0.0001
+
+=== DONE 2026-08-22 23:49:48 ===

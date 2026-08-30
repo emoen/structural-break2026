@@ -1,0 +1,19 @@
+=== METRIC-WEIGHTED-LOSS probe on ranker+rf E78 base79  2026-08-28 12:06:12  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship_scales=(40, 100, 250)
+NBASE=79 NCOL=79  metric-weight w(t): maxL=999 n_pos[peak]=1941 n_neg[0]=9971  gammas=[0.5, 1.0, 1.5]
+  [cache] seed 42 built in 1177s  Xtr(79037, 79) Rr(311156, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_struct79_cache/seed_42.pkl
+[seed 42] base79 (gamma=0) ranker+rf = 0.6330  (192s)
+[seed 42] gamma=0.5  0.6342  d=+0.0012  (203s)
+[seed 42] gamma=1.0  0.6323  d=-0.0007  (150s)
+[seed 42] gamma=1.5  0.6235  d=-0.0095  (104s)
+  [cache] seed 7 built in 484s  Xtr(79113, 79) Rr(311442, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_struct79_cache/seed_7.pkl
+[seed 7] base79 (gamma=0) ranker+rf = 0.6248  (185s)
+[seed 7] gamma=0.5  0.6225  d=-0.0022  (194s)
+[seed 7] gamma=1.0  0.6195  d=-0.0053  (155s)
+[seed 7] gamma=1.5  0.6123  d=-0.0125  (108s)
+  [cache] seed 123 built in 492s  Xtr(79068, 79) Rr(311143, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_struct79_cache/seed_123.pkl
+[seed 123] base79 (gamma=0) ranker+rf = 0.6398  (179s)
+[seed 123] gamma=0.5  0.6358  d=-0.0040  (190s)
+[seed 123] gamma=1.0  0.6263  d=-0.0135  (150s)
+[seed 123] gamma=1.5  0.6109  d=-0.0289  (103s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_wloss_rankerrf_summary.txt

@@ -1,0 +1,26 @@
+=== AR-MDN DECORRELATION DIAGNOSTIC  2026-08-29 10:46:02 ===
+seeds=[42, 7, 123]  base2 = 0.45*pct(ranker)+0.55*pct(rf)  orth_w grid=[0.05, 0.1, 0.2, 0.3]
+q: is the learned member REDUNDANT (embedding dead) or DECORRELATED-MISCOMBINED (build bigger)?
+
+[seed 42]  (232s)
+  standalone TS-AUC : mlp=0.5396  ranker=0.6283  rf=0.6249  base2=0.6323
+  redundancy Spearman(mlp, .): blend=+0.313  ranker=+0.122  rf=+0.392   (OLS mlp~rk+rf  R^2=0.184)
+  ORTHOGONAL residual TS-AUC = 0.5039   (0.50 => no new ranking signal)
+  better-combiner (base2 + w*pct(orth)):  base2=0.6323  w=0.05:0.6316(-0.0007)  w=0.10:0.6300(-0.0023)  w=0.20:0.6242(-0.0080)  w=0.30:0.6140(-0.0183)
+  => REDUNDANT on this embedding (change the INPUT, not just the model)
+
+[seed 7]  (249s)
+  standalone TS-AUC : mlp=0.5460  ranker=0.6225  rf=0.6175  base2=0.6247
+  redundancy Spearman(mlp, .): blend=+0.335  ranker=+0.139  rf=+0.417   (OLS mlp~rk+rf  R^2=0.205)
+  ORTHOGONAL residual TS-AUC = 0.5111   (0.50 => no new ranking signal)
+  better-combiner (base2 + w*pct(orth)):  base2=0.6247  w=0.05:0.6245(-0.0003)  w=0.10:0.6235(-0.0012)  w=0.20:0.6191(-0.0057)  w=0.30:0.6106(-0.0141)
+  => REDUNDANT on this embedding (change the INPUT, not just the model)
+
+[seed 123]  (234s)
+  standalone TS-AUC : mlp=0.5454  ranker=0.6355  rf=0.6292  base2=0.6389
+  redundancy Spearman(mlp, .): blend=+0.291  ranker=+0.117  rf=+0.373   (OLS mlp~rk+rf  R^2=0.167)
+  ORTHOGONAL residual TS-AUC = 0.5112   (0.50 => no new ranking signal)
+  better-combiner (base2 + w*pct(orth)):  base2=0.6389  w=0.05:0.6387(-0.0002)  w=0.10:0.6378(-0.0012)  w=0.20:0.6328(-0.0061)  w=0.30:0.6225(-0.0165)
+  => REDUNDANT on this embedding (change the INPUT, not just the model)
+
+done

@@ -1,0 +1,25 @@
+=== TWO-HEAD EARLY/LATE probe on ranker+rf E78 base79  2026-08-28 13:14:02  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 blend=0.45/0.55 ship_scales=(40, 100, 250)
+arms (K,lam)=[(40, 0.4), (40, 0.6), (60, 0.4), (60, 0.6)]  (lam = weight on EARLY head; base = single generalist)
+[seed 42] K=40 head pos: early=5290 late=15888
+[seed 42] K=60 head pos: early=7116 late=14062
+[seed 42] base79 generalist ranker+rf = 0.6330  (pos_rows 21178/79037)  (183s)
+[seed 42] K40_l0.4   0.6252  d=-0.0078  (315s)
+[seed 42] K40_l0.6   0.6137  d=-0.0193  (315s)
+[seed 42] K60_l0.4   0.6267  d=-0.0064  (316s)
+[seed 42] K60_l0.6   0.6177  d=-0.0153  (316s)
+[seed 7] K=40 head pos: early=5324 late=15929
+[seed 7] K=60 head pos: early=7106 late=14147
+[seed 7] base79 generalist ranker+rf = 0.6248  (pos_rows 21253/79113)  (190s)
+[seed 7] K40_l0.4   0.6177  d=-0.0070  (317s)
+[seed 7] K40_l0.6   0.6073  d=-0.0174  (323s)
+[seed 7] K60_l0.4   0.6187  d=-0.0061  (312s)
+[seed 7] K60_l0.6   0.6109  d=-0.0138  (315s)
+[seed 123] K=40 head pos: early=5378 late=15983
+[seed 123] K=60 head pos: early=7169 late=14192
+[seed 123] base79 generalist ranker+rf = 0.6398  (pos_rows 21361/79068)  (193s)
+[seed 123] K40_l0.4   0.6340  d=-0.0058  (318s)
+[seed 123] K40_l0.6   0.6211  d=-0.0187  (316s)
+[seed 123] K60_l0.4   0.6339  d=-0.0059  (298s)
+[seed 123] K60_l0.6   0.6223  d=-0.0175  (299s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_twohead_rankerrf_summary.txt

@@ -1,0 +1,13 @@
+=== STACK META2  2026-08-22 20:25:25 ===
+members=['hgb', 'ranker', 'rf', 'xgb', 'catboost']  search=[42, 7, 123]  fresh=[31337, 2025, 555, 99]  winner_w={'ranker': 0.45, 'rf': 0.4, 'xgb': 0.1, 'catboost': 0.05, 'hgb': 0.0}
+[cache ready] 7 seeds
+
+-- combiners (honest: fit on OOF, FRESH held out) --
+   method              search   fresh     all    d_all   d_frsh  np/7
+   champ               0.6255  0.6221  0.6236  +0.0000  +0.0000     -
+   winner_pct          0.6267  0.6238  0.6250  +0.0015  +0.0017   7/7
+   iso_blend           0.6249  0.6241  0.6245  +0.0009  +0.0020   3/7
+   lgbmrank_rank_xendcg  0.6099  0.6122  0.6112  -0.0124  -0.0099   0/7
+   lgbmrank_lambdarank  0.6173  0.6169  0.6171  -0.0065  -0.0052   0/7
+
+=== DONE 2026-08-22 20:29:44 ===

@@ -1,0 +1,19 @@
+residual block: mode=min, AR(8,) x trails(None, 120) x scales(60, 130, 250) -> +6 feats; STEPS_PER_SERIES=30
+dependence block (b_no_accf): +10 feats (studentized resid + early-onset CUSUM + arch contrast + sup-F; ACF-lag block dropped)
+pointwise matrix (11784, 61) from 398 series, 0.302 positive
+  trained hgb
+  trained rf
+  trained xgb
+  trained catboost
+  converted rf -> ONNX (15.0 MB)
+ranker matrix (23177, 61), 954 query groups (online steps)
+saved 5 members; active blend = {'ranker': 0.45, 'rf': 0.4, 'xgb': 0.1, 'catboost': 0.05}
+[train] 114s
+[saved] members=[('ranker', 'ranker'), ('rf', 'onnx'), ('xgb', 'clf'), ('catboost', 'clf'), ('hgb', 'clf')]
+[saved] has rf_onnx=True size=15.0MB  'rf' in models=False
+[saved] refs keys=['hgb', 'rf', 'xgb', 'catboost', 'ranker']
+
+[infer] 50983 scores (expected 50983); nan=0; min=0.0000 max=0.9877 mean=0.5512
+[infer] 171.4s total -> 3.36 ms/point
+
+SMOKE OK

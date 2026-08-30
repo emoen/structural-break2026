@@ -1,0 +1,91 @@
+=== WINDOW-LENGTH re-search on ranker+rf E75 base79  2026-08-27 09:38:44  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 NCOL=79
+configs=['base_60_130_250', 't_40_100_250', 't_50_120_250', 't_70_140_250', 't_80_160_250', 't_60_110_250', 't_60_150_250', 't_45_130_250', 't_60_130_200', 't_60_130_220', 't_50_140_250', 't_70_160_250', 'w300_60_150_300', 'w300_70_160_300', 'w350_80_175_350']
+  [cache] seed 42 cfg base_60_130_250 built in 514s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_base_60_130_250.pkl
+[seed 42] base_60_130_250    win=250 (60, 130, 250)   0.6304  d=+0.0000  (706s)
+  [cache] seed 42 cfg t_40_100_250 built in 512s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_40_100_250.pkl
+[seed 42] t_40_100_250       win=250 (40, 100, 250)   0.6323  d=+0.0018  (708s)
+  [cache] seed 42 cfg t_50_120_250 built in 523s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_50_120_250.pkl
+[seed 42] t_50_120_250       win=250 (50, 120, 250)   0.6310  d=+0.0006  (708s)
+  [cache] seed 42 cfg t_70_140_250 built in 516s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_70_140_250.pkl
+[seed 42] t_70_140_250       win=250 (70, 140, 250)   0.6299  d=-0.0005  (701s)
+  [cache] seed 42 cfg t_80_160_250 built in 532s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_80_160_250.pkl
+[seed 42] t_80_160_250       win=250 (80, 160, 250)   0.6304  d=-0.0000  (715s)
+  [cache] seed 42 cfg t_60_110_250 built in 495s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_60_110_250.pkl
+[seed 42] t_60_110_250       win=250 (60, 110, 250)   0.6305  d=+0.0000  (679s)
+  [cache] seed 42 cfg t_60_150_250 built in 515s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_60_150_250.pkl
+[seed 42] t_60_150_250       win=250 (60, 150, 250)   0.6302  d=-0.0003  (699s)
+  [cache] seed 42 cfg t_45_130_250 built in 512s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_45_130_250.pkl
+[seed 42] t_45_130_250       win=250 (45, 130, 250)   0.6288  d=-0.0017  (700s)
+  [cache] seed 42 cfg t_60_130_200 built in 528s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_60_130_200.pkl
+[seed 42] t_60_130_200       win=250 (60, 130, 200)   0.6283  d=-0.0021  (721s)
+  [cache] seed 42 cfg t_60_130_220 built in 517s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_60_130_220.pkl
+[seed 42] t_60_130_220       win=250 (60, 130, 220)   0.6294  d=-0.0011  (710s)
+  [cache] seed 42 cfg t_50_140_250 built in 526s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_50_140_250.pkl
+[seed 42] t_50_140_250       win=250 (50, 140, 250)   0.6305  d=+0.0001  (710s)
+  [cache] seed 42 cfg t_70_160_250 built in 557s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_t_70_160_250.pkl
+[seed 42] t_70_160_250       win=250 (70, 160, 250)   0.6296  d=-0.0008  (751s)
+  [cache] seed 42 cfg w300_60_150_300 built in 636s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_w300_60_150_300.pkl
+[seed 42] w300_60_150_300    win=300 (60, 150, 300)   0.6303  d=-0.0001  (844s)
+  [cache] seed 42 cfg w300_70_160_300 built in 660s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_w300_70_160_300.pkl
+[seed 42] w300_70_160_300    win=300 (70, 160, 300)   0.6313  d=+0.0009  (868s)
+  [cache] seed 42 cfg w350_80_175_350 built in 693s  Xtr(79037, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_42_w350_80_175_350.pkl
+[seed 42] w350_80_175_350    win=350 (80, 175, 350)   0.6298  d=-0.0007  (902s)
+  [cache] seed 7 cfg base_60_130_250 built in 621s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_base_60_130_250.pkl
+[seed 7] base_60_130_250    win=250 (60, 130, 250)   0.6242  d=+0.0000  (836s)
+  [cache] seed 7 cfg t_40_100_250 built in 505s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_40_100_250.pkl
+[seed 7] t_40_100_250       win=250 (40, 100, 250)   0.6247  d=+0.0005  (690s)
+  [cache] seed 7 cfg t_50_120_250 built in 506s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_50_120_250.pkl
+[seed 7] t_50_120_250       win=250 (50, 120, 250)   0.6254  d=+0.0012  (687s)
+  [cache] seed 7 cfg t_70_140_250 built in 521s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_70_140_250.pkl
+[seed 7] t_70_140_250       win=250 (70, 140, 250)   0.6246  d=+0.0004  (701s)
+  [cache] seed 7 cfg t_80_160_250 built in 536s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_80_160_250.pkl
+[seed 7] t_80_160_250       win=250 (80, 160, 250)   0.6244  d=+0.0002  (716s)
+  [cache] seed 7 cfg t_60_110_250 built in 501s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_60_110_250.pkl
+[seed 7] t_60_110_250       win=250 (60, 110, 250)   0.6236  d=-0.0006  (682s)
+  [cache] seed 7 cfg t_60_150_250 built in 521s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_60_150_250.pkl
+[seed 7] t_60_150_250       win=250 (60, 150, 250)   0.6249  d=+0.0007  (701s)
+  [cache] seed 7 cfg t_45_130_250 built in 507s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_45_130_250.pkl
+[seed 7] t_45_130_250       win=250 (45, 130, 250)   0.6262  d=+0.0020  (694s)
+  [cache] seed 7 cfg t_60_130_200 built in 498s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_60_130_200.pkl
+[seed 7] t_60_130_200       win=250 (60, 130, 200)   0.6231  d=-0.0011  (692s)
+  [cache] seed 7 cfg t_60_130_220 built in 529s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_60_130_220.pkl
+[seed 7] t_60_130_220       win=250 (60, 130, 220)   0.6236  d=-0.0006  (713s)
+  [cache] seed 7 cfg t_50_140_250 built in 514s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_50_140_250.pkl
+[seed 7] t_50_140_250       win=250 (50, 140, 250)   0.6251  d=+0.0009  (696s)
+  [cache] seed 7 cfg t_70_160_250 built in 532s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_t_70_160_250.pkl
+[seed 7] t_70_160_250       win=250 (70, 160, 250)   0.6245  d=+0.0003  (715s)
+  [cache] seed 7 cfg w300_60_150_300 built in 541s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_w300_60_150_300.pkl
+[seed 7] w300_60_150_300    win=300 (60, 150, 300)   0.6238  d=-0.0004  (724s)
+  [cache] seed 7 cfg w300_70_160_300 built in 550s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_w300_70_160_300.pkl
+[seed 7] w300_70_160_300    win=300 (70, 160, 300)   0.6238  d=-0.0004  (731s)
+  [cache] seed 7 cfg w350_80_175_350 built in 577s  Xtr(79113, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_7_w350_80_175_350.pkl
+[seed 7] w350_80_175_350    win=350 (80, 175, 350)   0.6247  d=+0.0005  (756s)
+  [cache] seed 123 cfg base_60_130_250 built in 514s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_base_60_130_250.pkl
+[seed 123] base_60_130_250    win=250 (60, 130, 250)   0.6391  d=+0.0000  (695s)
+  [cache] seed 123 cfg t_40_100_250 built in 488s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_40_100_250.pkl
+[seed 123] t_40_100_250       win=250 (40, 100, 250)   0.6389  d=-0.0001  (669s)
+  [cache] seed 123 cfg t_50_120_250 built in 504s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_50_120_250.pkl
+[seed 123] t_50_120_250       win=250 (50, 120, 250)   0.6392  d=+0.0001  (685s)
+  [cache] seed 123 cfg t_70_140_250 built in 526s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_70_140_250.pkl
+[seed 123] t_70_140_250       win=250 (70, 140, 250)   0.6395  d=+0.0004  (709s)
+  [cache] seed 123 cfg t_80_160_250 built in 541s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_80_160_250.pkl
+[seed 123] t_80_160_250       win=250 (80, 160, 250)   0.6382  d=-0.0008  (722s)
+  [cache] seed 123 cfg t_60_110_250 built in 506s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_60_110_250.pkl
+[seed 123] t_60_110_250       win=250 (60, 110, 250)   0.6395  d=+0.0004  (687s)
+  [cache] seed 123 cfg t_60_150_250 built in 526s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_60_150_250.pkl
+[seed 123] t_60_150_250       win=250 (60, 150, 250)   0.6373  d=-0.0018  (706s)
+  [cache] seed 123 cfg t_45_130_250 built in 507s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_45_130_250.pkl
+[seed 123] t_45_130_250       win=250 (45, 130, 250)   0.6397  d=+0.0006  (688s)
+  [cache] seed 123 cfg t_60_130_200 built in 496s  Xtr(79068, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_cache/seed_123_t_60_130_200.pkl
+[seed 123] t_60_130_200       win=250 (60, 130, 200)   0.6396  d=+0.0006  (682s)
+Traceback (most recent call last):
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_rankerrf.py", line 456, in <module>
+    main()
+    ~~~~^^
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_rankerrf.py", line 418, in main
+    sd = prepare_seed_cfg(seed, cfg)
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_winsearch_rankerrf.py", line 333, in prepare_seed_cfg
+    pickle.dump(sd, f, protocol=pickle.HIGHEST_PROTOCOL)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device

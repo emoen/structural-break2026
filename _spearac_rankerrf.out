@@ -1,0 +1,25 @@
+=== SPEARMAN-AC probe on ranker+rf E75 base79  2026-08-27 19:56:33  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=88 scales=(60, 130, 250)
+base spans (AR8, shipped)=['ar8_t60', 'ar8_t200']  cand lags=[('sac1', 1), ('sac2', 2), ('sac3', 3)]
+candidates=['sac1', 'sac2', 'sac3', 'sac_all']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 0.00e+00  (nonzero cand cols 9/9)
+  [cache] seed 42 built in 832s  Xtr(79037, 88) Rr(311156, 88) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_spearac_cache/seed_42.pkl
+[seed 42] base79 ranker+rf = 0.6304  (187s)
+[seed 42] sac1         0.6318  d=+0.0014  (189s)
+[seed 42] sac2         0.6308  d=+0.0003  (189s)
+[seed 42] sac3         0.6284  d=-0.0021  (191s)
+[seed 42] sac_all      0.6305  d=+0.0001  (204s)
+  [cache] seed 7 built in 841s  Xtr(79113, 88) Rr(311442, 88) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_spearac_cache/seed_7.pkl
+[seed 7] base79 ranker+rf = 0.6242  (182s)
+[seed 7] sac1         0.6251  d=+0.0009  (186s)
+[seed 7] sac2         0.6236  d=-0.0006  (192s)
+[seed 7] sac3         0.6236  d=-0.0006  (206s)
+[seed 7] sac_all      0.6227  d=-0.0015  (221s)
+  [cache] seed 123 built in 1027s  Xtr(79068, 88) Rr(311143, 88) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_spearac_cache/seed_123.pkl
+[seed 123] base79 ranker+rf = 0.6391  (228s)
+[seed 123] sac1         0.6383  d=-0.0008  (240s)
+[seed 123] sac2         0.6391  d=+0.0001  (239s)
+[seed 123] sac3         0.6385  d=-0.0006  (243s)
+[seed 123] sac_all      0.6395  d=+0.0005  (267s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_spearac_rankerrf_summary.txt

@@ -1,0 +1,25 @@
+=== RESIDUAL-SHAPE probe on ranker+rf E75 base79  2026-08-27 21:53:51  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=85 ship_scales=(60, 130, 250)  cand_scales=(60, 130, 250)
+arms=[('rkurt', 'kurt', (130, 250)), ('rqkurt', 'qkurt', (60, 130, 250)), ('rhill', 'hill', (250,))]
+candidates=['rkurt', 'rqkurt', 'rhill', 'rshape_all']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 2.53e-14  (nonzero cand cols 6/6)
+  [cache] seed 42 built in 734s  Xtr(79037, 85) Rr(311156, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_rshape_cache/seed_42.pkl
+[seed 42] base79 ranker+rf = 0.6304  (229s)
+[seed 42] rkurt        0.6290  d=-0.0014  (236s)
+[seed 42] rqkurt       0.6311  d=+0.0007  (191s)
+[seed 42] rhill        0.6322  d=+0.0018  (184s)
+[seed 42] rshape_all   0.6314  d=+0.0009  (193s)
+  [cache] seed 7 built in 582s  Xtr(79113, 85) Rr(311442, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_rshape_cache/seed_7.pkl
+[seed 7] base79 ranker+rf = 0.6242  (179s)
+[seed 7] rkurt        0.6237  d=-0.0005  (182s)
+[seed 7] rqkurt       0.6244  d=+0.0002  (186s)
+[seed 7] rhill        0.6227  d=-0.0015  (182s)
+[seed 7] rshape_all   0.6233  d=-0.0009  (192s)
+  [cache] seed 123 built in 586s  Xtr(79068, 85) Rr(311143, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_rshape_cache/seed_123.pkl
+[seed 123] base79 ranker+rf = 0.6391  (178s)
+[seed 123] rkurt        0.6374  d=-0.0016  (183s)
+[seed 123] rqkurt       0.6387  d=-0.0003  (189s)
+[seed 123] rhill        0.6378  d=-0.0013  (183s)
+[seed 123] rshape_all   0.6356  d=-0.0035  (193s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_rshape_rankerrf_summary.txt

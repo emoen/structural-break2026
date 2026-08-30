@@ -1,0 +1,22 @@
+=== MULTI-SCALE RAW-WINDOW SEQUENCE / 1-D CNN 3rd-member probe on ranker+rf base79  2026-08-30 08:56:15  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship_scales=(40, 100, 250)
+NCOL=79 seq_scales=(40, 128, 250) cnn_epochs=12 torch=2.13.0+cpu arms=[0.1, 0.2, 0.3]
+[affine-check] scale  40: seq maxdiff under x->3.7x+5.2: 0.00e+00  mask_eq=True  (nonzero 40/40)
+[affine-check] scale 128: seq maxdiff under x->3.7x+5.2: 0.00e+00  mask_eq=True  (nonzero 128/128)
+[affine-check] scale 250: seq maxdiff under x->3.7x+5.2: 0.00e+00  mask_eq=True  (nonzero 250/250)
+  [cache] seed 42 built in 511s  Xtr(79037, 79) SEQrows=79037 scales=(40, 128, 250) Rr(311156, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqcnnms_cache/seed_42.pkl
+[seed 42] base79 (w_mdn=0) ranker+rf = 0.6323  (1226s)
+[seed 42] wmdn0.10 0.6318  d=-0.0004  (1s)
+[seed 42] wmdn0.20 0.6305  d=-0.0018  (1s)
+[seed 42] wmdn0.30 0.6281  d=-0.0042  (1s)
+  [cache] seed 7 built in 515s  Xtr(79113, 79) SEQrows=79113 scales=(40, 128, 250) Rr(311442, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqcnnms_cache/seed_7.pkl
+[seed 7] base79 (w_mdn=0) ranker+rf = 0.6247  (553s)
+[seed 7] wmdn0.10 0.6239  d=-0.0008  (1s)
+[seed 7] wmdn0.20 0.6224  d=-0.0023  (1s)
+[seed 7] wmdn0.30 0.6198  d=-0.0049  (1s)
+  [cache] seed 123 built in 520s  Xtr(79068, 79) SEQrows=79068 scales=(40, 128, 250) Rr(311143, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqcnnms_cache/seed_123.pkl
+[seed 123] base79 (w_mdn=0) ranker+rf = 0.6389  (489s)
+[seed 123] wmdn0.10 0.6382  d=-0.0007  (1s)
+[seed 123] wmdn0.20 0.6368  d=-0.0021  (1s)
+[seed 123] wmdn0.30 0.6344  d=-0.0046  (1s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqcnnms_rankerrf_summary.txt

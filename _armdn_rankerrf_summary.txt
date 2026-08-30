@@ -1,0 +1,11 @@
+# AR-residual density-ratio 3rd-member probe on ranker+rf base79  2026-08-29 07:57:38
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) KQ=32 mlp={'hidden_layer_sizes': (64, 32), 'activation': 'relu', 'alpha': 0.001} max_iter=300
+# 3rd member = MLP on the history-standardized AR8 window-residual quantile embedding
+# (affine-invariant density-ratio matched filter); w_mdn=0 == the 2-member champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior LOW: learned-rep members E45/E47/E31 died.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00120  -0.00170  -0.00091   0/3
+wmdn0.20      -0.00475  -0.00577  -0.00388   0/3
+wmdn0.30      -0.01116  -0.01265  -0.00923   0/3

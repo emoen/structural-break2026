@@ -1,0 +1,9 @@
+# metric-weighted-loss probe on ranker+rf E78 base79  2026-08-28 23:19:00
+# seeds=[42, 7] rf_trees=120 dense_k=20 blend=0.45/0.55 ship=(40, 100, 250)
+# sample_weight = (metric pairing count at step t)^gamma, mean-normalized; gamma=0 == champion.
+# pos row weighted by n_neg(t), neg row by n_pos(t) -> the humped empirical w(t).
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds.
+
+gamma         mean_d     min_d     max_d   npos
+0.5         +0.00239  -0.00342  +0.00820   1/2
+1.0         -0.00216  -0.00868  +0.00437   1/2

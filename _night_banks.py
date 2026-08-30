@@ -282,7 +282,53 @@ NDEP = len(DEP_NAMES)
 
 
 # ===========================================================================
-# Deliverable (e): causal sequential change-point detector bank
+# Batch Bayesian change-point bank (CLOSED 2026-08-21: screen-positive, ship-gate-NEGATIVE)
+# ---------------------------------------------------------------------------
+# Offline single-changepoint conjugate-Gaussian model on the within-window standardized series.
+# Multi-seed x multi-offset HONEST OOF-AUC screen (_grind_confirm) was strongly positive:
+# +0.006..+0.011 over champ61, 3/3 at every offset, largest at early offsets. BUT the full
+# streaming ship-gate (_bayescp_ship: champ61 vs champ61+bcp, shipped 0.6/0.4 blend, TS-AUC)
+# came back NEGATIVE: mean_d -0.0013, 0/3 seeds, min_t -1.11. Lesson: the static broken-vs-unbroken
+# OOF-AUC discrimination screen and the per-step cross-series TS-AUC RANKING metric diverge; a
+# feature can sharpen discrimination yet hurt the cross-series ordering the metric rewards. Kept as
+# an exploratory mode (like dep2/supf2/seq/calib/calibz); NOT in the champion.
+#   bcp_logbf: log Bayes factor for "one change" vs "no change" (uniform prior over split).
+#   bcp_kmap : MAP change location / n.
+#   bcp_ent  : normalized posterior entropy over the split location (localisation certainty).
+BAYESCP_NAMES = ["bcp_logbf", "bcp_kmap", "bcp_ent"]
+NBAYESCP = len(BAYESCP_NAMES)
+_BCP_TAU2 = 10.0
+
+
+def bayescp_feats(w, ctx=None, ref=None):
+    v = np.asarray(w, dtype=np.float64)
+    n = len(v)
+    if n < 24:
+        return [0.0, 0.0, 0.0]
+    z = (v - v.mean()) / (v.std() + 1e-9)
+    cs = np.concatenate([[0.0], np.cumsum(z)])
+    cq = np.concatenate([[0.0], np.cumsum(z * z)])
+
+    def lml(a, b):
+        cnt = b - a
+        if cnt <= 0:
+            return 0.0
+        s = cs[b] - cs[a]; sq = cq[b] - cq[a]
+        prec = cnt + 1.0 / _BCP_TAU2
+        return -0.5 * sq + 0.5 * s * s / prec - 0.5 * math.log(prec * _BCP_TAU2)
+
+    ml0 = lml(0, n)
+    lo, hi = max(4, n // 12), n - max(4, n // 12)
+    ks = np.arange(lo, hi)
+    lps = np.array([lml(0, int(k)) + lml(int(k), n) for k in ks])
+    m = lps.max()
+    ev1 = m + math.log(np.exp(lps - m).sum()) - math.log(len(ks))
+    logbf = ev1 - ml0
+    post = np.exp(lps - m); post /= post.sum()
+    kmap = ks[int(np.argmax(lps))] / n
+    ent = -float(np.sum(post * np.log(post + _EPS))) / math.log(len(ks))
+    return [float(logbf), float(kmap), float(ent)]
+
 # ---------------------------------------------------------------------------
 # The EDA early-detection cliff showed the champion loses ~27 AUC points from a clean window
 # (0.97) to the just-after-break regime (0.71 at 10 post points), and the per-time-online metric

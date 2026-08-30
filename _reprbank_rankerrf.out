@@ -1,0 +1,20 @@
+=== REPR bank on ranker+rf ship base  2026-08-25 13:28:02  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=73 NCOL=82 cep_k=2 hig_kmax=8 scales=(60, 130, 250)
+candidates=['cep', 'higuchi', 'repr_all']
+  [cache] seed 42 built in 1657s  Xtr(79037, 82) Rr(311156, 82) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_reprbank_cache/seed_42.pkl
+[seed 42] base73 ranker+rf = 0.6263  (887s)
+[seed 42] cep              0.6278  d=+0.0015  (449s)
+[seed 42] higuchi          0.6258  d=-0.0005  (380s)
+[seed 42] repr_all         0.6254  d=-0.0009  (385s)
+  [cache] seed 7 built in 1374s  Xtr(79113, 82) Rr(311442, 82) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_reprbank_cache/seed_7.pkl
+[seed 7] base73 ranker+rf = 0.6228  (357s)
+[seed 7] cep              0.6205  d=-0.0024  (391s)
+[seed 7] higuchi          0.6223  d=-0.0006  (389s)
+[seed 7] repr_all         0.6198  d=-0.0030  (435s)
+  [cache] seed 123 built in 1775s  Xtr(79068, 82) Rr(311143, 82) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_reprbank_cache/seed_123.pkl
+[seed 123] base73 ranker+rf = 0.6361  (428s)
+[seed 123] cep              0.6345  d=-0.0016  (471s)
+[seed 123] higuchi          0.6365  d=+0.0004  (396s)
+[seed 123] repr_all         0.6325  d=-0.0036  (541s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_reprbank_rankerrf_summary.txt

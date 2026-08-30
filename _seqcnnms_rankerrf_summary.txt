@@ -1,0 +1,12 @@
+# multi-scale raw-window sequence / 1-D CNN 3rd-member probe on ranker+rf base79  2026-08-30 09:59:57
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) seq_scales=(40, 128, 250) cnn_epochs=12
+# 3rd member = torch multi-branch 1-D CNN over 3 history-standardized window scales
+# (40/128/250; extends the single-scale E83 NULL); w_mdn=0 == the champion baseline.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior LOW: E83 single-scale NULL + learned-rep E31/E45/E47 +
+# shape E59/E79/E82 all NULL.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00065  -0.00079  -0.00044   0/3
+wmdn0.20      -0.00209  -0.00234  -0.00179   0/3
+wmdn0.30      -0.00458  -0.00495  -0.00422   0/3

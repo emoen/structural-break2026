@@ -1,0 +1,208 @@
+=== MODEL ZOO  2026-08-22 00:44:59  smoke=False ===
+features: mode=champ_dep cols=61 (b_no_accf champion set)
+search seeds=[42, 7, 123]  fresh seeds=[31337, 2025, 555, 99]  families=['hgb', 'lgbm', 'xgb', 'catboost', 'gbdt', 'rf', 'extratrees', 'logreg', 'ridge', 'sgd', 'lda', 'qda', 'gnb', 'knn', 'svc', 'mlp']
+
+-- building features (search seeds) --
+   seed 42: 79037 train rows, 10 folds (184s)
+   seed 7: 79113 train rows, 10 folds (177s)
+   seed 123: 79068 train rows, 10 folds (177s)
+
+== STAGE 1+2: default + rough grid (search seeds) ==
+   hgb/default            mean=0.6160 sd=0.0016 seeds=[0.615, 0.6148, 0.6183] (57s)
+   hgb/rough0             mean=0.6136 sd=0.0025 seeds=[0.6132, 0.6107, 0.6168] (44s)
+   hgb/rough1             mean=0.6147 sd=0.0011 seeds=[0.6144, 0.6135, 0.6162] (57s)
+   hgb/rough2             mean=0.6143 sd=0.0024 seeds=[0.6125, 0.6128, 0.6176] (60s)
+   hgb/rough3             mean=0.6120 sd=0.0020 seeds=[0.6107, 0.6105, 0.6148] (44s)
+   lgbm/default           mean=0.6151 sd=0.0023 seeds=[0.6122, 0.6154, 0.6178] (57s)
+   lgbm/rough0            mean=0.6162 sd=0.0015 seeds=[0.6148, 0.6154, 0.6182] (66s)
+   lgbm/rough1            mean=0.6132 sd=0.0014 seeds=[0.6113, 0.6139, 0.6145] (62s)
+   lgbm/rough2            mean=0.6150 sd=0.0034 seeds=[0.6137, 0.6117, 0.6197] (62s)
+   lgbm/rough3            mean=0.6154 sd=0.0018 seeds=[0.6129, 0.6163, 0.617] (72s)
+   xgb/default            mean=0.6171 sd=0.0026 seeds=[0.6138, 0.6173, 0.6202] (52s)
+   xgb/rough0             mean=0.6135 sd=0.0026 seeds=[0.6121, 0.6112, 0.6172] (48s)
+   xgb/rough1             mean=0.6116 sd=0.0025 seeds=[0.6089, 0.6149, 0.611] (48s)
+   xgb/rough2             mean=0.6153 sd=0.0020 seeds=[0.6136, 0.6142, 0.618] (57s)
+   catboost/default       mean=0.6142 sd=0.0025 seeds=[0.6121, 0.6127, 0.6177] (45s)
+   catboost/rough0        mean=0.6108 sd=0.0021 seeds=[0.6086, 0.6103, 0.6136] (46s)
+   catboost/rough1        mean=0.6157 sd=0.0028 seeds=[0.6117, 0.6177, 0.6178] (52s)
+   catboost/rough2        mean=0.6164 sd=0.0022 seeds=[0.6146, 0.615, 0.6195] (47s)
+   gbdt/default           mean=0.6049 sd=0.0031 seeds=[0.602, 0.6036, 0.6091] (424s)
+   gbdt/rough0            mean=0.6018 sd=0.0037 seeds=[0.5989, 0.5995, 0.607] (552s)
+   gbdt/rough1            mean=0.6108 sd=0.0036 seeds=[0.6075, 0.609, 0.6157] (478s)
+   rf/default             mean=0.6190 sd=0.0032 seeds=[0.6166, 0.6168, 0.6235] (115s)
+   rf/rough0              mean=0.6195 sd=0.0041 seeds=[0.6179, 0.6155, 0.6251] (172s)
+   rf/rough1              mean=0.6161 sd=0.0035 seeds=[0.6135, 0.6137, 0.6211] (260s)
+   rf/rough2              mean=0.6161 sd=0.0033 seeds=[0.6146, 0.6131, 0.6207] (122s)
+   extratrees/default     mean=0.6091 sd=0.0027 seeds=[0.6098, 0.6056, 0.6121] (59s)
+   extratrees/rough0      mean=0.6123 sd=0.0028 seeds=[0.6116, 0.6093, 0.616] (78s)
+   extratrees/rough1      mean=0.6150 sd=0.0020 seeds=[0.6141, 0.6131, 0.6178] (73s)
+   extratrees/rough2      mean=0.5998 sd=0.0034 seeds=[0.5992, 0.5961, 0.6042] (64s)
+   logreg/default         mean=0.5649 sd=0.0012 seeds=[0.565, 0.5633, 0.5663] (41s)
+   logreg/rough0          mean=0.5649 sd=0.0017 seeds=[0.5637, 0.5638, 0.5673] (39s)
+   logreg/rough1          mean=0.5649 sd=0.0013 seeds=[0.5656, 0.563, 0.566] (41s)
+   logreg/rough2          mean=0.5636 sd=0.0011 seeds=[0.5643, 0.562, 0.5644] (41s)
+   ridge/default          mean=0.5637 sd=0.0018 seeds=[0.563, 0.562, 0.5662] (37s)
+   ridge/rough0           mean=0.5640 sd=0.0020 seeds=[0.5637, 0.5617, 0.5665] (37s)
+   ridge/rough1           mean=0.5639 sd=0.0016 seeds=[0.5627, 0.5627, 0.5662] (37s)
+   ridge/rough2           mean=0.5641 sd=0.0021 seeds=[0.5625, 0.5628, 0.567] (36s)
+   sgd/default            mean=0.5538 sd=0.0040 seeds=[0.5557, 0.5482, 0.5574] (39s)
+   sgd/rough0             mean=0.5625 sd=0.0011 seeds=[0.5627, 0.5636, 0.5611] (37s)
+   sgd/rough1             mean=0.5536 sd=0.0066 seeds=[0.5484, 0.5495, 0.5629] (39s)
+   lda/default            mean=0.5653 sd=0.0022 seeds=[0.5624, 0.566, 0.5676] (37s)
+   lda/rough0             mean=0.5664 sd=0.0021 seeds=[0.5642, 0.5657, 0.5692] (36s)
+   lda/rough1             mean=0.5685 sd=0.0029 seeds=[0.5671, 0.5659, 0.5726] (36s)
+   qda/default            mean=0.5705 sd=0.0010 seeds=[0.5718, 0.5702, 0.5694] (39s)
+   qda/rough0             FAILED: LinAlgError: The covariance matrix of class 0 is not full rank. Increase the value of `reg_param` to reduce the collinearity.
+Traceback (most recent call last):
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_model_zoo.py", line 528, in main
+    r = run_config(fam, params, S_by_seed, SEEDS, fam["scale"], fam["sub"])
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_model_zoo.py", line 483, in run_config
+    a, pr = eval_config(fam["ctor"], params, S_by_seed[seed], seed,
+            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        scale=scale, sub=sub, want_preds=want_preds)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_model_zoo.py", line 159, in eval_config
+    model.fit(Xfit, yfit)
+    ~~~~~~~~~^^^^^^^^^^^^
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/.venv/lib/python3.13/site-packages/sklearn/base.py", line 1403, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+  File "/home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/.venv/lib/python3.13/site-packages/sklearn/discriminant_analysis.py", line 1141, in fit
+    raise linalg.LinAlgError(
+    ...<3 lines>...
+    )
+numpy.linalg.LinAlgError: The covariance matrix of class 0 is not full rank. Increase the value of `reg_param` to reduce the collinearity.
+   qda/rough1             mean=0.5747 sd=0.0013 seeds=[0.5737, 0.5765, 0.5738] (39s)
+   gnb/default            mean=0.5642 sd=0.0087 seeds=[0.5523, 0.5673, 0.573] (37s)
+   gnb/rough0             mean=0.5666 sd=0.0075 seeds=[0.5567, 0.568, 0.575] (37s)
+   gnb/rough1             mean=0.5728 sd=0.0077 seeds=[0.5731, 0.5632, 0.582] (37s)
+   knn/default            mean=0.5004 sd=0.0001 seeds=[0.5003, 0.5005, 0.5003] (58s)
+   knn/rough0             mean=0.5000 sd=0.0000 seeds=[0.5, 0.5, 0.5] (63s)
+   knn/rough1             mean=0.5564 sd=0.0013 seeds=[0.5579, 0.5548, 0.5564] (56s)
+   svc/default            mean=0.5793 sd=0.0040 seeds=[0.5847, 0.5752, 0.5779] (378s)
+   svc/rough0             mean=0.5765 sd=0.0032 seeds=[0.5809, 0.5737, 0.5748] (385s)
+   svc/rough1             mean=0.5802 sd=0.0043 seeds=[0.5863, 0.5772, 0.5772] (362s)
+   mlp/default            mean=0.5905 sd=0.0055 seeds=[0.5867, 0.5983, 0.5864] (54s)
+   mlp/rough0             mean=0.5888 sd=0.0108 seeds=[0.5755, 0.6019, 0.5891] (62s)
+   mlp/rough1             mean=0.5940 sd=0.0042 seeds=[0.5969, 0.5969, 0.588] (55s)
+
+-- DEFAULT scores (search-seed mean TS-AUC) --
+   hgb          0.6160
+   lgbm         0.6151
+   xgb          0.6171
+   catboost     0.6142
+   gbdt         0.6049
+   rf           0.6190
+   extratrees   0.6091
+   logreg       0.5649
+   ridge        0.5637
+   sgd          0.5538
+   lda          0.5653
+   qda          0.5705
+   gnb          0.5642
+   knn          0.5004
+   svc          0.5793
+   mlp          0.5905
+
+-- best config per family (default ∪ rough) --
+   rf           0.6195  (rough0)
+   xgb          0.6171  (default)
+   catboost     0.6164  (rough2)
+   lgbm         0.6162  (rough0)
+   hgb          0.6160  (default)
+   extratrees   0.6150  (rough1)
+   gbdt         0.6108  (rough1)
+   mlp          0.5940  (rough1)
+   svc          0.5802  (rough1)
+   qda          0.5747  (rough1)
+   gnb          0.5728  (rough1)
+   lda          0.5685  (rough1)
+   logreg       0.5649  (rough0)
+   ridge        0.5641  (rough2)
+   sgd          0.5625  (rough0)
+   knn          0.5564  (rough1)
+
+== TOP-3 families selected: ['rf', 'xgb', 'catboost'] ==
+
+== STAGE 4: fine grid (top-3, search seeds) ==
+
+   -- rf: 19 fine configs --
+      fine0   mean=0.6195 sd=0.0041 (170s)
+      fine1   mean=0.6189 sd=0.0041 (133s)
+      fine2   mean=0.6190 sd=0.0032 (119s)
+      fine3   mean=0.6172 sd=0.0032 (110s)
+      fine4   mean=0.6168 sd=0.0036 (399s)
+      fine5   mean=0.6191 sd=0.0033 (345s)
+      fine6   mean=0.6184 sd=0.0030 (316s)
+      fine7   mean=0.6179 sd=0.0035 (110s)
+      fine8   mean=0.6175 sd=0.0034 (99s)
+      fine9   mean=0.6161 sd=0.0032 (93s)
+      fine10  mean=0.6192 sd=0.0040 (232s)
+      fine11  mean=0.6190 sd=0.0036 (204s)
+      fine12  mean=0.6175 sd=0.0033 (188s)
+      fine13  mean=0.6184 sd=0.0036 (766s)
+      fine14  mean=0.6197 sd=0.0034  <== new best (659s)
+      fine15  mean=0.6189 sd=0.0034 (597s)
+      fine16  mean=0.6185 sd=0.0038 (188s)
+      fine17  mean=0.6180 sd=0.0037 (166s)
+      fine18  mean=0.6162 sd=0.0033 (153s)
+   >> rf best: 0.6197  {"n_estimators": 800, "max_features": 0.5, "min_samples_leaf": 20}
+
+   -- xgb: 19 fine configs --
+      fine0   mean=0.6171 sd=0.0026 (47s)
+      fine1   mean=0.6143 sd=0.0030 (49s)
+      fine2   mean=0.6148 sd=0.0032 (49s)
+      fine3   mean=0.6158 sd=0.0032 (55s)
+      fine4   mean=0.6165 sd=0.0022 (55s)
+      fine5   mean=0.6155 sd=0.0020 (62s)
+      fine6   mean=0.6160 sd=0.0015 (64s)
+      fine7   mean=0.6139 sd=0.0028 (46s)
+      fine8   mean=0.6142 sd=0.0029 (46s)
+      fine9   mean=0.6156 sd=0.0027 (50s)
+      fine10  mean=0.6140 sd=0.0027 (50s)
+      fine11  mean=0.6136 sd=0.0017 (56s)
+      fine12  mean=0.6138 sd=0.0017 (56s)
+      fine13  mean=0.6153 sd=0.0018 (42s)
+      fine14  mean=0.6139 sd=0.0020 (42s)
+      fine15  mean=0.6135 sd=0.0015 (45s)
+      fine16  mean=0.6135 sd=0.0043 (45s)
+      fine17  mean=0.6104 sd=0.0011 (48s)
+      fine18  mean=0.6126 sd=0.0029 (48s)
+   >> xgb best: 0.6171  {"n_estimators": 400, "learning_rate": 0.03, "max_depth": 6, "subsample": 0.8, "colsample_bytree": 0.7, "reg_lambda": 1.0, "min_child_weight": 5}
+
+   -- catboost: 19 fine configs --
+      fine0   mean=0.6164 sd=0.0022 (47s)
+      fine1   mean=0.6108 sd=0.0021 (46s)
+      fine2   mean=0.6108 sd=0.0020 (46s)
+      fine3   mean=0.6155 sd=0.0031 (51s)
+      fine4   mean=0.6154 sd=0.0017 (52s)
+      fine5   mean=0.6158 sd=0.0031 (72s)
+      fine6   mean=0.6163 sd=0.0032 (72s)
+      fine7   mean=0.6111 sd=0.0023 (44s)
+      fine8   mean=0.6120 sd=0.0024 (44s)
+      fine9   mean=0.6148 sd=0.0023 (47s)
+      fine10  mean=0.6147 sd=0.0016 (47s)
+      fine11  mean=0.6152 sd=0.0025 (62s)
+      fine12  mean=0.6162 sd=0.0027 (62s)
+      fine13  mean=0.6123 sd=0.0021 (41s)
+      fine14  mean=0.6121 sd=0.0025 (41s)
+      fine15  mean=0.6163 sd=0.0023 (43s)
+      fine16  mean=0.6153 sd=0.0014 (43s)
+      fine17  mean=0.6159 sd=0.0020 (52s)
+      fine18  mean=0.6157 sd=0.0028 (52s)
+   >> catboost best: 0.6164  {"iterations": 600, "learning_rate": 0.03, "depth": 6, "l2_leaf_reg": 10.0}
+
+== STAGE 5: FINAL — winners on search + fresh seeds ==
+   fresh seed 31337 built (175s)
+   fresh seed 2025 built (173s)
+   fresh seed 555 built (176s)
+   fresh seed 99 built (174s)
+
+-- FINAL TABLE (winners) --
+   model            search    fresh      all   config
+   rf               0.6197   0.6196   0.6196   {"n_estimators": 800, "max_features": 0.5, "min_samples_leaf": 20}
+   xgb              0.6171   0.6143   0.6155   {"n_estimators": 400, "learning_rate": 0.03, "max_depth": 6, "subsample": 0.8, "colsample_bytree": 0.7, "reg_lambda": 1.0, "min_child_weight": 5}
+   catboost         0.6164   0.6136   0.6148   {"iterations": 600, "learning_rate": 0.03, "depth": 6, "l2_leaf_reg": 10.0}
+   hgb_champ        0.6160   0.6153   0.6156   {"learning_rate": 0.021145795969329348, "max_iter": 400, "max_leaf_nodes": 63, "min_samples_leaf": 10, "l2_regularization": 1.0, "max_features": 0.5}
+
+=== DONE 2026-08-22 05:05:54  elapsed 260.9 min ===
+outputs: _model_zoo_default.tsv _model_zoo_rough.tsv _model_zoo_fine.tsv _model_zoo_final.tsv _model_zoo_best.json _model_zoo_preds.pkl

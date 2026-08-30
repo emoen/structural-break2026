@@ -74,6 +74,8 @@ def _arma(rng, n, phi, theta, sd, burn=200):
 
 
 def _garch(rng, n, omega, alpha, beta, burn=300):
+    if alpha + beta > 0.98:                 # enforce stationarity (else variance explodes -> inf)
+        beta = 0.98 - alpha
     N = n + burn
     z = rng.standard_normal(N)
     s2 = np.empty(N)
@@ -104,34 +106,46 @@ def _stationary_ar2(rng):
             return [phi1, phi2]
 
 
+def _perturb_ar2(rng, a, scale=0.25):
+    """Stationary AR(2) that is a SMALL perturbation of `a` (subtle real-like coef change)."""
+    for _ in range(50):
+        b = [a[0] + rng.normal(0.0, scale), a[1] + rng.normal(0.0, scale)]
+        if b[1] + b[0] < 0.98 and b[1] - b[0] < 0.98 and abs(b[1]) < 0.95:
+            return b
+    return a
+
+
 # --- break vs no-break segment builders ------------------------------------
 def gen_break(rng, fam, n_pre, n_post):
     """Return (pre[n_pre], post[n_post]) where post = pre-process mutated by `fam`."""
     if fam == "gauss_mean":
         sd = rng.uniform(0.8, 1.2)
-        shift = rng.uniform(0.4, 1.6) * rng.choice([-1, 1])
-        return _ar(rng, n_pre, [0.0], sd), _ar(rng, n_post, [0.0], sd) + shift
+        # real |mean_shift|: median ~0.05, p95 ~0.28 -> lognormal in std units
+        shift = rng.choice([-1, 1]) * float(rng.lognormal(-3.0, 1.0))
+        return _ar(rng, n_pre, [0.0], sd), _ar(rng, n_post, [0.0], sd) + shift * sd
     if fam == "gauss_var":
-        r = rng.uniform(1.6, 3.5) ** rng.choice([-1, 1])
-        return _ar(rng, n_pre, [0.0], 1.0), _ar(rng, n_post, [0.0], 1.0 * r)
+        sd = rng.uniform(0.8, 1.2)
+        # real var_ratio: median ~1.0, p95 ~2.4 -> lognormal (sd multiplier = sqrt)
+        r = float(np.exp(rng.normal(0.0, 0.20)))
+        return _ar(rng, n_pre, [0.0], sd), _ar(rng, n_post, [0.0], sd * r)
     if fam == "ar_coef":
         a = _stationary_ar2(rng)
-        b = _stationary_ar2(rng)
+        b = _perturb_ar2(rng, a, 0.25)              # subtle coef change, not a fresh process
         return _ar(rng, n_pre, a, 1.0), _ar(rng, n_post, b, 1.0)
     if fam == "ar_var":
         a = _stationary_ar2(rng)
-        r = rng.uniform(1.5, 3.0) ** rng.choice([-1, 1])
-        return _ar(rng, n_pre, a, 1.0), _ar(rng, n_post, a, 1.0 * r)
+        r = float(np.exp(rng.normal(0.0, 0.20)))    # subtle innovation-variance change
+        return _ar(rng, n_pre, a, 1.0), _ar(rng, n_post, a, r)
     if fam == "ma":
         q = rng.integers(1, 4)
         ta = rng.uniform(-0.8, 0.8, q)
-        tb = rng.uniform(-0.8, 0.8, q)
+        tb = ta + rng.normal(0.0, 0.25, q)          # subtle MA-coef change
         return _ma(rng, n_pre, ta, 1.0), _ma(rng, n_post, tb, 1.0)
     if fam == "arma":
         a = _stationary_ar2(rng)
         ta = rng.uniform(-0.7, 0.7, rng.integers(1, 3))
-        b = _stationary_ar2(rng)
-        tb = rng.uniform(-0.7, 0.7, rng.integers(1, 3))
+        b = _perturb_ar2(rng, a, 0.25)
+        tb = ta + rng.normal(0.0, 0.25, len(ta))
         return _arma(rng, n_pre, a, ta, 1.0), _arma(rng, n_post, b, tb, 1.0)
     if fam == "garch":
         pa = (rng.uniform(0.02, 0.1), rng.uniform(0.02, 0.15), rng.uniform(0.7, 0.9))
@@ -147,7 +161,7 @@ def gen_break(rng, fam, n_pre, n_post):
         return _skewdraw(rng, n_pre, rng.uniform(0.6, 1.5), 1.0), _ar(rng, n_post, [0.0], 1.0)
     if fam == "trend":
         sd = rng.uniform(0.8, 1.2)
-        slope = rng.uniform(0.004, 0.02) * rng.choice([-1, 1])
+        slope = rng.choice([-1, 1]) * rng.uniform(0.0002, 0.0015) * sd   # subtle drift onset
         post = _ar(rng, n_post, [0.0], sd) + slope * np.arange(n_post)
         return _ar(rng, n_pre, [0.0], sd), post
     if fam == "spectral":
@@ -197,24 +211,48 @@ def gen_real_splice(rng, real, n_pre, n_post):
     return a[i:i + n_pre], b[j:j + n_post]
 
 
+def _heavy_tail_overlay(rng, seg):
+    """Impose clustered stochastic volatility on a minority of series -> rare heavy tails.
+
+    Real online segments have p95 kurtosis ~17 (vs ~2 for pure Gaussian families). A persistent
+    log-vol envelope multiplies the whole series equally, so mean~0 and the pre/post variance
+    ratio are preserved (standardisation by the pre-break ref renormalises the scale).
+    """
+    if rng.random() >= 0.20:                       # ~80% stay near-Gaussian
+        return seg
+    if rng.random() < 0.20:                        # ~4% overall: extreme fat tails (real p95 kurt ~17)
+        s = rng.uniform(0.85, 1.30)
+    else:
+        s = rng.uniform(0.35, 0.85)                # log-vol amplitude -> tail heaviness
+    rho = rng.uniform(0.90, 0.98)                  # volatility clustering
+    n = len(seg)
+    h = np.empty(n)
+    h[0] = rng.normal(0.0, s)
+    innov = rng.normal(0.0, s * np.sqrt(1.0 - rho * rho), n)
+    for t in range(1, n):
+        h[t] = rho * h[t - 1] + innov[t]
+    return seg * np.exp(h - 0.5 * s * s)           # ~unit-mean-square envelope
+
+
 # --- one series ------------------------------------------------------------
 def generate_one(rng, real, break_rate):
-    H = int(rng.integers(1000, 2800))
-    O = int(rng.integers(400, 1600))
+    H = int(rng.integers(1100, 4900))      # real H: p5~1188 p50~2970 p95~4808
+    O = int(rng.integers(50, 1000))        # real O: p5~59 p50~506 p95~951 (short-online tail)
     fams = PARAM_FAMILIES + (["real_splice"] * 3 if real is not None else [])
     fam = rng.choice(fams)
     has_break = rng.random() < break_rate
     if has_break:
-        tau_index = int(rng.integers(40, max(41, O - 40)))
+        tau_index = int(rng.integers(5, max(6, O - 5)))   # real breaks can start very early (tau_abs p5~11)
         n_pre, n_post = H + tau_index, O - tau_index
         if fam == "real_splice":
             pre, post = gen_real_splice(rng, real, n_pre, n_post)
         else:
             pre, post = gen_break(rng, fam, n_pre, n_post)
         seg = np.concatenate([pre, post])
-        ref = pre
+        ref_len = len(pre)
     else:
         tau_index = -1
+        ref_len = H
         if fam == "real_splice":
             base = real[rng.integers(len(real))]
             if len(base) < H + O + 1:
@@ -224,7 +262,8 @@ def generate_one(rng, real, break_rate):
                 seg = base[s:s + H + O]
         else:
             seg = gen_nobreak(rng, fam, H + O)
-        ref = seg[:H]
+    seg = _heavy_tail_overlay(rng, np.asarray(seg, dtype=np.float64))
+    ref = seg[:ref_len]
     mu, sd = float(np.mean(ref)), float(np.std(ref))
     seg = (seg - mu) / (sd if sd > 1e-6 else 1.0)
     return H, O, tau_index, seg.astype(np.float32), str(fam)

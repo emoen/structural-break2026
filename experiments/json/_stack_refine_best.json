@@ -1,0 +1,17 @@
+{
+  "members": [
+    "hgb",
+    "ranker",
+    "rf",
+    "xgb",
+    "catboost"
+  ],
+  "best_fine_weights": {
+    "hgb": 0.02,
+    "ranker": 0.45,
+    "rf": 0.37,
+    "xgb": 0.1,
+    "catboost": 0.06
+  },
+  "champ_all": 0.6235502008437742
+}

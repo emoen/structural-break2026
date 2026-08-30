@@ -1,0 +1,268 @@
+{
+  "features": {
+    "mode": "champ_dep",
+    "cols": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      61,
+      62,
+      63,
+      64
+    ]
+  },
+  "seeds": {
+    "search": [
+      42,
+      7,
+      123
+    ],
+    "fresh": [
+      31337,
+      2025,
+      555,
+      99
+    ]
+  },
+  "top3": [
+    "rf",
+    "xgb",
+    "catboost"
+  ],
+  "best_per_family": {
+    "hgb": {
+      "tag": "default",
+      "params": {
+        "learning_rate": 0.021145795969329348,
+        "max_iter": 400,
+        "max_leaf_nodes": 63,
+        "min_samples_leaf": 10,
+        "l2_regularization": 1.0,
+        "max_features": 0.5
+      },
+      "search_mean": 0.6160406846288785
+    },
+    "lgbm": {
+      "tag": "rough0",
+      "params": {
+        "n_estimators": 600,
+        "learning_rate": 0.02,
+        "num_leaves": 31,
+        "subsample": 0.8,
+        "colsample_bytree": 0.6,
+        "reg_lambda": 1.0
+      },
+      "search_mean": 0.6161537257594965
+    },
+    "xgb": {
+      "tag": "default",
+      "params": {
+        "n_estimators": 400,
+        "learning_rate": 0.03,
+        "max_depth": 6,
+        "subsample": 0.8,
+        "colsample_bytree": 0.7,
+        "reg_lambda": 1.0,
+        "min_child_weight": 5
+      },
+      "search_mean": 0.6170744105365573
+    },
+    "catboost": {
+      "tag": "rough2",
+      "params": {
+        "iterations": 600,
+        "learning_rate": 0.03,
+        "depth": 6,
+        "l2_leaf_reg": 10.0
+      },
+      "search_mean": 0.6163530387005411
+    },
+    "gbdt": {
+      "tag": "rough1",
+      "params": {
+        "n_estimators": 150,
+        "learning_rate": 0.05,
+        "max_depth": 4,
+        "subsample": 0.7
+      },
+      "search_mean": 0.6107618164545981
+    },
+    "rf": {
+      "tag": "rough0",
+      "params": {
+        "n_estimators": 600,
+        "max_features": "sqrt",
+        "min_samples_leaf": 10
+      },
+      "search_mean": 0.6195037521063637
+    },
+    "extratrees": {
+      "tag": "rough1",
+      "params": {
+        "n_estimators": 400,
+        "max_features": 0.5,
+        "min_samples_leaf": 20,
+        "max_depth": 16
+      },
+      "search_mean": 0.6150012395308079
+    },
+    "logreg": {
+      "tag": "rough0",
+      "params": {
+        "C": 0.1
+      },
+      "search_mean": 0.5649188904473199
+    },
+    "ridge": {
+      "tag": "rough2",
+      "params": {
+        "alpha": 100.0
+      },
+      "search_mean": 0.564118039723036
+    },
+    "sgd": {
+      "tag": "rough0",
+      "params": {
+        "alpha": 0.001,
+        "penalty": "l2"
+      },
+      "search_mean": 0.5624503523093046
+    },
+    "lda": {
+      "tag": "rough1",
+      "params": {
+        "solver": "lsqr",
+        "shrinkage": 0.5
+      },
+      "search_mean": 0.5685159304516113
+    },
+    "qda": {
+      "tag": "rough1",
+      "params": {
+        "reg_param": 0.5
+      },
+      "search_mean": 0.5746813770822207
+    },
+    "gnb": {
+      "tag": "rough1",
+      "params": {
+        "var_smoothing": 1e-05
+      },
+      "search_mean": 0.5727751788584289
+    },
+    "knn": {
+      "tag": "rough1",
+      "params": {
+        "n_neighbors": 15,
+        "weights": "uniform"
+      },
+      "search_mean": 0.5563582160092673
+    },
+    "svc": {
+      "tag": "rough1",
+      "params": {
+        "kernel": "rbf",
+        "C": 1.0,
+        "gamma": 0.01
+      },
+      "search_mean": 0.5802150790365803
+    },
+    "mlp": {
+      "tag": "rough1",
+      "params": {
+        "hidden_layer_sizes": [
+          64,
+          32
+        ],
+        "alpha": 0.01,
+        "max_iter": 150,
+        "early_stopping": true
+      },
+      "search_mean": 0.5939660898514206
+    }
+  },
+  "winners": {
+    "rf": {
+      "n_estimators": 800,
+      "max_features": 0.5,
+      "min_samples_leaf": 20
+    },
+    "xgb": {
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "max_depth": 6,
+      "subsample": 0.8,
+      "colsample_bytree": 0.7,
+      "reg_lambda": 1.0,
+      "min_child_weight": 5
+    },
+    "catboost": {
+      "iterations": 600,
+      "learning_rate": 0.03,
+      "depth": 6,
+      "l2_leaf_reg": 10.0
+    },
+    "hgb_champ": {
+      "learning_rate": 0.021145795969329348,
+      "max_iter": 400,
+      "max_leaf_nodes": 63,
+      "min_samples_leaf": 10,
+      "l2_regularization": 1.0,
+      "max_features": 0.5
+    }
+  }
+}

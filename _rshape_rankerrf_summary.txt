@@ -1,0 +1,11 @@
+# residual-shape probe on ranker+rf E75 base79  2026-08-30 13:20:05
+# seeds=[42, 7] rf_trees=120 dense_k=20 blend=0.45/0.55
+# base79 = E75 champion; arms = prewhitened AR8-residual shape contrast vs history
+# rkurt@130,250  rqkurt@60,130,250  rhill@250 ; ISOLATION vs base79
+# RELAXED gate: any mean_d>0 is a candidate; rank by mean_d. BELIEVE only if robust arm moves.
+
+candidate         mean_d     min_d     max_d   npos
+rhill           +0.00100  +0.00050  +0.00150   2/2  <== WIN
+rqkurt          -0.00296  -0.01307  +0.00716   1/2
+rkurt           -0.00894  -0.01021  -0.00768   0/2
+rshape_all      -0.01805  -0.02560  -0.01051   0/2

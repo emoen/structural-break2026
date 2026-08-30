@@ -1,0 +1,11 @@
+# two-head early/late probe on ranker+rf E78 base79  2026-08-28 14:26:11
+# seeds=[42, 7, 123] rf_trees=500 blend=0.45/0.55 ship=(40, 100, 250)
+# early head: neg + pos(off<K); late head: neg + pos(off>=K); blend lam*early+(1-lam)*late.
+# base = single generalist (all rows) == champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds.
+
+arm             mean_d     min_d     max_d   npos
+K60_l0.4      -0.00611  -0.00636  -0.00593   0/3
+K40_l0.4      -0.00689  -0.00779  -0.00585   0/3
+K60_l0.6      -0.01555  -0.01749  -0.01383   0/3
+K40_l0.6      -0.01848  -0.01930  -0.01742   0/3

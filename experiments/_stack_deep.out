@@ -1,0 +1,82 @@
+=== STACK DEEP  2026-08-22 13:22:00  smoke=False ===
+members=['hgb', 'ranker', 'rf', 'xgb', 'catboost']  search=[42, 7, 123]  fresh=[31337, 2025, 555, 99]  step=0.05
+  [cache] seed 42 fit+dumped in 1499s -> _stack_cache/seed_42.pkl
+  [cache] seed 7 fit+dumped in 1918s -> _stack_cache/seed_7.pkl
+  [cache] seed 123 fit+dumped in 1905s -> _stack_cache/seed_123.pkl
+  [cache] seed 31337 fit+dumped in 1873s -> _stack_cache/seed_31337.pkl
+  [cache] seed 2025 fit+dumped in 1736s -> _stack_cache/seed_2025.pkl
+  [cache] seed 555 fit+dumped in 1741s -> _stack_cache/seed_555.pkl
+  [cache] seed 99 fit+dumped in 1829s -> _stack_cache/seed_99.pkl
+[cache ready] 7 seeds
+[sanity] champ ALL mean=0.6236 (expect ~0.6236 from _stack_zoo)
+
+-- weight sweep: 10626 blends, select on SEARCH seeds --
+   swept 10626 blends in 876s
+
+-- TOP weight blends (selected on SEARCH, honest FRESH/ALL) --
+    search   fresh     all   d_all  np/7  weights
+    0.6255  0.6221  0.6236 +0.0000     -  CHAMP [hgb=0.40 ranker=0.60]
+    0.6267  0.6238  0.6250 +0.0015   7/7  ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05
+    0.6267  0.6237  0.6250 +0.0014   7/7  hgb=0.05 ranker=0.45 rf=0.35 xgb=0.10 catboost=0.05
+    0.6267  0.6236  0.6249 +0.0014   7/7  ranker=0.45 rf=0.35 xgb=0.10 catboost=0.10
+    0.6267  0.6236  0.6249 +0.0014   7/7  ranker=0.45 rf=0.35 xgb=0.15 catboost=0.05
+    0.6267  0.6236  0.6249 +0.0014   7/7  hgb=0.05 ranker=0.45 rf=0.35 xgb=0.05 catboost=0.10
+    0.6267  0.6238  0.6250 +0.0015   7/7  ranker=0.45 rf=0.40 xgb=0.05 catboost=0.10
+    0.6267  0.6238  0.6250 +0.0015   7/7  ranker=0.45 rf=0.40 xgb=0.15
+    0.6267  0.6239  0.6251 +0.0015   7/7  hgb=0.05 ranker=0.45 rf=0.40 xgb=0.05 catboost=0.05
+    0.6267  0.6237  0.6249 +0.0014   7/7  hgb=0.05 ranker=0.45 rf=0.35 xgb=0.15
+    0.6267  0.6238  0.6251 +0.0015   7/7  hgb=0.05 ranker=0.45 rf=0.40 xgb=0.10
+    0.6267  0.6236  0.6249 +0.0014   7/7  ranker=0.50 rf=0.35 xgb=0.10 catboost=0.05
+    0.6267  0.6235  0.6249 +0.0013   7/7  ranker=0.45 rf=0.35 xgb=0.05 catboost=0.15
+    0.6267  0.6237  0.6250 +0.0014   7/7  hgb=0.10 ranker=0.45 rf=0.35 xgb=0.05 catboost=0.05
+    0.6267  0.6234  0.6248 +0.0012   7/7  ranker=0.50 rf=0.30 xgb=0.10 catboost=0.10
+    0.6267  0.6239  0.6251 +0.0016   7/7  ranker=0.45 rf=0.45 xgb=0.05 catboost=0.05
+    0.6267  0.6238  0.6250 +0.0015   7/7  hgb=0.05 ranker=0.45 rf=0.40 catboost=0.10
+    0.6267  0.6235  0.6249 +0.0013   7/7  ranker=0.45 rf=0.35 xgb=0.20
+    0.6267  0.6239  0.6251 +0.0016   7/7  ranker=0.45 rf=0.45 xgb=0.10
+    0.6267  0.6234  0.6248 +0.0012   7/7  ranker=0.45 rf=0.30 xgb=0.15 catboost=0.10
+    0.6267  0.6234  0.6248 +0.0013   7/7  ranker=0.50 rf=0.30 xgb=0.15 catboost=0.05
+    0.6266  0.6237  0.6250 +0.0014   7/7  ranker=0.40 rf=0.40 xgb=0.10 catboost=0.10
+    0.6266  0.6237  0.6250 +0.0014   7/7  ranker=0.40 rf=0.40 xgb=0.15 catboost=0.05
+    0.6266  0.6237  0.6250 +0.0014   7/7  hgb=0.10 ranker=0.45 rf=0.35 xgb=0.10
+    0.6266  0.6238  0.6250 +0.0015   7/7  hgb=0.05 ranker=0.40 rf=0.40 xgb=0.10 catboost=0.05
+    0.6266  0.6234  0.6248 +0.0013   7/7  hgb=0.05 ranker=0.45 rf=0.30 xgb=0.10 catboost=0.10
+    0.6266  0.6234  0.6248 +0.0013   7/7  hgb=0.05 ranker=0.45 rf=0.30 xgb=0.15 catboost=0.05
+    0.6266  0.6236  0.6249 +0.0013   7/7  ranker=0.50 rf=0.35 xgb=0.05 catboost=0.10
+    0.6266  0.6237  0.6249 +0.0014   7/7  hgb=0.10 ranker=0.45 rf=0.35 catboost=0.10
+    0.6266  0.6235  0.6248 +0.0013   7/7  hgb=0.05 ranker=0.50 rf=0.30 xgb=0.10 catboost=0.05
+    0.6266  0.6239  0.6251 +0.0015   7/7  ranker=0.40 rf=0.45 xgb=0.10 catboost=0.05
+    0.6266  0.6233  0.6247 +0.0012   7/7  ranker=0.45 rf=0.30 xgb=0.10 catboost=0.15
+    0.6266  0.6240  0.6251 +0.0016   7/7  hgb=0.05 ranker=0.40 rf=0.45 xgb=0.05 catboost=0.05
+    0.6266  0.6239  0.6251 +0.0015   7/7  ranker=0.40 rf=0.45 xgb=0.15
+    0.6266  0.6238  0.6250 +0.0014   7/7  hgb=0.05 ranker=0.40 rf=0.40 xgb=0.05 catboost=0.10
+    0.6266  0.6239  0.6251 +0.0015   7/7  hgb=0.10 ranker=0.45 rf=0.40 catboost=0.05
+    0.6266  0.6235  0.6248 +0.0013   7/7  hgb=0.05 ranker=0.50 rf=0.30 xgb=0.05 catboost=0.10
+    0.6266  0.6239  0.6251 +0.0015   7/7  ranker=0.45 rf=0.45 catboost=0.10
+    0.6266  0.6237  0.6249 +0.0014   7/7  hgb=0.05 ranker=0.50 rf=0.35 xgb=0.05 catboost=0.05
+    0.6266  0.6236  0.6249 +0.0013   7/7  ranker=0.50 rf=0.35 xgb=0.15
+    0.6266  0.6237  0.6249 +0.0014   7/7  hgb=0.05 ranker=0.50 rf=0.35 xgb=0.10
+
+-- sensible region (ranker 0.30-0.40, hgb 0.30-0.40): top 10 by SEARCH --
+    search   fresh     all   d_all  np/7  weights
+    0.6262  0.6234  0.6246 +0.0011   7/7  hgb=0.30 ranker=0.40 rf=0.30
+    0.6261  0.6232  0.6245 +0.0009   6/7  hgb=0.30 ranker=0.40 rf=0.25 xgb=0.05
+    0.6261  0.6232  0.6245 +0.0009   6/7  hgb=0.30 ranker=0.40 rf=0.25 catboost=0.05
+    0.6260  0.6235  0.6246 +0.0010   5/7  hgb=0.30 ranker=0.35 rf=0.35
+    0.6260  0.6230  0.6243 +0.0007   5/7  hgb=0.30 ranker=0.40 rf=0.20 xgb=0.05 catboost=0.05
+    0.6260  0.6230  0.6243 +0.0007   5/7  hgb=0.30 ranker=0.40 rf=0.20 xgb=0.10
+    0.6260  0.6229  0.6243 +0.0007   5/7  hgb=0.30 ranker=0.40 rf=0.20 catboost=0.10
+    0.6260  0.6232  0.6244 +0.0009   5/7  hgb=0.30 ranker=0.35 rf=0.30 xgb=0.05
+    0.6260  0.6232  0.6244 +0.0008   6/7  hgb=0.35 ranker=0.40 rf=0.25
+    0.6260  0.6233  0.6244 +0.0009   5/7  hgb=0.30 ranker=0.35 rf=0.30 catboost=0.05
+
+-- learned metas per subset (select on SEARCH, honest FRESH/ALL) --
+   method   search   fresh     all   d_all  np/7  subset
+   logit    0.6238  0.6217  0.6226 -0.0010   3/7  ranker+rf+xgb
+   gbm      0.6196  0.6175  0.6184 -0.0052   0/7  hgb+rf+xgb+catboost
+
+-- VERDICT (out-of-sample: best-on-SEARCH scored on FRESH vs champ) --
+   best-SEARCH blend [ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05]
+     search=0.6268  fresh=0.6238  champ_fresh=0.6221  d_fresh=+0.0017
+
+=== DONE 2026-08-22 17:28:26 ===
