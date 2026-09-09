@@ -36,6 +36,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REAL_X = os.path.join(HERE, "data", "X_train.parquet")
+REAL_Y = os.path.join(HERE, "data", "y_train.parquet")
 
 # families that need no real data; real_splice is added separately when enabled
 PARAM_FAMILIES = [
@@ -200,6 +201,35 @@ def load_real_arrays(max_series, seed):
     return [vals[start[i]:ends[i]] for i in sel]
 
 
+def load_real_lengths():
+    """Extract per-series (H, O, onset) triples from the REAL labels for length-matching.
+
+    H = historical length (first online time), O = online length, onset = tau_index within the
+    online segment (first target==1), or -1 for no-break. Returns four arrays:
+      real_H          all series' historical lengths
+      nobrk_O         online lengths of no-break series
+      brk_O, brk_ons  online length + onset of break series (kept as a JOINT pair, so a
+                      sampled break reproduces a real (O, onset) exactly -> real short-online
+                      series keep their genuinely-early onsets).
+    """
+    y = pd.read_parquet(REAL_Y, columns=["target"])
+    tgt = y["target"].to_numpy(dtype=np.int8)
+    tt = y.index.get_level_values("time").to_numpy(dtype=np.int64)
+    ids = y.index.get_level_values("id").to_numpy()
+    uniq, start = np.unique(ids, return_index=True)
+    ends = np.append(start[1:], len(ids))
+    H = tt[start].astype(np.int64)                 # first online time == historical length
+    O = (ends - start).astype(np.int64)            # online point count
+    onset = np.full(len(uniq), -1, dtype=np.int64)
+    for k in range(len(uniq)):
+        seg = tgt[start[k]:ends[k]]
+        w = int(np.argmax(seg))
+        if seg[w] == 1:
+            onset[k] = w
+    brk = onset >= 0
+    return H, O[~brk], O[brk], onset[brk]
+
+
 def gen_real_splice(rng, real, n_pre, n_post):
     a = real[rng.integers(len(real))]
     b = real[rng.integers(len(real))]
@@ -235,14 +265,26 @@ def _heavy_tail_overlay(rng, seg):
 
 
 # --- one series ------------------------------------------------------------
-def generate_one(rng, real, break_rate):
-    H = int(rng.integers(1100, 4900))      # real H: p5~1188 p50~2970 p95~4808
-    O = int(rng.integers(50, 1000))        # real O: p5~59 p50~506 p95~951 (short-online tail)
+def generate_one(rng, real, break_rate, lengths=None):
+    if lengths is None:
+        H = int(rng.integers(1100, 4900))      # real H: p5~1188 p50~2970 p95~4808
+        O = int(rng.integers(50, 1000))        # real O: p5~59 p50~506 p95~951 (short-online tail)
+        has_break = rng.random() < break_rate
+        tau_index = int(rng.integers(5, max(6, O - 5))) if has_break else -1
+    else:
+        # bootstrap real (H, O, onset) so synthetic length+onset dists match real exactly
+        real_H, nobrk_O, brk_O, brk_ons = lengths
+        H = int(real_H[rng.integers(len(real_H))])
+        has_break = rng.random() < break_rate
+        if has_break:
+            j = rng.integers(len(brk_O))
+            O, tau_index = int(brk_O[j]), int(brk_ons[j])
+        else:
+            O, tau_index = int(nobrk_O[rng.integers(len(nobrk_O))]), -1
     fams = PARAM_FAMILIES + (["real_splice"] * 3 if real is not None else [])
     fam = rng.choice(fams)
-    has_break = rng.random() < break_rate
     if has_break:
-        tau_index = int(rng.integers(5, max(6, O - 5)))   # real breaks can start very early (tau_abs p5~11)
+        tau_index = int(np.clip(tau_index, 1, max(1, O - 1)))
         n_pre, n_post = H + tau_index, O - tau_index
         if fam == "real_splice":
             pre, post = gen_real_splice(rng, real, n_pre, n_post)
@@ -277,6 +319,9 @@ def main():
     ap.add_argument("--break-rate", type=float, default=0.5)
     ap.add_argument("--real-series", type=int, default=1500)
     ap.add_argument("--no-real-splice", action="store_true")
+    ap.add_argument("--match-lengths", action="store_true",
+                    help="bootstrap real (H,O,onset) triples so synthetic length+onset dists match "
+                         "real exactly (covers the O<50 short-online tail the uniform range misses)")
     args = ap.parse_args()
 
     t0 = time.time()
@@ -284,13 +329,21 @@ def main():
     real = None if args.no_real_splice else load_real_arrays(args.real_series, args.seed)
     if real is not None:
         print(f"loaded {len(real)} real series for splicing", flush=True)
+    lengths = None
+    if args.match_lengths:
+        lengths = load_real_lengths()
+        rH, nO, bO, bOns = lengths
+        print(f"length-match ON: {len(rH)} real series | O p5/p50/p95 = "
+              f"{np.percentile(np.concatenate([nO, bO]), [5, 50, 95]).astype(int).tolist()} | "
+              f"break onset p5/p50/p95 = {np.percentile(bOns, [5, 50, 95]).astype(int).tolist()}",
+              flush=True)
 
     idv, tv, vv, pv = [], [], [], []
     y_id, y_t, y_tg = [], [], []
     idx = []
     fam_counts = {}
     for sid in range(args.n):
-        H, O, tau_index, seg, fam = generate_one(rng, real, args.break_rate)
+        H, O, tau_index, seg, fam = generate_one(rng, real, args.break_rate, lengths)
         fam_counts[fam] = fam_counts.get(fam, 0) + 1
         T = H + O
         t_arr = np.arange(T, dtype=np.int64)

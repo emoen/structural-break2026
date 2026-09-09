@@ -1,0 +1,13 @@
+# ModernTCN MULTI-LENS 3rd-member probe on ranker+rf base79  2026-09-01 15:28:01
+# lenses=adz in_ch=2 seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) L_SEQ=128 mtcn_epochs=12
+# 3rd member = ModernTCN (ICLR 2024): causal patch stem + large-kernel depthwise
+# Conv + pointwise ConvFFN over the selected causal/affine-invariant input lenses;
+# NO pooling, last-token head keeps changepoint LOCATION; w_mdn=0 == the champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior VERY LOW: learned-rep window nets E83/84/87/88/89/90 +
+# cusum-lens E91 all NULL.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00087  -0.00114  -0.00057   0/3
+wmdn0.20      -0.00366  -0.00415  -0.00298   0/3
+wmdn0.30      -0.00912  -0.00976  -0.00809   0/3

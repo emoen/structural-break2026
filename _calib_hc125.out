@@ -1,0 +1,13 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-04 08:37:23  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=316 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32
+arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
+candidates=['czms_all79', 'czrb_all79', 'czrb_champ51', 'czrb_dep28', 'czmix', 'calib_all']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 235/237)
+  [cache] seed 42 built in 958s  Xtr(79037, 316) Rr(311156, 316) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_hc125/seed_42.pkl
+[seed 42] base79 ranker+rf = 0.6310  (342s)
+[seed 42] czms_all79     0.6338  d=+0.0028  (1133s)
+[seed 42] czrb_all79     0.6342  d=+0.0032  (464s)
+[seed 42] czrb_champ51   0.6325  d=+0.0015  (360s)
+[seed 42] czrb_dep28     0.6364  d=+0.0054  (303s)
+[seed 42] czmix          0.6340  d=+0.0031  (688s)

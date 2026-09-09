@@ -1,0 +1,25 @@
+=== MODERNTCN MULTI-LENS 3rd-member probe on ranker+rf base79  2026-09-01 12:01:11  smoke=False ===
+lenses=['dz'] in_ch=2 cache=_seqmtcnmulti_cache_dz
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship_scales=(40, 100, 250)
+NCOL=79 L_SEQ=128 mtcn_epochs=12 torch=2.13.0+cpu arms=[0.1, 0.2, 0.3]
+[mtcn-arch] lenses=dz in_ch=2 patch=8 stride=8 tokens=16 dim=32 blocks=4 dw_kernel=13 ffn_mult=2 dropout=0.1 token_RF=49(>=tokens 16: True) input_cover=128(>=L_SEQ 128: True) head=last-token(no pooling)
+[causal-check] perturb input@64 (patch 8): earlier-token(<8) maxdiff=0.00e+00 later-token(>=8) maxdiff=2.47e+00 last-token maxdiff=1.24e+00 (earlier must be 0)
+[lens-causal] dz     positions<40 maxdiff=0.00e+00  (must be 0)
+[affine-check] lens dz     maxdiff under x->3.7x+5.2: 0.00e+00  (nonzero 127/128)
+[affine-check] ALL lenses=dz maxdiff=0.00e+00  mask_eq=True
+  [cache] seed 42 built in 526s  Xtr(79037, 79) SEQ(79037, 1, 128) Rr(311156, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqmtcnmulti_cache_dz/seed_42.pkl
+[seed 42] base79 (w_mdn=0) ranker+rf = 0.6323  (443s)
+[seed 42] wmdn0.10 0.6313  d=-0.0010  (1s)
+[seed 42] wmdn0.20 0.6282  d=-0.0041  (1s)
+[seed 42] wmdn0.30 0.6222  d=-0.0100  (1s)
+  [cache] seed 7 built in 525s  Xtr(79113, 79) SEQ(79113, 1, 128) Rr(311442, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqmtcnmulti_cache_dz/seed_7.pkl
+[seed 7] base79 (w_mdn=0) ranker+rf = 0.6247  (393s)
+[seed 7] wmdn0.10 0.6239  d=-0.0008  (1s)
+[seed 7] wmdn0.20 0.6211  d=-0.0036  (1s)
+[seed 7] wmdn0.30 0.6154  d=-0.0093  (1s)
+  [cache] seed 123 built in 522s  Xtr(79068, 79) SEQ(79068, 1, 128) Rr(311143, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqmtcnmulti_cache_dz/seed_123.pkl
+[seed 123] base79 (w_mdn=0) ranker+rf = 0.6389  (390s)
+[seed 123] wmdn0.10 0.6382  d=-0.0007  (1s)
+[seed 123] wmdn0.20 0.6353  d=-0.0036  (1s)
+[seed 123] wmdn0.30 0.6294  d=-0.0095  (1s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqmtcnmulti_rankerrf_summary_dz.txt

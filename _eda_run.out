@@ -1,0 +1,29 @@
+pool 10000 series; break_rate 0.497; sampling 2500
+usable series 2482  |  break_rate 0.496  |  online len median 510 p90 898  |  mean AR order 2.8
+scorers defined
+model proxy (raw trailing 5-moment)  TS-AUC = 0.5340
+oracle A  tau-KNOWING (raw)          TS-AUC = 0.4391
+gap_A (ceiling of the statistic + perfect tau) = -0.0950
+oracle B  tau-INTEGRATING (raw)      TS-AUC = 0.5381
+gap_A (tau-knowing)  = -0.0950
+gap_B (tau-blind)    = +0.0041
+price of not knowing tau = gap_A - gap_B = -0.0990
+fraction of ceiling that is tau-location = nan%   (post reports ~82%)
+oracle A tau-knowing  RAW      TS-AUC = 0.4391  (signal -0.0609)
+oracle A tau-knowing  WHITENED TS-AUC = 0.4907  (signal -0.0093)
+whitened / raw usable-signal ratio = 0.15x   (post reports ~2.5x)
+
+per-age AUC (raw -> whitened):
+  age   15:  raw 0.3724   white 0.3838   d +0.0114
+  age   20:  raw 0.3422   white 0.3620   d +0.0198
+  age   30:  raw 0.3271   white 0.3800   d +0.0530
+  age   45:  raw 0.3713   white 0.4167   d +0.0455
+  age   65:  raw 0.3920   white 0.4440   d +0.0520
+  age   90:  raw 0.4445   white 0.4824   d +0.0379
+  age  130:  raw 0.4439   white 0.5034   d +0.0595
+  age  180:  raw 0.4497   white 0.5176   d +0.0678
+  age  250:  raw 0.4824   white 0.5397   d +0.0573
+  age  350:  raw 0.5111   white 0.5624   d +0.0513
+  age  500:  raw 0.5214   white 0.5829   d +0.0615
+OOF R^2 predicting online length from 9 history descriptors = -0.0049
+(<= 0 means the history carries no usable prior on how long the online segment runs)

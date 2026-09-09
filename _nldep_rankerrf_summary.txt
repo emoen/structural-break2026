@@ -1,0 +1,12 @@
+# nonlinear-dependence probe on ranker+rf E78 base79  2026-09-02 14:59:19
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+# base79 = E78 champion (ship_scales=(40, 100, 250)); arms = AR8-prewhitened residual
+# nonlinear-serial contrast vs history
+# rtrev@100,250  rnlac@40,100,250  rsampen@100 ; ISOLATION vs base79
+# RELAXED gate: any mean_d>0 is a candidate; rank by mean_d. BELIEVE only if robust arm moves.
+
+candidate         mean_d     min_d     max_d   npos
+rsampen         -0.00009  -0.00074  +0.00023   2/3
+rnlac           -0.00027  -0.00091  +0.00011   2/3
+nldep_all       -0.00082  -0.00163  +0.00020   1/3
+rtrev           -0.00095  -0.00198  -0.00013   0/3

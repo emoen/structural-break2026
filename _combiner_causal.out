@@ -1,0 +1,35 @@
+=== COMBINER CAUSAL  2026-08-30 18:40:09  smoke=False ===
+members=['hgb', 'ranker', 'rf', 'xgb', 'catboost']  search=[42, 7, 123]  fresh=[31337, 2025, 555, 99]  grid_q=10  passes=2  W_RECENT=32
+[true-champ] weights: ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05   (vector over ['hgb', 'ranker', 'rf', 'xgb', 'catboost'])
+[affine-check] a=2.657 b=-2.302  ctx_step maxdiff=0.00e+00  ctx_disagree maxdiff=0.00e+00  ctx_disp maxdiff=5.24e-14
+  [ctx] seed 42 raw-dispersion re-derived+aligned in 22s -> _combiner_causal_cache/ctx_seed_42.pkl
+  [ctx] seed 7 raw-dispersion re-derived+aligned in 22s -> _combiner_causal_cache/ctx_seed_7.pkl
+  [ctx] seed 123 raw-dispersion re-derived+aligned in 22s -> _combiner_causal_cache/ctx_seed_123.pkl
+  [ctx] seed 31337 raw-dispersion re-derived+aligned in 21s -> _combiner_causal_cache/ctx_seed_31337.pkl
+  [ctx] seed 2025 raw-dispersion re-derived+aligned in 21s -> _combiner_causal_cache/ctx_seed_2025.pkl
+  [ctx] seed 555 raw-dispersion re-derived+aligned in 22s -> _combiner_causal_cache/ctx_seed_555.pkl
+  [ctx] seed 99 raw-dispersion re-derived+aligned in 21s -> _combiner_causal_cache/ctx_seed_99.pkl
+[cache+ctx ready] 7 seeds
+[sanity] TRUE-champ  search=0.6267  fresh=0.6238  ALL=0.6250
+
+-- ARM A: context-binned weight gating (1001 weight blends) --
+    search   fresh     all   d_all    np  arm
+    0.6267  0.6238  0.6250 +0.0000     -  CHAMP [ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05]
+    0.6274  0.6237  0.6253 +0.0003   3/7  A_step
+    0.6267  0.6237  0.6250 -0.0001   3/7  A_disagree
+    0.6272  0.6234  0.6250 -0.0000   4/7  A_disp
+    0.6278  0.6230  0.6250 -0.0000   3/7  A_step_x_disagree
+
+-- ARM B: learned causal meta on [members || ctx_step,ctx_disagree,ctx_disp] --
+    search   fresh     all   d_all    np  arm
+    0.6267  0.6238  0.6250 +0.0000     -  CHAMP [ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05]
+    0.6236  0.6205  0.6218 -0.0032   0/7  B_logit_aug
+    0.6226  0.6200  0.6211 -0.0039   0/7  B_gbm_aug
+    0.6234  0.6213  0.6222 -0.0028   1/7  B_logit_memonly
+    0.6168  0.6169  0.6168 -0.0082   0/7  B_gbm_memonly
+
+-- VERDICT (selected on SEARCH, reported on FRESH/ALL vs TRUE champ) --
+   best A_step_x_disagree  search=0.6278 fresh=0.6230 all=0.6250 d_all=-0.0000 np=3/7
+   best B_logit_aug        search=0.6236 fresh=0.6205 all=0.6218 d_all=-0.0032 np=0/7
+
+=== DONE 2026-08-30 20:02:04  json=experiments/json/_combiner_causal_best.json ===

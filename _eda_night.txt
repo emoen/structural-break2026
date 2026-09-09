@@ -1,0 +1,66 @@
+=== BIG NIGHT EDA  2026-09-02 23:44:36.593250 ===
+X (35036464, 2) y (5036517, 1)
+n_series 10000
+  ...0/10000 (3s)
+  ...2000/10000 (3s)
+  ...4000/10000 (3s)
+  ...6000/10000 (4s)
+  ...8000/10000 (4s)
+
+### break rate: 0.4967  (n_break 4967 )
+
+===== AXIS 1: ONLINE-LENGTH DISTRIBUTION (synth gap) =====
+online_len pcts: {"0": 10.0, "1": 19.0, "5": 58.0, "10": 106.0, "25": 255.8, "50": 502.0, "75": 751.0, "90": 898.0, "95": 948.0, "99": 989.0, "100": 999.0}
+  frac online_len < 20: 0.0110
+  frac online_len < 30: 0.0224
+  frac online_len < 50: 0.0423
+  frac online_len < 100: 0.0919
+  frac online_len < 200: 0.1915
+  frac online_len < 400: 0.3971
+history_len pcts: {"0": 1000.0, "1": 1042.0, "5": 1193.0, "10": 1396.0, "25": 1976.8, "50": 2998.0, "75": 4022.2, "90": 4612.0, "95": 4811.0, "99": 4958.0, "100": 5000.0}
+NOTE: synth generator min online ~400; real fraction below 400 is the gap.
+
+===== AXIS 3: METRIC WEIGHT ACROSS ONLINE-RELATIVE STEP =====
+total metric weight sum: 5.282e+09
+  25% of metric weight by online-step 167 (alive=8392, npos=1570, nneg=6822)
+  50% of metric weight by online-step 293 (alive=7105, npos=1915, nneg=5190)
+  75% of metric weight by online-step 450 (alive=5519, npos=1819, nneg=3700)
+  90% of metric weight by online-step 599 (alive=4057, npos=1571, nneg=2486)
+  weight by step buckets:
+    step[   0,  10) weight_frac=0.0024 alive~10000
+    step[  10,  25) weight_frac=0.0096 alive~9906
+    step[  25,  50) weight_frac=0.0270 alive~9696
+    step[  50, 100) weight_frac=0.0801 alive~9324
+    step[ 100, 200) weight_frac=0.1960 alive~8558
+    step[ 200, 400) weight_frac=0.3656 alive~7044
+    step[ 400, 999) weight_frac=0.3193 alive~3047
+
+===== BREAK ONSET (how fast breaks appear in online) =====
+onset_rel (online idx of first labeled break) pcts: {"0": 0.0, "1": 1.7, "5": 11.0, "10": 22.0, "25": 67.0, "50": 184.0, "75": 370.0, "90": 587.4, "95": 699.0, "99": 865.0, "100": 984.0}
+  frac breaks onset within first 1 online steps: 0.0058
+  frac breaks onset within first 5 online steps: 0.0228
+  frac breaks onset within first 10 online steps: 0.0455
+  frac breaks onset within first 25 online steps: 0.1123
+  frac breaks onset within first 50 online steps: 0.2011
+pos_frac (labeled-1 share among broken series) pcts: {"0": 0.001, "1": 0.011, "5": 0.058, "10": 0.106, "25": 0.262, "50": 0.52, "75": 0.762, "90": 0.904, "95": 0.955, "99": 0.993, "100": 1.0}
+
+===== AXIS A: BOUNDARY SHIFT DETECTABILITY (broke vs not) =====
+  |abs_dmean| single-signal series-level AUC(broke): 0.5110
+  |abs_dstd| single-signal series-level AUC(broke): 0.5076
+  |var_ratio| single-signal series-level AUC(broke): 0.5076
+  |dmean_z| single-signal series-level AUC(broke): 0.5110
+  (series-level = does the boundary shift predict *whether* it broke; cross-check vs champion's per-step task)
+
+===== AXIS 1: PROCESS MANIFOLD (synth realism targets) =====
+  ar1_h pcts: {"0": -0.987, "1": -0.736, "5": -0.401, "10": -0.197, "25": -0.041, "50": 0.009, "75": 0.18, "90": 0.477, "95": 0.588, "99": 0.886, "100": 0.998}
+  kurt_h pcts: {"0": -1.559, "1": -0.893, "5": -0.215, "10": -0.12, "25": -0.004, "50": 0.223, "75": 1.48, "90": 8.326, "95": 25.922, "99": 87.429, "100": 4783.774}
+  var_h pcts: {"0": 1.0, "1": 1.0, "5": 1.0, "10": 1.0, "25": 1.0, "50": 1.0, "75": 1.0, "90": 1.0, "95": 1.0, "99": 1.0, "100": 1.0}
+  frac |ar1_h|>0.5: 0.1192  frac kurt_h>3 (heavy tail): 0.1643
+
+===== CROSS-CUTS: broke-rate by online-length & by |mean-shift| =====
+  broke-rate by on_len quintile: [10.00,208.00):0.487 [208.00,403.00):0.507 [403.00,605.40):0.489 [605.40,800.00):0.497 [800.00,999.00):0.504
+  broke-rate by abs_dmean quintile: [0.00,0.03):0.482 [0.03,0.07):0.481 [0.07,0.13):0.502 [0.13,0.21):0.513 [0.21,2.48):0.504
+  broke-rate by var_ratio quintile: [0.00,0.08):0.497 [0.08,0.16):0.495 [0.16,0.27):0.474 [0.27,0.45):0.503 [0.45,4.42):0.513
+  broke-rate by hist_len quintile: [1000.00,1776.80):0.505 [1776.80,2580.60):0.493 [2580.60,3415.40):0.508 [3415.40,4221.00):0.484 [4221.00,5000.00):0.493
+
+=== DONE 4s ===

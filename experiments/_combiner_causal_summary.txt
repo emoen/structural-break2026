@@ -1,0 +1,12 @@
+COMBINER CAUSAL  2026-08-30 20:02:04  smoke=False
+TRUE champ [ranker=0.45 rf=0.40 xgb=0.10 catboost=0.05]  search=0.6267 fresh=0.6238 all=0.6250
+
+arm                    search    fresh      all    d_all     np
+A_step                 0.6274   0.6237   0.6253  +0.0003    3/7
+A_disagree             0.6267   0.6237   0.6250  -0.0001    3/7
+A_disp                 0.6272   0.6234   0.6250  -0.0000    4/7
+A_step_x_disagree      0.6278   0.6230   0.6250  -0.0000    3/7
+B_logit_aug            0.6236   0.6205   0.6218  -0.0032    0/7
+B_gbm_aug              0.6226   0.6200   0.6211  -0.0039    0/7
+B_logit_memonly        0.6234   0.6213   0.6222  -0.0028    1/7
+B_gbm_memonly          0.6168   0.6169   0.6168  -0.0082    0/7

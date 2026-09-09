@@ -1,0 +1,13 @@
+# dilated causal TCN 3rd-member probe on ranker+rf base79  2026-08-31 00:55:17
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) L_SEQ=128 tcn_epochs=12
+# 3rd member = dilated causal TCN (Bai 2018) on the raw history-standardized trailing
+# window; full-window RF, NO pooling, last-step head keeps changepoint LOCATION
+# (the E82 fix that pooled CNNs E83/E84 lacked); w_mdn=0 == the champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior LOW: learned-rep E31/E45/E47 + shape E59/E79/E82 +
+# pooled seq-CNN E83/E84 all NULL.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00107  -0.00117  -0.00101   0/3
+wmdn0.20      -0.00370  -0.00384  -0.00355   0/3
+wmdn0.30      -0.00831  -0.00855  -0.00807   0/3

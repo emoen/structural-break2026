@@ -1,0 +1,14 @@
+# Hyena-operator 3rd-member probe on ranker+rf base79  2026-08-31 11:34:13
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship=(40, 100, 250) L_SEQ=128 hyena_epochs=12
+# 3rd member = causal Hyena operator (Poli 2023): implicit long conv (positional-MLP
+# filter of full window length, exp-decay) + gating over the raw history-standardized
+# trailing window; NO pooling, last-step head keeps changepoint LOCATION; w_mdn=0 ==
+# the champion.
+# BELIEVE only if mean_d>=+0.0015 AND all-seeds-positive, then confirm on fresh seeds
+# {31337,2025,555,99}. Prior VERY LOW: learned-rep E31/E45/E47 + shape E59/E79/E82 +
+# pooled seq-CNN E83/E84 + dilated causal TCN E87 + ModernTCN E88 all NULL.
+
+arm             mean_d     min_d     max_d   npos
+wmdn0.10      -0.00105  -0.00136  -0.00087   0/3
+wmdn0.20      -0.00369  -0.00415  -0.00307   0/3
+wmdn0.30      -0.00832  -0.00902  -0.00707   0/3

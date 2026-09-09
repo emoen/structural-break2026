@@ -1,0 +1,63 @@
+=== nn two-sample (SMOKE) start 2026-09-06 21:15:56 ===
+device=cpu N_TRAIN=300 folds=2x40 screen_folds=2 WINDOW=250 epochs=2
+pool: 260 fit / 40 early-stop, eval on 2 folds x 40 | STEPS(nn)=10
+champion cache+fit in 0.1 min
+  HGB champion                 mean=0.4188  (baseline)
+pair train (2576, 900), positives 0.247
+pair val+es cache in 0.0 min
+config: WD=0.001 DROP=0.4 SEQ_CH=24 epochs=2 (early-stop on independent holdout)
+
+-- arch: seqhist --
+    epoch 1/2 loss=0.6548 es=0.4800
+    epoch 2/2 loss=0.6224 es=0.4774
+  trained+scored in 0.2 min (es-picked epoch 1, es_auc 0.4800)
+  seqhist (es-picked)          mean=0.3611  delta=-0.0576  t=-3.23  -> noise
+    blend w_seqhist=0.2        mean=0.4138  delta=-0.0050  t=-3.04  -> noise
+    blend w_seqhist=0.3        mean=0.4109  delta=-0.0079  t=-3.30  -> noise
+    blend w_seqhist=0.4        mean=0.4069  delta=-0.0119  t=-2.97  -> noise
+    blend w_seqhist=0.5        mean=0.4020  delta=-0.0168  t=-2.97  -> noise
+    blend w_seqhist=0.6        mean=0.3957  delta=-0.0231  t=-2.92  -> noise
+    blend w_seqhist=0.7        mean=0.3865  delta=-0.0323  t=-2.91  -> noise
+
+-- arch: seqhistbig --
+    epoch 1/2 loss=0.8088 es=0.4793
+    epoch 2/2 loss=0.6157 es=0.5251
+  trained+scored in 0.5 min (es-picked epoch 2, es_auc 0.5251)
+  seqhistbig (es-picked)       mean=0.3251  delta=-0.0937  t=-1.60  -> noise
+    blend w_seqhistbig=0.2     mean=0.4143  delta=-0.0045  t=-8.85  -> noise
+    blend w_seqhistbig=0.3     mean=0.4113  delta=-0.0075  t=-6.09  -> noise
+    blend w_seqhistbig=0.4     mean=0.4078  delta=-0.0110  t=-7.18  -> noise
+    blend w_seqhistbig=0.5     mean=0.4032  delta=-0.0156  t=-12.80  -> noise
+    blend w_seqhistbig=0.6     mean=0.3980  delta=-0.0208  t=-13.38  -> noise
+    blend w_seqhistbig=0.7     mean=0.3911  delta=-0.0277  t=-12.13  -> noise
+
+-- arch: settrans --
+    epoch 1/2 loss=0.6176 es=0.6279
+    epoch 2/2 loss=0.5663 es=0.6348
+  trained+scored in 2.1 min (es-picked epoch 2, es_auc 0.6348)
+  settrans (es-picked)         mean=0.5301  delta=+0.1113  t=+5.57  -> SHIP(hard)
+    blend w_settrans=0.2       mean=0.4192  delta=+0.0004  t=+66.31  -> SHIP(hard)
+    blend w_settrans=0.3       mean=0.4198  delta=+0.0010  t=+45.89  -> SHIP(hard)
+    blend w_settrans=0.4       mean=0.4205  delta=+0.0017  t=+31.31  -> SHIP(hard)
+    blend w_settrans=0.5       mean=0.4213  delta=+0.0025  t=+7.65  -> SHIP(hard)
+    blend w_settrans=0.6       mean=0.4229  delta=+0.0042  t=+6.56  -> SHIP(hard)
+    blend w_settrans=0.7       mean=0.4249  delta=+0.0062  t=+3.14  -> SHIP(hard)
+
+-- arch: gru --
+    epoch 1/2 loss=0.6439 es=0.5818
+    epoch 2/2 loss=0.5901 es=0.5848
+  trained+scored in 0.6 min (es-picked epoch 2, es_auc 0.5848)
+  gru (es-picked)              mean=0.3950  delta=-0.0237  t=-0.56  -> noise
+    blend w_gru=0.2            mean=0.4085  delta=-0.0103  t=-1.38  -> noise
+    blend w_gru=0.3            mean=0.4033  delta=-0.0154  t=-1.47  -> noise
+    blend w_gru=0.4            mean=0.3978  delta=-0.0210  t=-1.53  -> noise
+    blend w_gru=0.5            mean=0.3921  delta=-0.0267  t=-1.63  -> noise
+    blend w_gru=0.6            mean=0.3860  delta=-0.0328  t=-1.76  -> noise
+    blend w_gru=0.7            mean=0.3780  delta=-0.0408  t=-1.95  -> noise
+
+=== DONE in 4.4 min ===
+champion mean=0.4188 (on 2 folds)
+  seqhist: es-epoch(1) alone=0.3611 | best blend w=0.2 mean=0.4138
+seqhistbig: es-epoch(2) alone=0.3251 | best blend w=0.2 mean=0.4143
+ settrans: es-epoch(2) alone=0.5301 | best blend w=0.7 mean=0.4249
+      gru: es-epoch(2) alone=0.3950 | best blend w=0.2 mean=0.4085

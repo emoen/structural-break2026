@@ -1,0 +1,25 @@
+=== NONLINEAR-DEP probe on ranker+rf E78 base79  2026-09-02 13:44:09  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=85 ship_scales=(40, 100, 250)  cand_scales=(40, 100, 250)
+arms=[('rtrev', 'trev', (100, 250)), ('rnlac', 'sqacf', (40, 100, 250)), ('rsampen', 'sampen', (100,))]
+candidates=['rtrev', 'rnlac', 'rsampen', 'nldep_all']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 5.75e-15  (nonzero cand cols 6/6)
+  [cache] seed 42 built in 648s  Xtr(79037, 85) Rr(311156, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_nldep_cache/seed_42.pkl
+[seed 42] base79 ranker+rf = 0.6323  (174s)
+[seed 42] rtrev        0.6303  d=-0.0020  (173s)
+[seed 42] rnlac        0.6314  d=-0.0009  (176s)
+[seed 42] rsampen      0.6315  d=-0.0007  (171s)
+[seed 42] nldep_all    0.6306  d=-0.0016  (182s)
+  [cache] seed 7 built in 640s  Xtr(79113, 85) Rr(311442, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_nldep_cache/seed_7.pkl
+[seed 7] base79 ranker+rf = 0.6247  (164s)
+[seed 7] rtrev        0.6246  d=-0.0001  (171s)
+[seed 7] rnlac        0.6247  d=+0.0000  (174s)
+[seed 7] rsampen      0.6250  d=+0.0002  (169s)
+[seed 7] nldep_all    0.6249  d=+0.0002  (180s)
+  [cache] seed 123 built in 642s  Xtr(79068, 85) Rr(311143, 85) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_nldep_cache/seed_123.pkl
+[seed 123] base79 ranker+rf = 0.6389  (162s)
+[seed 123] rtrev        0.6382  d=-0.0008  (169s)
+[seed 123] rnlac        0.6391  d=+0.0001  (172s)
+[seed 123] rsampen      0.6392  d=+0.0002  (168s)
+[seed 123] nldep_all    0.6379  d=-0.0010  (175s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_nldep_rankerrf_summary.txt

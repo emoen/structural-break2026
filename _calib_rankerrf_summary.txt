@@ -1,0 +1,16 @@
+# per-series calibration probe on ranker+rf E78 base79  2026-09-08 01:06:13
+# seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+# base79 = E78 champion (ship_scales=(40, 100, 250)); arms = studentize base79 vs
+# per-series pre-break null (E68/E69 port), calib_win=250 null_wins=32
+# czms_champ51 / czms_all79 (mean/sd) ; czrb_all79 (robust med/MAD) ; ISOLATION vs base79
+# RELAXED gate: any mean_d>0 is a candidate; rank by mean_d. NOT the retired t>=2.5 bar.
+
+candidate         mean_d     min_d     max_d   npos
+czrb_gloc       +0.00260  +0.00217  +0.00324   3/3  <== WIN
+czms_all79      +0.00158  +0.00013  +0.00306   3/3  <== WIN
+czrb_champ51    +0.00137  -0.00127  +0.00298   2/3
+czmix           +0.00127  -0.00116  +0.00469   2/3
+calib_all       +0.00123  -0.00148  +0.00351   2/3
+czrb_all79      +0.00123  +0.00038  +0.00276   3/3  <== WIN
+czrb_dep28      +0.00092  -0.00176  +0.00266   2/3
+gloc            +0.00084  +0.00064  +0.00106   3/3  <== WIN

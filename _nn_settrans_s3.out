@@ -1,0 +1,42 @@
+=== nn two-sample (FULL) start 2026-09-06 21:21:09 ===
+device=cpu N_TRAIN=8000 folds=10x200 screen_folds=3 WINDOW=250 epochs=20
+pool: 7040 fit / 960 early-stop, eval on 3 folds x 200 | STEPS(nn)=10
+champion cache+fit in 0.6 min
+  HGB champion                 mean=0.5686  (baseline)
+pair train (69555, 900), positives 0.269
+pair val+es cache in 0.2 min
+config: WD=0.001 DROP=0.4 SEQ_CH=24 epochs=20 (early-stop on independent holdout)
+
+-- arch: settrans --
+    epoch 1/20 loss=0.5834 es=0.5279
+    epoch 2/20 loss=0.5766 es=0.5284
+    epoch 3/20 loss=0.5766 es=0.5287
+    epoch 4/20 loss=0.5767 es=0.5286
+    epoch 5/20 loss=0.5763 es=0.5287
+    epoch 6/20 loss=0.5767 es=0.5283
+    epoch 7/20 loss=0.5763 es=0.5290
+    epoch 8/20 loss=0.5764 es=0.5288
+    epoch 9/20 loss=0.5758 es=0.5305
+    epoch 10/20 loss=0.5761 es=0.5297
+    epoch 11/20 loss=0.5759 es=0.5326
+    epoch 12/20 loss=0.5757 es=0.5318
+    epoch 13/20 loss=0.5758 es=0.5321
+    epoch 14/20 loss=0.5758 es=0.5325
+    epoch 15/20 loss=0.5759 es=0.5328
+    epoch 16/20 loss=0.5753 es=0.5297
+    epoch 17/20 loss=0.5753 es=0.5325
+    epoch 18/20 loss=0.5754 es=0.5313
+    epoch 19/20 loss=0.5757 es=0.5348
+    epoch 20/20 loss=0.5757 es=0.5321
+  trained+scored in 367.7 min (es-picked epoch 19, es_auc 0.5348)
+  settrans (es-picked)         mean=0.5361  delta=-0.0325  t=-2.67  -> noise
+    blend w_settrans=0.2       mean=0.5680  delta=-0.0005  t=-0.15  -> noise
+    blend w_settrans=0.3       mean=0.5673  delta=-0.0013  t=-0.24  -> noise
+    blend w_settrans=0.4       mean=0.5660  delta=-0.0026  t=-0.36  -> noise
+    blend w_settrans=0.5       mean=0.5640  delta=-0.0045  t=-0.53  -> noise
+    blend w_settrans=0.6       mean=0.5611  delta=-0.0075  t=-0.79  -> noise
+    blend w_settrans=0.7       mean=0.5572  delta=-0.0114  t=-1.10  -> noise
+
+=== DONE in 369.5 min ===
+champion mean=0.5686 (on 3 folds)
+ settrans: es-epoch(19) alone=0.5361 | best blend w=0.2 mean=0.5680

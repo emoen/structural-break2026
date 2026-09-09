@@ -1,0 +1,17 @@
+=== STATE-SPACE-MODEL 3rd-member probe on ranker+rf base79  2026-08-31 13:01:35  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55 ship_scales=(40, 100, 250)
+NCOL=79 L_SEQ=128 ssm_epochs=12 torch=2.13.0+cpu arms=[0.1, 0.2, 0.3]
+[ssm-arch] dim=32 blocks=2 state_N=16 discretization=zoh selective=no kind=real-diagonal(A=-exp(A_log),dt=softplus) recurrence=sequential-time-loop ffn_mult=2 dropout=0.1 RF=128(>=L_SEQ 128: True) head=last-token(no pooling)
+[causal-check] perturb input@64: earlier(<64) maxdiff=0.00e+00 later(>=64) maxdiff=1.45e+01 last-token maxdiff=1.44e-02 (earlier must be 0)
+[affine-check] seq maxdiff under x->3.7x+5.2: 0.00e+00  mask_eq=True  (nonzero 128/128)
+  [cache] seed 42 built in 613s  Xtr(79037, 79) SEQ(79037, 128) Rr(311156, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqssm_cache/seed_42.pkl
+[seed 42] base79 (w_mdn=0) ranker+rf = 0.6323  (4683s)
+[seed 42] wmdn0.10 0.6310  d=-0.0013  (1s)
+[seed 42] wmdn0.20 0.6278  d=-0.0044  (1s)
+[seed 42] wmdn0.30 0.6225  d=-0.0098  (1s)
+  [cache] seed 7 built in 618s  Xtr(79113, 79) SEQ(79113, 128) Rr(311442, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqssm_cache/seed_7.pkl
+[seed 7] base79 (w_mdn=0) ranker+rf = 0.6247  (6087s)
+[seed 7] wmdn0.10 0.6241  d=-0.0006  (1s)
+[seed 7] wmdn0.20 0.6222  d=-0.0026  (1s)
+[seed 7] wmdn0.30 0.6183  d=-0.0064  (1s)
+  [cache] seed 123 built in 887s  Xtr(79068, 79) SEQ(79068, 128) Rr(311143, 79) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_seqssm_cache/seed_123.pkl

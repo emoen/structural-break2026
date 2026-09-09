@@ -22,7 +22,7 @@ DATA = os.path.join(HERE, "data")
 
 WINDOW = 75
 MIN_N = 15
-HIST_CAP = 200
+HIST_CAP = int(os.environ.get("HIST_CAP", "200"))  # history-ref resolution (env-sweepable)
 PREDICT_EVERY = 1
 SEED = 42
 MAX_ITER = 200

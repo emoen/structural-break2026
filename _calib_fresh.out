@@ -1,0 +1,31 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-02 18:40:10  smoke=False ===
+seeds=[31337, 2025, 555, 99] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=288 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32
+arms=[('czms_champ51', 'meansd', 51), ('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79)]
+candidates=['czms_champ51', 'czms_all79', 'czrb_all79', 'calib_all']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 208/209)
+  [cache] seed 31337 built in 690s  Xtr(79127, 288) Rr(311369, 288) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache/seed_31337.pkl
+[seed 31337] base79 ranker+rf = 0.6343  (171s)
+[seed 31337] czms_champ51   0.6388  d=+0.0045  (288s)
+[seed 31337] czms_all79     0.6408  d=+0.0064  (378s)
+[seed 31337] czrb_all79     0.6404  d=+0.0061  (366s)
+[seed 31337] calib_all      0.6400  d=+0.0057  (720s)
+  [cache] seed 2025 built in 686s  Xtr(79119, 288) Rr(311351, 288) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache/seed_2025.pkl
+[seed 2025] base79 ranker+rf = 0.6289  (172s)
+[seed 2025] czms_champ51   0.6303  d=+0.0014  (295s)
+[seed 2025] czms_all79     0.6319  d=+0.0030  (379s)
+[seed 2025] czrb_all79     0.6337  d=+0.0047  (374s)
+[seed 2025] calib_all      0.6303  d=+0.0014  (719s)
+  [cache] seed 555 built in 691s  Xtr(79034, 288) Rr(310837, 288) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache/seed_555.pkl
+[seed 555] base79 ranker+rf = 0.6258  (172s)
+[seed 555] czms_champ51   0.6286  d=+0.0028  (302s)
+[seed 555] czms_all79     0.6294  d=+0.0036  (387s)
+[seed 555] czrb_all79     0.6322  d=+0.0064  (377s)
+[seed 555] calib_all      0.6325  d=+0.0067  (722s)
+  [cache] seed 99 built in 686s  Xtr(79068, 288) Rr(311271, 288) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache/seed_99.pkl
+[seed 99] base79 ranker+rf = 0.6146  (165s)
+[seed 99] czms_champ51   0.6179  d=+0.0033  (289s)
+[seed 99] czms_all79     0.6200  d=+0.0054  (382s)
+[seed 99] czrb_all79     0.6205  d=+0.0059  (362s)
+[seed 99] calib_all      0.6203  d=+0.0057  (716s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_rankerrf_summary.txt
