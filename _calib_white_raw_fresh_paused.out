@@ -1,0 +1,6 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-13 10:29:40  smoke=False ===
+seeds=[31337, 2025, 555, 99] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=364 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32  whiten=False
+arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
+candidates=['white_raw']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 283/285)

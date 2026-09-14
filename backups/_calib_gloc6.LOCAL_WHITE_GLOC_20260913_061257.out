@@ -1,0 +1,31 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-12 19:38:46  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=364 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32  whiten=False
+arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
+candidates=['raw_gloc', 'white_gloc', 'dual_gloc', 'asym_gloc', 'var_gloc', 'horizon_gloc']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 283/285)
+  [cache] seed 42 built in 1105s  Xtr(79037, 364) Rr(311156, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_42.pkl
+[seed 42] czrb_all79+wblock ranker+rf = 0.6329  (433s)
+[seed 42] raw_gloc       0.6360  d=+0.0031  (441s)
+[seed 42] white_gloc     0.6342  d=+0.0014  (439s)
+[seed 42] dual_gloc      0.6350  d=+0.0022  (463s)
+[seed 42] asym_gloc      0.6350  d=+0.0021  (444s)
+[seed 42] var_gloc       0.6345  d=+0.0016  (439s)
+[seed 42] horizon_gloc   0.6348  d=+0.0019  (454s)
+  [cache] seed 7 built in 1043s  Xtr(79113, 364) Rr(311442, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_7.pkl
+[seed 7] czrb_all79+wblock ranker+rf = 0.6283  (534s)
+[seed 7] raw_gloc       0.6307  d=+0.0024  (564s)
+[seed 7] white_gloc     0.6332  d=+0.0050  (550s)
+[seed 7] dual_gloc      0.6304  d=+0.0021  (583s)
+[seed 7] asym_gloc      0.6278  d=-0.0004  (567s)
+[seed 7] var_gloc       0.6288  d=+0.0006  (567s)
+[seed 7] horizon_gloc   0.6301  d=+0.0019  (578s)
+  [cache] seed 123 built in 1058s  Xtr(79068, 364) Rr(311143, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_123.pkl
+[seed 123] czrb_all79+wblock ranker+rf = 0.6414  (430s)
+[seed 123] raw_gloc       0.6426  d=+0.0013  (444s)
+[seed 123] white_gloc     0.6427  d=+0.0013  (448s)
+[seed 123] dual_gloc      0.6426  d=+0.0012  (462s)
+[seed 123] asym_gloc      0.6407  d=-0.0007  (444s)
+[seed 123] var_gloc       0.6437  d=+0.0023  (440s)
+[seed 123] horizon_gloc   0.6413  d=-0.0001  (442s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_rankerrf_summary.txt

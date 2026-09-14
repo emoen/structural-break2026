@@ -108,6 +108,18 @@ NLOC = 7
 _GLOC = os.environ.get("GLOC") == "1"
 NGLOC = NLOC
 
+# Six-arm refinement screen for the full-prefix locator. All arms share one feature cache and are
+# compared against the current local baseline (base79 + robust calibration + WBLOCK).
+_GLOC6 = os.environ.get("GLOC6") == "1"
+_GLOC_COMBOS = os.environ.get("GLOC_COMBOS") == "1"
+_BAYES_GLOC = os.environ.get("BAYES_GLOC") == "1"
+NWHITE_GLOC = 7
+NBAYES_GLOC = 8
+NAGREE_GLOC = 3
+NASYM_GLOC = NLOC
+NVAR_GLOC = 7
+NHORIZON_GLOC = 9
+
 # WBLOCK bet (E112): ADDITIVE whitened readout. E109 (WHITEN) REPLACED the raw stream with the AR-
 # innovation-whitened stream and recomputed the whole base79 family -> NULL. Here we KEEP raw base79
 # and APPEND a compact break-signal block computed on the whitened trailing window (moments that
@@ -133,10 +145,13 @@ CACHE_DIR = os.path.join(HERE, "_calib_cache"
                          + ("_whiten" if _WHITEN else "")
                          + ("_locator" if _LOCATOR else "")
                          + ("_gloc" if _GLOC else "")
+                         + ("_gloc6" if _GLOC6 else "")
+                         + ("_bayes" if _BAYES_GLOC else "")
                          + ("_wblock" if _WBLOCK else ""))
-RAW = os.path.join(HERE, "_calib_rankerrf_raw.tsv")
-SUMMARY = os.path.join(HERE, "_calib_rankerrf_summary.txt")
-LOG = os.path.join(HERE, "_calib_rankerrf.log")
+_OUTPUT_STEM = os.environ.get("CALIB_OUTPUT_STEM", "_calib_rankerrf")
+RAW = os.path.join(HERE, f"{_OUTPUT_STEM}_raw.tsv")
+SUMMARY = os.path.join(HERE, f"{_OUTPUT_STEM}_summary.txt")
+LOG = os.path.join(HERE, f"{_OUTPUT_STEM}.log")
 
 # --- base AR8 spans (SHIPPED, byte-identical to _nldep/_wloss) --------------
 BASE_SPAN_SPECS = [
@@ -200,6 +215,24 @@ if _GLOC:                                          # FULL-BUFFER global change-p
         ("czrb_gloc", ["czrb_all79", "gloc"]),             # SHIPPED arm + global-locator (incremental)
     ]
 
+if _GLOC6:
+    for _name, _width in [
+        ("gloc", NGLOC),
+        ("white_gloc", NWHITE_GLOC),
+        ("agree_gloc", NAGREE_GLOC),
+        ("asym_gloc", NASYM_GLOC),
+        ("var_gloc", NVAR_GLOC),
+        ("horizon_gloc", NHORIZON_GLOC),
+    ]:
+        CAND_SLICE[_name] = np.arange(NCOL, NCOL + _width)
+        NCOL += _width
+
+if _BAYES_GLOC:
+    if not _GLOC6:
+        raise ValueError("BAYES_GLOC requires GLOC6=1 for the shared whitened full prefix")
+    CAND_SLICE["bayes_gloc"] = np.arange(NCOL, NCOL + NBAYES_GLOC)
+    NCOL += NBAYES_GLOC
+
 if _WBLOCK:                                         # ADDITIVE whitened readout block (E112)
     CAND_SLICE["wblock"] = np.arange(NCOL, NCOL + WBLOCK_N)
     NCOL = NCOL + WBLOCK_N
@@ -207,6 +240,35 @@ if _WBLOCK:                                         # ADDITIVE whitened readout 
         ("wblock", ["wblock"]),                            # base79 + whitened block (isolated)
         ("czrb_wblock", ["czrb_all79", "wblock"]),         # SHIPPED arm + whitened block (incremental)
     ]
+
+if _GLOC6:
+    _champ = ["czrb_all79", "wblock"]
+    if _GLOC_COMBOS:
+        _white = _champ + ["white_gloc"]
+        CANDIDATES = [
+            ("white_var", _white + ["var_gloc"]),
+            ("white_raw", _white + ["gloc"]),
+            ("white_raw_var", _white + ["gloc", "var_gloc"]),
+        ]
+    else:
+        CANDIDATES = [
+            ("raw_gloc", _champ + ["gloc"]),
+            ("white_gloc", _champ + ["white_gloc"]),
+            ("dual_gloc", _champ + ["gloc", "white_gloc", "agree_gloc"]),
+            ("asym_gloc", _champ + ["asym_gloc"]),
+            ("var_gloc", _champ + ["var_gloc"]),
+            ("horizon_gloc", _champ + ["horizon_gloc"]),
+        ]
+
+if _BAYES_GLOC:
+    _white_champ = ["czrb_all79", "wblock", "white_gloc"]
+    CANDIDATES = [("white_bayes", _white_champ + ["bayes_gloc"])]
+
+if os.environ.get("CANDIDATES"):
+    _selected = set(os.environ["CANDIDATES"].split(","))
+    CANDIDATES = [(name, arms) for name, arms in CANDIDATES if name in _selected]
+    if not CANDIDATES:
+        raise ValueError(f"CANDIDATES matched no available arms: {sorted(_selected)}")
 
 
 # --- AR8 base-span fit / residual-var-ratio feats (verbatim from _nldep) -----
@@ -300,7 +362,30 @@ def _ship_block(ws, ctx):
 _LOC_FACT = np.array([1.0, 2.0, 6.0, 24.0, 120.0])   # k! null-variance scaling for moments 1..5
 
 
-def locator_feats(w, ctx):
+def _locator_parts(w, min_fraction=0.1):
+    w = np.asarray(w, dtype=np.float64)
+    n = len(w)
+    if n < 24:
+        return None
+    edge = max(6, int(n * min_fraction))
+    lo, hi = edge, n - edge
+    if hi <= lo:
+        return None
+    csum = np.cumsum(w)
+    csq = np.cumsum(w * w)
+    ks = np.arange(lo, hi)
+    a = ks.astype(np.float64)
+    b = (n - ks).astype(np.float64)
+    m1 = csum[ks - 1] / a
+    m2 = (csum[-1] - csum[ks - 1]) / b
+    v1 = np.maximum(csq[ks - 1] / a - m1 * m1, _EPS)
+    v2 = np.maximum((csq[-1] - csq[ks - 1]) / b - m2 * m2, _EPS)
+    tstat = np.abs(m1 - m2) / np.sqrt(v1 / a + v2 / b + _EPS)
+    lvr = np.log(v2 / v1)
+    return w, n, ks, m1, m2, v1, v2, tstat, lvr
+
+
+def locator_feats(w, ctx, min_fraction=0.1):
     """Directed change-point locator on the trailing window (all cols affine-invariant).
 
     Scan interior splits, locate the argmax standardized mean-contrast break kbest, then emit a
@@ -308,26 +393,10 @@ def locator_feats(w, ctx):
     position), this adds the HIGHER-moment (skew/kurt/5th) shift of the located post-segment vs the
     located pre-segment -- the part _chow_supf does not measure.
     """
-    w = np.asarray(w, dtype=np.float64)
-    n = len(w)
-    if n < 24:
+    parts = _locator_parts(w, min_fraction)
+    if parts is None:
         return [0.0] * NLOC
-    lo = max(6, n // 10)
-    hi = n - max(6, n // 10)
-    if hi <= lo:
-        return [0.0] * NLOC
-    csum = np.cumsum(w)
-    csq = np.cumsum(w * w)
-    tot = csum[-1]
-    ks = np.arange(lo, hi)
-    a = ks.astype(np.float64)
-    b = (n - ks).astype(np.float64)
-    m1 = csum[ks - 1] / a
-    m2 = (tot - csum[ks - 1]) / b
-    v1 = np.maximum(csq[ks - 1] / a - m1 * m1, _EPS)
-    v2 = np.maximum((csq[-1] - csq[ks - 1]) / b - m2 * m2, _EPS)
-    tstat = np.abs(m1 - m2) / np.sqrt(v1 / a + v2 / b + _EPS)
-    lvr = np.log(v2 / v1)
+    w, n, ks, _m1, _m2, _v1, _v2, tstat, lvr = parts
     it = int(np.argmax(tstat))
     il = int(np.argmax(np.abs(lvr)))
     kbest = int(ks[it])
@@ -341,6 +410,120 @@ def locator_feats(w, ctx):
     hm_mag = float(np.sum(m[2:] * m[2:] / _LOC_FACT[2:]))   # skew+kurt+5th effect size (matched)
     out = [float(min(tstat[it], 50.0)), kbest / n, float(min(abs(lvr[il]), 20.0)),
            float(ks[il] / n), hm_mag, float(m[2]), float(m[3])]
+    return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
+
+
+def white_gloc_feats(wh):
+    """Gaussian likelihood locator on history-whitened full-prefix innovations."""
+    parts = _locator_parts(wh)
+    if parts is None:
+        return [0.0] * NWHITE_GLOC
+    w, n, ks, m1, m2, v1, v2, _tstat, lvr = parts
+    var0 = max(float(w.var()), _EPS)
+    a = ks.astype(np.float64)
+    b = (n - ks).astype(np.float64)
+    gain = np.maximum(0.5 * (n * math.log(var0) - a * np.log(v1) - b * np.log(v2)), 0.0)
+    ib = int(np.argmax(gain))
+    kbest = int(ks[ib])
+    post = w[kbest:]
+    ac1 = 0.0
+    if len(post) >= 5:
+        centered = post - post.mean()
+        ac1 = float(np.dot(centered[:-1], centered[1:]) / (np.dot(centered, centered) + _EPS))
+    radius = max(2, len(gain) // 20)
+    keep = np.ones(len(gain), dtype=bool)
+    keep[max(0, ib - radius):min(len(gain), ib + radius + 1)] = False
+    second = float(gain[keep].max()) if np.any(keep) else 0.0
+    peak = float(gain[ib])
+    prominence = (peak - second) / (peak + _EPS)
+    out = [peak / n, kbest / n, float(m2[ib] - m1[ib]), float(lvr[ib]), ac1,
+           prominence, float(np.mean(gain >= 0.8 * peak))]
+    return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
+
+
+def bayes_white_gloc_feats(wh, break_prior=0.5):
+    """BIC-regularized posterior over one break in the whitened full prefix."""
+    parts = _locator_parts(wh)
+    if parts is None:
+        return [0.0] * NBAYES_GLOC
+    w, n, ks, m1, m2, v1, v2, _tstat, _lvr = parts
+    var0 = max(float(w.var()), _EPS)
+    a = ks.astype(np.float64)
+    b = (n - ks).astype(np.float64)
+    gain = np.maximum(0.5 * (n * math.log(var0) - a * np.log(v1) - b * np.log(v2)), 0.0)
+
+    # A split adds two parameters (one mean and variance), so BIC contributes log(n).
+    # The break prior is spread uniformly over admissible split locations.
+    prior = float(np.clip(break_prior, 1e-6, 1.0 - 1e-6))
+    log_split = gain - math.log(n) + math.log(prior) - math.log(len(ks))
+    log_null = math.log1p(-prior)
+    shift = max(log_null, float(np.max(log_split)))
+    null_weight = math.exp(log_null - shift)
+    split_weight = np.exp(log_split - shift)
+    normalizer = null_weight + float(split_weight.sum())
+    split_post = split_weight / max(normalizer, _EPS)
+    break_prob = float(split_post.sum())
+    conditional = split_post / max(break_prob, _EPS)
+
+    pos = ks.astype(np.float64) / n
+    mean_pos = float(np.dot(conditional, pos))
+    map_index = int(np.argmax(conditional))
+    map_pos = float(pos[map_index])
+    post_sd = float(math.sqrt(max(np.dot(conditional, (pos - mean_pos) ** 2), 0.0)))
+    cdf = np.cumsum(conditional)
+    q05 = float(pos[min(np.searchsorted(cdf, 0.05), len(pos) - 1)])
+    q95 = float(pos[min(np.searchsorted(cdf, 0.95), len(pos) - 1)])
+    all_post = np.concatenate([[null_weight / normalizer], split_post])
+    entropy = float(-np.sum(all_post * np.log(all_post + _EPS)) / math.log(len(all_post)))
+    ordered = np.sort(conditional)
+    mode_gap = float(ordered[-1] - ordered[-2]) if len(ordered) > 1 else float(ordered[-1])
+    pooled_sd = np.sqrt(0.5 * (v1 + v2) + _EPS)
+    avg_effect = float(np.dot(conditional, (m2 - m1) / pooled_sd))
+    out = [break_prob, mean_pos, map_pos, post_sd, q95 - q05, entropy, mode_gap, avg_effect]
+    return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
+
+
+def agree_gloc_feats(raw, white):
+    raw_pos, white_pos = raw[1], white[1]
+    return [abs(raw_pos - white_pos), min(raw[0], white[0]), raw_pos * white_pos]
+
+
+def var_gloc_feats(w):
+    """Read out the full prefix at the split selected by maximum variance contrast."""
+    parts = _locator_parts(w)
+    if parts is None:
+        return [0.0] * NVAR_GLOC
+    w, n, ks, m1, m2, v1, v2, tstat, lvr = parts
+    ib = int(np.argmax(np.abs(lvr)))
+    kbest = int(ks[ib])
+    pre, post = w[:kbest], w[kbest:]
+    sp, sq = pre.std() + _EPS, post.std() + _EPS
+    skew_pre = float(np.mean(((pre - pre.mean()) / sp) ** 3))
+    skew_post = float(np.mean(((post - post.mean()) / sq) ** 3))
+    mean_shift = float((m2[ib] - m1[ib]) / math.sqrt(0.5 * (v1[ib] + v2[ib]) + _EPS))
+    out = [abs(float(lvr[ib])), kbest / n, float(tstat[ib]), mean_shift,
+           skew_post - skew_pre, float(v2[ib] / (v1[ib] + _EPS)), len(post) / n]
+    return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
+
+
+def horizon_gloc_feats(w):
+    """Mean, variance and lag-1 dependence shifts over three post-location horizons."""
+    parts = _locator_parts(w)
+    if parts is None:
+        return [0.0] * NHORIZON_GLOC
+    w, _n, ks, _m1, _m2, _v1, _v2, tstat, _lvr = parts
+    kbest = int(ks[int(np.argmax(tstat))])
+    pre = w[:kbest]
+    mu, sd = float(pre.mean()), float(pre.std()) + _EPS
+    pre_z = (pre - mu) / sd
+    pre_ac1 = float(np.dot(pre_z[:-1], pre_z[1:]) / (np.dot(pre_z, pre_z) + _EPS)) if len(pre_z) >= 5 else 0.0
+    out = []
+    for width in (32, 96, len(w) - kbest):
+        post = w[max(kbest, len(w) - width):]
+        z = (post - mu) / sd
+        ac1 = float(np.dot(z[:-1] - z.mean(), z[1:] - z.mean()) /
+                    (np.dot(z - z.mean(), z - z.mean()) + _EPS)) if len(z) >= 5 else 0.0
+        out.extend([float(z.mean()), float(np.log(z.var() + _EPS)), ac1 - pre_ac1])
     return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
 
 
@@ -454,7 +637,7 @@ def _refs(x_h, ctx):
     return base
 
 
-def _row(w, ctx, refs, full=None, wh=None):
+def _row(w, ctx, refs, full=None, wh=None, wh_full=None):
     w = np.asarray(w, dtype=np.float64)
     base = _base79_row(w, ctx, refs)
     feats = [base, np.asarray(_cand_feats(base, refs), dtype=np.float64)]
@@ -463,6 +646,21 @@ def _row(w, ctx, refs, full=None, wh=None):
     if _GLOC:                                          # scan the ENTIRE online prefix, not just w
         seq = w if full is None else np.asarray(full, dtype=np.float64)
         feats.append(np.asarray(locator_feats(seq, ctx), dtype=np.float64))
+    if _GLOC6:
+        seq = w if full is None else np.asarray(full, dtype=np.float64)
+        wseq = seq if wh_full is None else np.asarray(wh_full, dtype=np.float64)
+        raw = locator_feats(seq, ctx)
+        white = white_gloc_feats(wseq)
+        feats.extend([
+            np.asarray(raw, dtype=np.float64),
+            np.asarray(white, dtype=np.float64),
+            np.asarray(agree_gloc_feats(raw, white), dtype=np.float64),
+            np.asarray(locator_feats(seq, ctx, min_fraction=0.0), dtype=np.float64),
+            np.asarray(var_gloc_feats(seq), dtype=np.float64),
+            np.asarray(horizon_gloc_feats(seq), dtype=np.float64),
+        ])
+        if _BAYES_GLOC:
+            feats.append(np.asarray(bayes_white_gloc_feats(wseq), dtype=np.float64))
     if _WBLOCK:                                         # whitened-window readout (additive)
         wseq = w if wh is None else np.asarray(wh, dtype=np.float64)
         feats.append(np.asarray(wblock_feats(wseq, ctx), dtype=np.float64))
@@ -483,7 +681,7 @@ def _train_series(sid, x_h, x_on, tau, steps):
     if len(active) == 0:
         return np.zeros((0, NCOL)), [], [], []
     refs = _refs(x_h, ctx)
-    wh_on = whiten_pair(x_h, x_on)[1] if _WBLOCK else None
+    wh_on = whiten_pair(x_h, x_on)[1] if (_WBLOCK or _GLOC6) else None
     base = active[0]
     rows, labels, tvals = [], [], []
     for t in steps:
@@ -492,8 +690,9 @@ def _train_series(sid, x_h, x_on, tau, steps):
             continue
         lo = max(0, t - WINDOW + 1)
         rows.append(_row(x_on[lo:t + 1], ctx, refs,
-                         full=x_on[:t + 1] if _GLOC else None,
-                         wh=wh_on[lo:t + 1] if _WBLOCK else None))
+                         full=x_on[:t + 1] if (_GLOC or _GLOC6) else None,
+                         wh=wh_on[lo:t + 1] if _WBLOCK else None,
+                         wh_full=wh_on[:t + 1] if _GLOC6 else None))
         labels.append(1 if (tau >= 0 and t >= tau) else 0)
         tvals.append(int(t))
     return _san(rows), labels, tvals, [int(sid)] * len(labels)
@@ -505,10 +704,11 @@ def _val_series(sid, x_h, x_on, oi):
     ctx = hist_context(x_h, HIST_CAP)
     refs = _refs(x_h, ctx)
     active = _active(x_on)
-    wh_on = whiten_pair(x_h, x_on)[1] if _WBLOCK else None
+    wh_on = whiten_pair(x_h, x_on)[1] if (_WBLOCK or _GLOC6) else None
     rows = [_row(x_on[max(0, t - WINDOW + 1):t + 1], ctx, refs,
-                 full=x_on[:t + 1] if _GLOC else None,
-                 wh=wh_on[max(0, t - WINDOW + 1):t + 1] if _WBLOCK else None)
+                  full=x_on[:t + 1] if (_GLOC or _GLOC6) else None,
+                  wh=wh_on[max(0, t - WINDOW + 1):t + 1] if _WBLOCK else None,
+                  wh_full=wh_on[:t + 1] if _GLOC6 else None)
             for t in active]
     feat = _san(rows)
     midx = pd.MultiIndex.from_product([[sid], oi], names=["id", "time"])
@@ -688,15 +888,19 @@ def _affine_check():
         xh[i] += 0.3 * xh[i - 1] - 0.1 * xh[i - 2]
     w = xh[-260:].copy()
     ctx = hist_context(xh, HIST_CAP)
+    wh1 = whiten_pair(xh, xh)[1] if (_WBLOCK or _GLOC6) else None
     r1 = _row(w, ctx, _refs(xh, ctx),
-              full=xh if _GLOC else None,
-              wh=whiten_pair(xh, w)[1] if _WBLOCK else None)
+              full=xh if (_GLOC or _GLOC6) else None,
+              wh=wh1[-len(w):] if _WBLOCK else None,
+              wh_full=wh1 if _GLOC6 else None)
     a, b = 7.3, -2.1
     xh2, w2 = a * xh + b, a * w + b
     ctx2 = hist_context(xh2, HIST_CAP)
+    wh2 = whiten_pair(xh2, xh2)[1] if (_WBLOCK or _GLOC6) else None
     r2 = _row(w2, ctx2, _refs(xh2, ctx2),
-              full=xh2 if _GLOC else None,
-              wh=whiten_pair(xh2, w2)[1] if _WBLOCK else None)
+              full=xh2 if (_GLOC or _GLOC6) else None,
+              wh=wh2[-len(w2):] if _WBLOCK else None,
+              wh_full=wh2 if _GLOC6 else None)
     cand_idx = np.arange(NBASE, NCOL)
     md = float(np.max(np.abs(r1[cand_idx] - r2[cand_idx]))) if len(cand_idx) else 0.0
     nz = int(np.sum(np.abs(r1[cand_idx]) > 1e-9))
@@ -721,8 +925,11 @@ def main():
         sd = prepare_seed(seed)
         metas = make_folds_meta(sd)
         t0 = time.time()
-        base_auc = score_cols(sd, metas, BASE_COLS, seed)
-        log(f"[seed {seed}] base79 ranker+rf = {base_auc:.4f}  ({time.time()-t0:.0f}s)")
+        baseline_names = os.environ.get("BASELINE", "").split(",") if os.environ.get("BASELINE") else []
+        baseline_cols = cand_cols(baseline_names) if baseline_names else BASE_COLS
+        base_auc = score_cols(sd, metas, baseline_cols, seed)
+        baseline_label = "+".join(baseline_names) if baseline_names else "base79"
+        log(f"[seed {seed}] {baseline_label} ranker+rf = {base_auc:.4f}  ({time.time()-t0:.0f}s)")
         res = {}
         for name, cand_names in CANDIDATES:
             tc = time.time()

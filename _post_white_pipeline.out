@@ -1,0 +1,51 @@
+Waiting for PID 79209 before starting the 15-job pipeline...
+PID 79209 finished; starting pipeline.
+=== POST-WHITE PIPELINE 2026-09-14 00:40:07 ===
+data_seeds=[42, 7, 123] model_seeds=[42, 7, 123, 2024, 31337] jobs=15
+[stage 1 seed 42] base ranker   14s
+[stage 1 seed 42] base rf       668s
+[stage 1 seed 42] base xgb      27s
+[stage 1 seed 42] base catboost 8s
+[stage 1 seed 42] rich ranker   14s
+[stage 1 seed 42] rich rf       672s
+[stage 1 seed 42] rich xgb      23s
+[stage 1 seed 42] rich catboost 8s
+[stage 1 seed 42] complete in 24.1m
+[stage 1 seed 7] base ranker   13s
+[stage 1 seed 7] base rf       648s
+[stage 1 seed 7] base xgb      22s
+[stage 1 seed 7] base catboost 8s
+[stage 1 seed 7] rich ranker   14s
+[stage 1 seed 7] rich rf       652s
+[stage 1 seed 7] rich xgb      23s
+[stage 1 seed 7] rich catboost 8s
+[stage 1 seed 7] complete in 23.3m
+[stage 1 seed 123] base ranker   13s
+[stage 1 seed 123] base rf       650s
+[stage 1 seed 123] base xgb      22s
+[stage 1 seed 123] base catboost 8s
+[stage 1 seed 123] rich ranker   14s
+[stage 1 seed 123] rich rf       667s
+[stage 1 seed 123] rich xgb      23s
+[stage 1 seed 123] rich catboost 8s
+[stage 1 seed 123] complete in 23.6m
+[stage 1] winner=ranker+rf mask=3
+[stage 2 data 42 model 42] complete in 1.3m
+[stage 2 data 42 model 7] complete in 24.5m
+[stage 2 data 42 model 123] complete in 24.5m
+[stage 2 data 42 model 2024] complete in 24.5m
+[stage 2 data 42 model 31337] complete in 24.4m
+[stage 2 data 7 model 42] complete in 1.3m
+[stage 2 data 7 model 7] complete in 23.7m
+[stage 2 data 7 model 123] complete in 23.8m
+[stage 2 data 7 model 2024] complete in 23.7m
+[stage 2 data 7 model 31337] complete in 23.6m
+[stage 2 data 123 model 42] complete in 1.3m
+[stage 2 data 123 model 7] complete in 24.1m
+[stage 2 data 123 model 123] complete in 24.0m
+[stage 2 data 123 model 2024] complete in 24.0m
+[stage 2 data 123 model 31337] complete in 24.1m
+[stage 2] accepted_params=['ranker_slow500', 'catboost_depth8']
+[stage 3] best_weights={'ranker': 0.55, 'rf': 0.3, 'xgb': 0.05, 'catboost': 0.1} mean_d=+0.003699
+[stage 5] gate=PASS
+=== DONE 2026-09-14 06:51:49 ===

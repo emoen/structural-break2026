@@ -1,37 +1,16 @@
-=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-07 21:21:24  smoke=False ===
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-12 07:26:24  smoke=False ===
 seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
 NBASE=79 NCOL=323 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32  whiten=False
 arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
 candidates=['czms_all79', 'czrb_all79', 'czrb_champ51', 'czrb_dep28', 'czmix', 'calib_all', 'gloc', 'czrb_gloc']
 [affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 242/244)
-  [cache] seed 42 built in 790s  Xtr(79037, 323) Rr(311156, 323) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc/seed_42.pkl
-[seed 42] base79 ranker+rf = 0.6323  (178s)
-[seed 42] czms_all79     0.6324  d=+0.0001  (398s)
-[seed 42] czrb_all79     0.6328  d=+0.0005  (377s)
-[seed 42] czrb_champ51   0.6310  d=-0.0013  (296s)
-[seed 42] czrb_dep28     0.6349  d=+0.0027  (263s)
-[seed 42] czmix          0.6311  d=-0.0012  (608s)
-[seed 42] calib_all      0.6308  d=-0.0015  (841s)
-[seed 42] gloc           0.6329  d=+0.0006  (191s)
-[seed 42] czrb_gloc      0.6347  d=+0.0024  (410s)
-  [cache] seed 7 built in 1197s  Xtr(79113, 323) Rr(311442, 323) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc/seed_7.pkl
-[seed 7] base79 ranker+rf = 0.6247  (203s)
-[seed 7] czms_all79     0.6278  d=+0.0031  (397s)
-[seed 7] czrb_all79     0.6275  d=+0.0028  (391s)
-[seed 7] czrb_champ51   0.6277  d=+0.0030  (309s)
-[seed 7] czrb_dep28     0.6266  d=+0.0019  (261s)
-[seed 7] czmix          0.6294  d=+0.0047  (615s)
-[seed 7] calib_all      0.6283  d=+0.0035  (812s)
-[seed 7] gloc           0.6256  d=+0.0008  (196s)
-[seed 7] czrb_gloc      0.6280  d=+0.0032  (399s)
-  [cache] seed 123 built in 766s  Xtr(79068, 323) Rr(311143, 323) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc/seed_123.pkl
-[seed 123] base79 ranker+rf = 0.6389  (178s)
-[seed 123] czms_all79     0.6405  d=+0.0016  (398s)
-[seed 123] czrb_all79     0.6393  d=+0.0004  (389s)
-[seed 123] czrb_champ51   0.6413  d=+0.0024  (299s)
-[seed 123] czrb_dep28     0.6372  d=-0.0018  (259s)
-[seed 123] czmix          0.6392  d=+0.0003  (619s)
-[seed 123] calib_all      0.6406  d=+0.0017  (843s)
-[seed 123] gloc           0.6400  d=+0.0011  (193s)
-[seed 123] czrb_gloc      0.6411  d=+0.0022  (410s)
-wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_rankerrf_summary.txt
+  [cache] seed 42 built in 997s  Xtr(79037, 323) Rr(311156, 323) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc/seed_42.pkl
+[seed 42] base79 ranker+rf = 0.6323  (229s)
+[seed 42] czms_all79     0.6324  d=+0.0001  (512s)
+[seed 42] czrb_all79     0.6328  d=+0.0005  (519s)
+[seed 42] czrb_champ51   0.6310  d=-0.0013  (409s)
+[seed 42] czrb_dep28     0.6349  d=+0.0027  (347s)
+[seed 42] czmix          0.6311  d=-0.0012  (964s)
+[seed 42] calib_all      0.6308  d=-0.0015  (1365s)
+[seed 42] gloc           0.6329  d=+0.0006  (223s)
+[seed 42] czrb_gloc      0.6347  d=+0.0024  (1054s)

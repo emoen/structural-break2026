@@ -1,0 +1,16 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-12 19:35:34  smoke=True ===
+seeds=[42, 7] rf_trees=120 dense_k=20 blend=0.45/0.55
+NBASE=79 NCOL=364 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32  whiten=False
+arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
+candidates=['raw_gloc', 'white_gloc', 'dual_gloc', 'asym_gloc', 'var_gloc', 'horizon_gloc']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 283/285)
+  [cache] seed 42 built in 55s  Xtr(2968, 364) Rr(5901, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_42_smoke.pkl
+[seed 42] czrb_all79+wblock ranker+rf = 0.5689  (7s)
+[seed 42] raw_gloc       0.5794  d=+0.0105  (7s)
+[seed 42] white_gloc     0.5805  d=+0.0117  (8s)
+[seed 42] dual_gloc      0.5870  d=+0.0181  (8s)
+[seed 42] asym_gloc      0.5896  d=+0.0207  (12s)
+[seed 42] var_gloc       0.5936  d=+0.0248  (11s)
+[seed 42] horizon_gloc   0.5882  d=+0.0194  (11s)
+  [cache] seed 7 built in 54s  Xtr(2966, 364) Rr(5915, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_7_smoke.pkl
+[seed 7] czrb_all79+wblock ranker+rf = 0.5793  (8s)

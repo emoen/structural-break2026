@@ -49,6 +49,44 @@ Deep experiment history lives in memory (`/memories/repo/structural-break.md`,
 7. **Check `df -h .` before cache-heavy sweeps.** Probe caches can be 30GB+. Delete each
    `_*_cache` after the run.
 
+## Competition rules (from the official doc + docs.crunchdao.com, verified 2026-09-09)
+
+- **Compute quota = 15 hours/week**, refreshing **every Wednesday 16:00 UTC**. Quota is GLOBAL
+  across runtimes (some burn it faster). A full run ≈ 59 min train + ~2.5 min infer. **Failed runs
+  are DISCOUNTED**, not full-cost: timeout or terminated = **5%** of duration, other crashes =
+  **30%**. Env setup (data download / installs) does NOT count; timeout is set 30 min past quota.
+- **Deadline: 2026-10-01 16:00 UTC** (the old Sept-17 date is superseded). Final eval end of Oct.
+- **Determinism required:** re-run on 10% of data must match within `1e-8` — **inference only,
+  NOT training** (official footnote). So pretraining is never penalized on reproducibility.
+- Parallelism is **series-level only** (each point still processed separately); avoid writing
+  files under concurrency; use `threadpoolctl` for the OpenBLAS/parallelism conflict.
+- **No internet in the cloud** (local unix-socket connections only).
+- Data: public train 10k (local+cloud), reduced test 100 (local only), public test 10k (cloud),
+  private test 10k (cloud). Break present w.p. 0.5; `tau` 0-indexed within the online segment.
+
+### Pretraining / shipping a model artifact (verified)
+
+- **Pretraining IS allowed and stays reward-eligible** as long as the training CODE is pushed with
+  the submission. To skip the cloud `train()` call: either select **"No training"** on the run
+  screen, OR make `train()` dead code (early `return`, original code left intact); external
+  scripts must also be pushed with a pointer comment (`pass  # available in train_script/train.py`).
+  INELIGIBLE only if you ship a model **without** its training code, files of "unknown origin", or
+  long strings decoded at runtime. Skipping `train()` saves the full ~59 min/run against quota.
+- **`model_directory_path` IS the `resources/` dir.** `infer()` already does
+  `joblib.load(os.path.join(model_directory_path, "model.joblib"))` — shipping the identical
+  `model.joblib` the champion's `train()` produces is byte-for-byte score-neutral (verify with a
+  prediction bit-compare, same as the serial-vs-parallel check).
+- **Size limits:** a submission ≤ 5 GB, `resources/` ≤ 10 GB. The ~100 MB gzipped model is tiny.
+- **Submit-with-artifact — two routes:** (1) web "Submit a Notebook" page → "Add file(s)" also
+  uploads `model.joblib` into `resources/` (keeps the current notebook-upload workflow, fine for a
+  single ~100 MB file); (2) **Hybrid CLI** (docs' recommended route for large pretrained models):
+  `crunch setup <comp> <model> --token <tok> <dir>`, name the notebook `main.ipynb`, put
+  `model.joblib` in `resources/`, `crunch push` — but `requirements.txt` must be maintained BY HAND
+  in hybrid mode (package-version specifiers don't work).
+- **Run chain:** submit (notebook + `model.joblib`) → create a Run with **"No training"** → runs
+  `infer()` only → validates + scores. Must do at least one Run to confirm validity. `resources/`
+  content persists across runs (train→infer transition and run-to-run).
+
 ## Environment
 
 - Python venv: **`.venv/bin/python`** (system `python` is not on PATH; use the absolute path).
@@ -66,17 +104,17 @@ Deep experiment history lives in memory (`/memories/repo/structural-break.md`,
 - **Local harness is directionally predictive** but LB-shrunk (`mean_d ~+0.008` local →
   ~+1pt LB). LB resolution ≈ 0.04pt.
 - **Believe-rule / noise gate (current):** an ensemble-delta arm must have
-  `mean_d >= +0.0015` AND be **positive on all screen seeds** `{42,7,123}`, THEN confirm on
-  **fresh disjoint seeds** `{31337,2025,555,99}`. The believe-rule is a submission-scarcity
-  noise gate on the ENSEMBLE delta — a member being weaker than the ensemble is expected;
-  decorrelation is what matters.
+  `mean_d >= +0.0015` AND be **positive on all screen seeds** `{42,7,123}`. Do **NOT**
+  reconfirm on a different seed set or automatically launch runs on `{31337,2025,555,99}`.
+  The believe-rule is a submission-scarcity noise gate on the ENSEMBLE delta — a member being
+  weaker than the ensemble is expected; decorrelation is what matters.
 - **Always re-baseline vs the CURRENT champion**, not an old base. A member confirmed vs a weak
   base can be redundant vs the stronger ensemble.
 - **NEVER trust smoke numbers.** Smoke (2-fold / tiny data / reduced recipe) is a
   correctness/plumbing check ONLY. Deltas at smoke scale are worthless (repeatedly: smoke
   `t=15` → full `t=0.4`). Confirm at full folds / full `dense_k` before believing anything.
-- **4/4 pool-positive means nothing without fresh-seed confirm** (seeds 2025/555/99 are
-  historically adversarial and have correctly killed pool-luck winners).
+- Judge candidates on the declared screen seeds only. Historical results on other seeds remain
+  useful context, but do not trigger a second confirmation stage unless the user explicitly asks.
 - Best-of-K search deltas are **selection-biased**; re-validate the chosen config on independent
   seeds (select on multi-seed MEAN, not single-seed max).
 - All new features must be **affine-invariant** (scale + location) and **causal** (history-only).
@@ -87,7 +125,7 @@ Deep experiment history lives in memory (`/memories/repo/structural-break.md`,
 - Report results as **clean markdown tables**, not prose.
 - Show `config/block, mean_d, min_d, pos (n/N), t_agg, per-seed t (one column per seed), verdict`.
 - Include the t score BOTH aggregated AND per-seed; label seed columns with the real seed numbers.
-- Separate **SCREEN** vs **FRESH** tables.
+- Report one **SCREEN** table; do not create or run a separate fresh-seed confirmation stage.
 - **Lead with absolute TS-AUC**, not just deltas.
 - Spell out acronyms in user-facing text (say "random forest" / "leaderboard" / "gradient
   boosting member", not RF/LB/HGB).

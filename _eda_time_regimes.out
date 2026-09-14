@@ -1,0 +1,6 @@
+Loading seed 42 cache and fitting exact champion members...
+Fit and scored ranker: 18s
+Fit and scored rf: 691s
+Fit and scored xgb: 28s
+Fit and scored catboost: 8s
+EDA complete: /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/docs/time_regime_eda/REPORT.md

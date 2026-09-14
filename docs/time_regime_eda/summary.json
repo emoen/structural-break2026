@@ -1,0 +1,15 @@
+{
+  "seed": 42,
+  "series": 2000,
+  "online_rows": 1012097,
+  "overall_ts_auc": 0.6339930144783809,
+  "metric_weight": 214360227,
+  "weakest_post_break_regime": "onset 0-4",
+  "weakest_regime_auc": 0.5094129484088941,
+  "break_series_crossing_0.5_fraction": 0.9154078549848943,
+  "median_detection_delay_at_0.5": 1.0,
+  "break_series_decay_over_0.1_fraction": 0.1196236559139785,
+  "no_break_pre_score_ge_0.5_fraction": 0.4231637826792314,
+  "mean_plateau_fraction": 0.061386164364670974,
+  "median_max_jump": 0.28969822253940025
+}

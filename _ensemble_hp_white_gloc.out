@@ -1,0 +1,326 @@
+=== WHITE-GLOC FOUR-MEMBER HP SCREEN 2026-09-13 18:03:57 ===
+data_seeds=[42, 7, 123] model_seed=42 cols=173 rf_screen_trees=250 jobs=15
+candidate_counts={'ranker': 10, 'rf': 8, 'xgb': 12, 'catboost': 10}
+  [cache] seed 42 built in 1205s  Xtr(79037, 364) Rr(311156, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_42.pkl
+
+[seed 42] cache ready Xtr=(79037, 364) Rr=(311156, 364)
+  baseline ranker   fit+predict 31s
+  baseline rf       fit+predict 836s
+  baseline xgb      fit+predict 46s
+  baseline catboost fit+predict 17s
+  four-member baseline auc=0.634982
+  ranker   leaves15         auc=0.633882 d=-0.001100 t=-0.77
+    elapsed=29s
+  ranker   leaves63         auc=0.634961 d=-0.000021 t=-0.02
+    elapsed=59s
+  ranker   child10          auc=0.634689 d=-0.000293 t=-0.28
+    elapsed=42s
+  ranker   child40          auc=0.633893 d=-0.001089 t=-1.29
+    elapsed=45s
+  ranker   cols055          auc=0.636569 d=+0.001587 t=+1.55
+    elapsed=38s
+  ranker   cols085          auc=0.635843 d=+0.000861 t=+0.81
+    elapsed=47s
+  ranker   cols100          auc=0.634582 d=-0.000400 t=-0.43
+    elapsed=48s
+  ranker   l2_3             auc=0.634077 d=-0.000905 t=-0.84
+    elapsed=50s
+  ranker   l2_5             auc=0.634621 d=-0.000361 t=-0.45
+    elapsed=49s
+  ranker   slow500          auc=0.636378 d=+0.001396 t=+1.55
+    elapsed=70s
+  rf       mf030            auc=0.634829 d=-0.000002 t=-0.00
+    elapsed=306s
+  rf       mf070            auc=0.634169 d=-0.000662 t=-1.94
+    elapsed=733s
+  rf       leaf10           auc=0.634668 d=-0.000163 t=-0.28
+    elapsed=603s
+  rf       leaf40           auc=0.634333 d=-0.000498 t=-1.19
+    elapsed=468s
+  rf       mf030_leaf10     auc=0.634984 d=+0.000153 t=+0.34
+    elapsed=387s
+  rf       mf030_leaf40     auc=0.635071 d=+0.000240 t=+0.54
+    elapsed=307s
+  rf       mf070_leaf10     auc=0.634284 d=-0.000547 t=-1.02
+    elapsed=798s
+  rf       mf070_leaf40     auc=0.634672 d=-0.000159 t=-0.36
+    elapsed=282s
+  xgb      depth4           auc=0.634654 d=-0.000328 t=-0.91
+    elapsed=17s
+  xgb      depth5           auc=0.634704 d=-0.000278 t=-1.17
+    elapsed=20s
+  xgb      depth8           auc=0.635395 d=+0.000413 t=+1.72
+    elapsed=39s
+  xgb      child2           auc=0.634989 d=+0.000007 t=+0.05
+    elapsed=25s
+  xgb      child10          auc=0.635057 d=+0.000075 t=+0.74
+    elapsed=24s
+  xgb      rows065          auc=0.635115 d=+0.000132 t=+0.67
+    elapsed=25s
+  xgb      rows100          auc=0.634780 d=-0.000202 t=-1.07
+    elapsed=24s
+  xgb      cols050          auc=0.634993 d=+0.000011 t=+0.06
+    elapsed=23s
+  xgb      cols085          auc=0.635253 d=+0.000271 t=+2.17
+    elapsed=25s
+  xgb      cols100          auc=0.635101 d=+0.000119 t=+0.69
+    elapsed=26s
+  xgb      l2_3             auc=0.634848 d=-0.000134 t=-1.72
+    elapsed=24s
+  xgb      l2_10            auc=0.635011 d=+0.000029 t=+0.18
+    elapsed=25s
+  catboost depth5           auc=0.634878 d=-0.000104 t=-1.07
+    elapsed=7s
+  catboost depth7           auc=0.634986 d=+0.000004 t=+0.06
+    elapsed=13s
+  catboost depth8           auc=0.634993 d=+0.000011 t=+0.10
+    elapsed=21s
+  catboost l2_3             auc=0.635060 d=+0.000078 t=+0.98
+    elapsed=10s
+  catboost l2_30            auc=0.634947 d=-0.000035 t=-0.53
+    elapsed=11s
+  catboost rs0              auc=0.634973 d=-0.000009 t=-0.12
+    elapsed=10s
+  catboost rs05             auc=0.634969 d=-0.000013 t=-0.21
+    elapsed=10s
+  catboost rs2              auc=0.635058 d=+0.000076 t=+1.18
+    elapsed=10s
+  catboost bern08           auc=0.634929 d=-0.000053 t=-0.78
+    elapsed=10s
+  catboost bayes05          auc=0.635030 d=+0.000048 t=+0.59
+    elapsed=11s
+[seed 42] done in 116.8 min
+  [cache] seed 7 built in 1024s  Xtr(79113, 364) Rr(311442, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_7.pkl
+
+[seed 7] cache ready Xtr=(79113, 364) Rr=(311442, 364)
+  baseline ranker   fit+predict 17s
+  baseline rf       fit+predict 678s
+  baseline xgb      fit+predict 24s
+  baseline catboost fit+predict 9s
+  four-member baseline auc=0.633184
+  ranker   leaves15         auc=0.628727 d=-0.004456 t=-3.77
+    elapsed=13s
+  ranker   leaves63         auc=0.631792 d=-0.001392 t=-1.20
+    elapsed=31s
+  ranker   child10          auc=0.631510 d=-0.001674 t=-4.67
+    elapsed=19s
+  ranker   child40          auc=0.630636 d=-0.002548 t=-3.44
+    elapsed=18s
+  ranker   cols055          auc=0.628802 d=-0.004382 t=-4.41
+    elapsed=19s
+  ranker   cols085          auc=0.630947 d=-0.002237 t=-1.54
+    elapsed=18s
+  ranker   cols100          auc=0.630674 d=-0.002510 t=-1.79
+    elapsed=19s
+  ranker   l2_3             auc=0.631996 d=-0.001188 t=-0.83
+    elapsed=19s
+  ranker   l2_5             auc=0.631176 d=-0.002008 t=-1.29
+    elapsed=20s
+  ranker   slow500          auc=0.631387 d=-0.001797 t=-1.62
+    elapsed=27s
+  rf       mf030            auc=0.633149 d=+0.000387 t=+1.08
+    elapsed=127s
+  rf       mf070            auc=0.632972 d=+0.000210 t=+0.40
+    elapsed=305s
+  rf       leaf10           auc=0.633383 d=+0.000621 t=+1.00
+    elapsed=240s
+  rf       leaf40           auc=0.632315 d=-0.000447 t=-1.19
+    elapsed=191s
+  rf       mf030_leaf10     auc=0.633369 d=+0.000607 t=+1.11
+    elapsed=143s
+  rf       mf030_leaf40     auc=0.632341 d=-0.000421 t=-0.84
+    elapsed=114s
+  rf       mf070_leaf10     auc=0.633123 d=+0.000361 t=+0.63
+    elapsed=345s
+  rf       mf070_leaf40     auc=0.632596 d=-0.000166 t=-0.64
+    elapsed=269s
+  xgb      depth4           auc=0.632764 d=-0.000420 t=-1.67
+    elapsed=17s
+  xgb      depth5           auc=0.632800 d=-0.000383 t=-2.20
+    elapsed=20s
+  xgb      depth8           auc=0.633504 d=+0.000320 t=+1.17
+    elapsed=38s
+  xgb      child2           auc=0.633333 d=+0.000149 t=+1.27
+    elapsed=25s
+  xgb      child10          auc=0.632964 d=-0.000220 t=-1.51
+    elapsed=24s
+  xgb      rows065          auc=0.633250 d=+0.000066 t=+0.34
+    elapsed=24s
+  xgb      rows100          auc=0.633356 d=+0.000172 t=+1.06
+    elapsed=24s
+  xgb      cols050          auc=0.632918 d=-0.000266 t=-2.38
+    elapsed=23s
+  xgb      cols085          auc=0.633106 d=-0.000078 t=-0.66
+    elapsed=25s
+  xgb      cols100          auc=0.633351 d=+0.000167 t=+0.96
+    elapsed=26s
+  xgb      l2_3             auc=0.632974 d=-0.000210 t=-1.44
+    elapsed=24s
+  xgb      l2_10            auc=0.633063 d=-0.000121 t=-1.01
+    elapsed=25s
+  catboost depth5           auc=0.633161 d=-0.000023 t=-0.24
+    elapsed=7s
+  catboost depth7           auc=0.633300 d=+0.000116 t=+1.71
+    elapsed=13s
+  catboost depth8           auc=0.633370 d=+0.000186 t=+1.96
+    elapsed=22s
+  catboost l2_3             auc=0.633260 d=+0.000076 t=+1.28
+    elapsed=10s
+  catboost l2_30            auc=0.633275 d=+0.000091 t=+2.25
+    elapsed=10s
+  catboost rs0              auc=0.633365 d=+0.000181 t=+2.30
+    elapsed=10s
+  catboost rs05             auc=0.633222 d=+0.000038 t=+0.83
+    elapsed=10s
+  catboost rs2              auc=0.633191 d=+0.000007 t=+0.09
+    elapsed=11s
+  catboost bern08           auc=0.633232 d=+0.000048 t=+0.57
+    elapsed=10s
+  catboost bayes05          auc=0.633222 d=+0.000038 t=+0.60
+    elapsed=11s
+[seed 7] done in 69.5 min
+  [cache] seed 123 built in 1028s  Xtr(79068, 364) Rr(311143, 364) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_wblock/seed_123.pkl
+
+[seed 123] cache ready Xtr=(79068, 364) Rr=(311143, 364)
+  baseline ranker   fit+predict 18s
+  baseline rf       fit+predict 695s
+  baseline xgb      fit+predict 23s
+  baseline catboost fit+predict 9s
+  four-member baseline auc=0.642112
+  ranker   leaves15         auc=0.641713 d=-0.000399 t=-0.38
+    elapsed=12s
+  ranker   leaves63         auc=0.642168 d=+0.000056 t=+0.04
+    elapsed=31s
+  ranker   child10          auc=0.641844 d=-0.000268 t=-0.84
+    elapsed=18s
+  ranker   child40          auc=0.642159 d=+0.000047 t=+0.10
+    elapsed=19s
+  ranker   cols055          auc=0.641607 d=-0.000505 t=-0.40
+    elapsed=19s
+  ranker   cols085          auc=0.643048 d=+0.000936 t=+0.88
+    elapsed=19s
+  ranker   cols100          auc=0.641872 d=-0.000240 t=-0.25
+    elapsed=19s
+  ranker   l2_3             auc=0.641586 d=-0.000526 t=-0.55
+    elapsed=19s
+  ranker   l2_5             auc=0.643360 d=+0.001248 t=+1.10
+    elapsed=20s
+  ranker   slow500          auc=0.643460 d=+0.001348 t=+1.42
+    elapsed=28s
+  rf       mf030            auc=0.641342 d=-0.000418 t=-0.87
+    elapsed=127s
+  rf       mf070            auc=0.641882 d=+0.000122 t=+0.48
+    elapsed=319s
+  rf       leaf10           auc=0.642076 d=+0.000316 t=+1.12
+    elapsed=263s
+  rf       leaf40           auc=0.641274 d=-0.000487 t=-1.97
+    elapsed=196s
+  rf       mf030_leaf10     auc=0.641628 d=-0.000133 t=-0.28
+    elapsed=142s
+  rf       mf030_leaf40     auc=0.641232 d=-0.000529 t=-0.89
+    elapsed=116s
+  rf       mf070_leaf10     auc=0.641377 d=-0.000384 t=-2.20
+    elapsed=364s
+  rf       mf070_leaf40     auc=0.640900 d=-0.000861 t=-1.95
+    elapsed=279s
+  xgb      depth4           auc=0.642055 d=-0.000057 t=-0.15
+    elapsed=17s
+  xgb      depth5           auc=0.641955 d=-0.000157 t=-0.49
+    elapsed=19s
+  xgb      depth8           auc=0.642229 d=+0.000117 t=+0.60
+    elapsed=38s
+  xgb      child2           auc=0.642000 d=-0.000112 t=-0.57
+    elapsed=24s
+  xgb      child10          auc=0.642158 d=+0.000046 t=+0.23
+    elapsed=23s
+  xgb      rows065          auc=0.641984 d=-0.000128 t=-0.59
+    elapsed=24s
+  xgb      rows100          auc=0.642115 d=+0.000003 t=+0.01
+    elapsed=23s
+  xgb      cols050          auc=0.642257 d=+0.000145 t=+0.51
+    elapsed=22s
+  xgb      cols085          auc=0.642185 d=+0.000073 t=+0.24
+    elapsed=25s
+  xgb      cols100          auc=0.642071 d=-0.000040 t=-0.15
+    elapsed=26s
+  xgb      l2_3             auc=0.641941 d=-0.000171 t=-0.68
+    elapsed=24s
+  xgb      l2_10            auc=0.642314 d=+0.000202 t=+0.81
+    elapsed=24s
+  catboost depth5           auc=0.642188 d=+0.000076 t=+0.95
+    elapsed=8s
+  catboost depth7           auc=0.642128 d=+0.000016 t=+0.14
+    elapsed=14s
+  catboost depth8           auc=0.642252 d=+0.000140 t=+0.93
+    elapsed=21s
+  catboost l2_3             auc=0.642163 d=+0.000051 t=+0.70
+    elapsed=10s
+  catboost l2_30            auc=0.642088 d=-0.000024 t=-0.29
+    elapsed=10s
+  catboost rs0              auc=0.642210 d=+0.000098 t=+0.74
+    elapsed=10s
+  catboost rs05             auc=0.642125 d=+0.000013 t=+0.11
+    elapsed=10s
+  catboost rs2              auc=0.642136 d=+0.000024 t=+0.22
+    elapsed=10s
+  catboost bern08           auc=0.642169 d=+0.000058 t=+0.65
+    elapsed=10s
+  catboost bayes05          auc=0.642070 d=-0.000042 t=-0.53
+    elapsed=11s
+[seed 123] done in 71.0 min
+
+=== RANDOM FOREST 800-TREE FINALISTS ===
+  leaf10: screen mean_d=+0.000258
+  mf030_leaf10: screen mean_d=+0.000209
+  rf       leaf10           auc=0.634584 d=-0.000398 t=-0.79
+  rf       mf030_leaf10     auc=0.634809 d=-0.000173 t=-0.43
+  rf       leaf10           auc=0.633162 d=-0.000022 t=-0.06
+  rf       mf030_leaf10     auc=0.633520 d=+0.000336 t=+0.91
+  rf       leaf10           auc=0.642150 d=+0.000039 t=+0.12
+  rf       mf030_leaf10     auc=0.641887 d=-0.000224 t=-0.54
+
+=== SCREEN SUMMARY ===
+stage/member/config                        mean_d      min_d     pos
+screen/ranker/slow500                   +0.000316  -0.001797   2/3
+screen/xgb/depth8                       +0.000283  +0.000117   3/3
+screen/rf/leaf10                        +0.000258  -0.000163   2/3
+screen/rf/mf030_leaf10                  +0.000209  -0.000133   2/3
+screen/catboost/depth8                  +0.000112  +0.000011   3/3
+screen/catboost/rs0                     +0.000090  -0.000009   2/3
+screen/xgb/cols085                      +0.000089  -0.000078   2/3
+screen/xgb/cols100                      +0.000082  -0.000040   2/3
+screen/catboost/l2_3                    +0.000069  +0.000051   3/3
+screen/catboost/depth7                  +0.000046  +0.000004   3/3
+screen/xgb/l2_10                        +0.000037  -0.000121   2/3
+screen/catboost/rs2                     +0.000036  +0.000007   3/3
+screen/xgb/rows065                      +0.000024  -0.000128   2/3
+screen/catboost/bern08                  +0.000017  -0.000053   2/3
+screen/xgb/child2                       +0.000015  -0.000112   2/3
+screen/catboost/bayes05                 +0.000015  -0.000042   2/3
+screen/catboost/rs05                    +0.000013  -0.000013   2/3
+screen/catboost/l2_30                   +0.000011  -0.000035   1/3
+screen/xgb/rows100                      -0.000009  -0.000202   2/3
+screen/rf/mf030                         -0.000011  -0.000418   1/3
+screen/catboost/depth5                  -0.000017  -0.000104   1/3
+final800/rf/mf030_leaf10                -0.000021  -0.000224   1/3
+screen/xgb/child10                      -0.000033  -0.000220   2/3
+screen/xgb/cols050                      -0.000037  -0.000266   2/3
+screen/rf/mf070                         -0.000110  -0.000662   2/3
+final800/rf/leaf10                      -0.000127  -0.000398   1/3
+screen/ranker/cols085                   -0.000147  -0.002237   2/3
+screen/xgb/l2_3                         -0.000172  -0.000210   0/3
+screen/rf/mf070_leaf10                  -0.000190  -0.000547   1/3
+screen/rf/mf030_leaf40                  -0.000237  -0.000529   1/3
+screen/xgb/depth4                       -0.000269  -0.000420   0/3
+screen/xgb/depth5                       -0.000273  -0.000383   0/3
+screen/ranker/l2_5                      -0.000374  -0.002008   1/3
+screen/rf/mf070_leaf40                  -0.000395  -0.000861   0/3
+screen/ranker/leaves63                  -0.000452  -0.001392   1/3
+screen/rf/leaf40                        -0.000477  -0.000498   0/3
+screen/ranker/child10                   -0.000745  -0.001674   0/3
+screen/ranker/l2_3                      -0.000873  -0.001188   0/3
+screen/ranker/cols100                   -0.001050  -0.002510   0/3
+screen/ranker/cols055                   -0.001100  -0.004382   1/3
+screen/ranker/child40                   -0.001197  -0.002548   1/3
+screen/ranker/leaves15                  -0.001985  -0.004456   0/3
+=== DONE 2026-09-13 23:57:12 ===
