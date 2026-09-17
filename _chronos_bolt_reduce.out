@@ -1,0 +1,4 @@
+norms5: standalone=0.530423 residual=0.510819 rho=0.093071 best@0.05=0.644505 d=+0.000462
+pca16: standalone=0.516620 residual=0.504538 rho=0.072630 best@0.025=0.644020 d=-0.000023
+pca32: standalone=0.523070 residual=0.506597 rho=0.097059 best@0.025=0.644111 d=+0.000068
+pca64: standalone=0.536995 residual=0.514798 rho=0.128592 best@0.05=0.644536 d=+0.000493

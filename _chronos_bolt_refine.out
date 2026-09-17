@@ -1,0 +1,50 @@
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 9537.23it/s]
+train_views: 12800/311156
+train_views: 25600/311156
+train_views: 38400/311156
+train_views: 51200/311156
+train_views: 64000/311156
+train_views: 76800/311156
+train_views: 89600/311156
+train_views: 102400/311156
+train_views: 115200/311156
+train_views: 128000/311156
+train_views: 140800/311156
+train_views: 153600/311156
+train_views: 166400/311156
+train_views: 179200/311156
+train_views: 192000/311156
+train_views: 204800/311156
+train_views: 217600/311156
+train_views: 230400/311156
+train_views: 243200/311156
+train_views: 256000/311156
+train_views: 268800/311156
+train_views: 281600/311156
+train_views: 294400/311156
+train_views: 307200/311156
+built train_views.npy 311156 rows in 3.0m
+exact train-row and regression-token replay passed
+fold0_views: 12800/103509
+fold0_views: 25600/103509
+fold0_views: 38400/103509
+fold0_views: 51200/103509
+fold0_views: 64000/103509
+fold0_views: 76800/103509
+fold0_views: 89600/103509
+fold0_views: 102400/103509
+built fold0_views.npy 103509 rows in 0.9m
+fold 0 exact active-row and regression-token replay passed
+fold1_views: 12800/99455
+fold1_views: 25600/99455
+fold1_views: 38400/99455
+fold1_views: 51200/99455
+fold1_views: 64000/99455
+fold1_views: 76800/99455
+fold1_views: 89600/99455
+built fold1_views.npy 99455 rows in 0.9m
+fold 1 exact active-row and regression-token replay passed
+reg: standalone=0.532300 residual=0.509801 rho=0.145466 best@0.025=0.644220 d=+0.000178
+last: standalone=0.530185 residual=0.508090 rho=0.141522 best@0.025=0.644196 d=+0.000153
+last_minus_mean: standalone=0.545224 residual=0.518328 rho=0.153689 best@0.075=0.645024 d=+0.000981
+all: standalone=0.543183 residual=0.514388 rho=0.180206 best@0.05=0.644691 d=+0.000648

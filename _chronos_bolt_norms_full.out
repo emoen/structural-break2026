@@ -1,0 +1,169 @@
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 10367.97it/s]
+train_seed42: 25600/311156
+train_seed42: 51200/311156
+train_seed42: 76800/311156
+train_seed42: 102400/311156
+train_seed42: 128000/311156
+train_seed42: 153600/311156
+train_seed42: 179200/311156
+train_seed42: 204800/311156
+train_seed42: 230400/311156
+train_seed42: 256000/311156
+train_seed42: 281600/311156
+train_seed42: 307200/311156
+built train_seed42.npy 311156 rows in 2.9m
+seed42_fold0: 25600/103509
+seed42_fold0: 51200/103509
+seed42_fold0: 76800/103509
+seed42_fold0: 102400/103509
+built seed42_fold0.npy 103509 rows in 0.9m
+seed42_fold1: 25600/99455
+seed42_fold1: 51200/99455
+seed42_fold1: 76800/99455
+built seed42_fold1.npy 99455 rows in 0.9m
+seed42_fold2: 25600/97626
+seed42_fold2: 51200/97626
+seed42_fold2: 76800/97626
+built seed42_fold2.npy 97626 rows in 0.8m
+seed42_fold3: 25600/101198
+seed42_fold3: 51200/101198
+seed42_fold3: 76800/101198
+built seed42_fold3.npy 101198 rows in 0.8m
+seed42_fold4: 25600/91889
+seed42_fold4: 51200/91889
+seed42_fold4: 76800/91889
+built seed42_fold4.npy 91889 rows in 0.7m
+seed42_fold5: 25600/100195
+seed42_fold5: 51200/100195
+seed42_fold5: 76800/100195
+built seed42_fold5.npy 100195 rows in 0.8m
+seed42_fold6: 25600/97518
+seed42_fold6: 51200/97518
+seed42_fold6: 76800/97518
+built seed42_fold6.npy 97518 rows in 0.8m
+seed42_fold7: 25600/96437
+seed42_fold7: 51200/96437
+seed42_fold7: 76800/96437
+built seed42_fold7.npy 96437 rows in 0.8m
+seed42_fold8: 25600/93252
+seed42_fold8: 51200/93252
+seed42_fold8: 76800/93252
+built seed42_fold8.npy 93252 rows in 0.8m
+seed42_fold9: 25600/103035
+seed42_fold9: 51200/103035
+seed42_fold9: 76800/103035
+seed42_fold9: 102400/103035
+built seed42_fold9.npy 103035 rows in 0.8m
+seed 42: standalone=0.509089 rho=0.070917 complete in 11.3m
+train_seed7: 25600/311442
+train_seed7: 51200/311442
+train_seed7: 76800/311442
+train_seed7: 102400/311442
+train_seed7: 128000/311442
+train_seed7: 153600/311442
+train_seed7: 179200/311442
+train_seed7: 204800/311442
+train_seed7: 230400/311442
+train_seed7: 256000/311442
+train_seed7: 281600/311442
+train_seed7: 307200/311442
+built train_seed7.npy 311442 rows in 2.6m
+seed7_fold0: 25600/97691
+seed7_fold0: 51200/97691
+seed7_fold0: 76800/97691
+built seed7_fold0.npy 97691 rows in 0.8m
+seed7_fold1: 25600/94750
+seed7_fold1: 51200/94750
+seed7_fold1: 76800/94750
+built seed7_fold1.npy 94750 rows in 0.8m
+seed7_fold2: 25600/98017
+seed7_fold2: 51200/98017
+seed7_fold2: 76800/98017
+built seed7_fold2.npy 98017 rows in 0.8m
+seed7_fold3: 25600/100650
+seed7_fold3: 51200/100650
+seed7_fold3: 76800/100650
+built seed7_fold3.npy 100650 rows in 0.8m
+seed7_fold4: 25600/99454
+seed7_fold4: 51200/99454
+seed7_fold4: 76800/99454
+built seed7_fold4.npy 99454 rows in 0.8m
+seed7_fold5: 25600/92876
+seed7_fold5: 51200/92876
+seed7_fold5: 76800/92876
+built seed7_fold5.npy 92876 rows in 0.8m
+seed7_fold6: 25600/103053
+seed7_fold6: 51200/103053
+seed7_fold6: 76800/103053
+seed7_fold6: 102400/103053
+built seed7_fold6.npy 103053 rows in 0.8m
+seed7_fold7: 25600/104001
+seed7_fold7: 51200/104001
+seed7_fold7: 76800/104001
+seed7_fold7: 102400/104001
+built seed7_fold7.npy 104001 rows in 0.8m
+seed7_fold8: 25600/94361
+seed7_fold8: 51200/94361
+seed7_fold8: 76800/94361
+built seed7_fold8.npy 94361 rows in 0.8m
+seed7_fold9: 25600/100441
+seed7_fold9: 51200/100441
+seed7_fold9: 76800/100441
+built seed7_fold9.npy 100441 rows in 0.8m
+seed 7: standalone=0.515047 rho=0.071533 complete in 10.7m
+train_seed123: 25600/311143
+train_seed123: 51200/311143
+train_seed123: 76800/311143
+train_seed123: 102400/311143
+train_seed123: 128000/311143
+train_seed123: 153600/311143
+train_seed123: 179200/311143
+train_seed123: 204800/311143
+train_seed123: 230400/311143
+train_seed123: 256000/311143
+train_seed123: 281600/311143
+train_seed123: 307200/311143
+built train_seed123.npy 311143 rows in 2.6m
+seed123_fold0: 25600/95689
+seed123_fold0: 51200/95689
+seed123_fold0: 76800/95689
+built seed123_fold0.npy 95689 rows in 0.8m
+seed123_fold1: 25600/100517
+seed123_fold1: 51200/100517
+seed123_fold1: 76800/100517
+built seed123_fold1.npy 100517 rows in 0.8m
+seed123_fold2: 25600/99880
+seed123_fold2: 51200/99880
+seed123_fold2: 76800/99880
+built seed123_fold2.npy 99880 rows in 0.8m
+seed123_fold3: 25600/103386
+seed123_fold3: 51200/103386
+seed123_fold3: 76800/103386
+seed123_fold3: 102400/103386
+built seed123_fold3.npy 103386 rows in 0.8m
+seed123_fold4: 25600/91614
+seed123_fold4: 51200/91614
+seed123_fold4: 76800/91614
+built seed123_fold4.npy 91614 rows in 0.8m
+seed123_fold5: 25600/98222
+seed123_fold5: 51200/98222
+seed123_fold5: 76800/98222
+built seed123_fold5.npy 98222 rows in 0.8m
+seed123_fold6: 25600/102127
+seed123_fold6: 51200/102127
+seed123_fold6: 76800/102127
+built seed123_fold6.npy 102127 rows in 0.8m
+seed123_fold7: 25600/99291
+seed123_fold7: 51200/99291
+seed123_fold7: 76800/99291
+built seed123_fold7.npy 99291 rows in 0.8m
+seed123_fold8: 25600/99470
+seed123_fold8: 51200/99470
+seed123_fold8: 76800/99470
+built seed123_fold8.npy 99470 rows in 0.8m
+seed123_fold9: 25600/101704
+seed123_fold9: 51200/101704
+seed123_fold9: 76800/101704
+built seed123_fold9.npy 101704 rows in 0.8m
+seed 123: standalone=0.511046 rho=0.088298 complete in 10.7m
+best weight=0.025 auc=0.637853 mean_d=-0.000067 min_d=-0.000122 pos=1/3 gate=False

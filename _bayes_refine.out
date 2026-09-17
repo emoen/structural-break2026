@@ -1,0 +1,22 @@
+=== PER-SERIES CALIB probe on ranker+rf E78 base79  2026-09-14 22:23:16  smoke=False ===
+seeds=[42, 7, 123] rf_trees=500 dense_k=40 blend=0.45/0.55
+NBASE=79 NCOL=374 ship_scales=(40, 100, 250)  calib_win=250 null_wins=32  whiten=False
+arms=[('czms_all79', 'meansd', 79), ('czrb_all79', 'robust', 79), ('czrb_champ51', 'robust', 51), ('czrb_dep28', 'robust', 28)]
+candidates=['white_gauss_cal', 'white_student_cal', 'white_both_cal']
+[affine-check] cand cols maxdiff under x->7.3x+-2.1: 4.47e-07  (nonzero cand cols 293/295)
+  [cache] seed 42 built in 1151s  Xtr(79037, 374) Rr(311156, 374) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_bayesref_wblock/seed_42.pkl
+[seed 42] czrb_all79+wblock+white_gloc ranker+rf = 0.6342  (420s)
+[seed 42] white_gauss_cal 0.6342  d=-0.0000  (426s)
+[seed 42] white_student_cal 0.6349  d=+0.0007  (428s)
+[seed 42] white_both_cal 0.6345  d=+0.0003  (437s)
+  [cache] seed 7 built in 1047s  Xtr(79113, 374) Rr(311442, 374) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_bayesref_wblock/seed_7.pkl
+[seed 7] czrb_all79+wblock+white_gloc ranker+rf = 0.6332  (401s)
+[seed 7] white_gauss_cal 0.6317  d=-0.0015  (412s)
+[seed 7] white_student_cal 0.6336  d=+0.0003  (413s)
+[seed 7] white_both_cal 0.6312  d=-0.0021  (421s)
+  [cache] seed 123 built in 1053s  Xtr(79068, 374) Rr(311143, 374) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_bayesref_wblock/seed_123.pkl
+[seed 123] czrb_all79+wblock+white_gloc ranker+rf = 0.6427  (411s)
+[seed 123] white_gauss_cal 0.6393  d=-0.0034  (426s)
+[seed 123] white_student_cal 0.6385  d=-0.0043  (421s)
+[seed 123] white_both_cal 0.6383  d=-0.0044  (431s)
+wrote /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_bayes_refine_summary.txt

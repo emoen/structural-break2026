@@ -1,0 +1,48 @@
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 4337.17it/s]
+train_reg: 12800/311156
+train_reg: 25600/311156
+train_reg: 38400/311156
+train_reg: 51200/311156
+train_reg: 64000/311156
+train_reg: 76800/311156
+train_reg: 89600/311156
+train_reg: 102400/311156
+train_reg: 115200/311156
+train_reg: 128000/311156
+train_reg: 140800/311156
+train_reg: 153600/311156
+train_reg: 166400/311156
+train_reg: 179200/311156
+train_reg: 192000/311156
+train_reg: 204800/311156
+train_reg: 217600/311156
+train_reg: 230400/311156
+train_reg: 243200/311156
+train_reg: 256000/311156
+train_reg: 268800/311156
+train_reg: 281600/311156
+train_reg: 294400/311156
+train_reg: 307200/311156
+built train_reg.npy 311156 rows in 2.5m
+exact train-row alignment passed
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 11670.10it/s]
+fold0_reg: 12800/103509
+fold0_reg: 25600/103509
+fold0_reg: 38400/103509
+fold0_reg: 51200/103509
+fold0_reg: 64000/103509
+fold0_reg: 76800/103509
+fold0_reg: 89600/103509
+fold0_reg: 102400/103509
+built fold0_reg.npy 103509 rows in 0.8m
+fold 0 active-row alignment passed
+fold1_reg: 12800/99455
+fold1_reg: 25600/99455
+fold1_reg: 38400/99455
+fold1_reg: 51200/99455
+fold1_reg: 64000/99455
+fold1_reg: 76800/99455
+fold1_reg: 89600/99455
+built fold1_reg.npy 99455 rows in 0.8m
+fold 1 active-row alignment passed
+baseline=0.644043 standalone=0.532300 residual=0.509801 best_weight=0.025 best_auc=0.644220 delta=+0.000178

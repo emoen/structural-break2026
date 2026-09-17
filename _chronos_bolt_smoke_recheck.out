@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 9407.19it/s]
+reuse train_reg.npy (311156, 256)
+exact train-row alignment passed
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 9855.40it/s]
+reuse fold0_reg.npy (103509, 256)
+fold 0 active-row alignment passed
+reuse fold1_reg.npy (99455, 256)
+fold 1 active-row alignment passed
+baseline=0.644043 standalone=0.532300 residual=0.509801 best_weight=0.025 best_auc=0.644220 delta=+0.000178

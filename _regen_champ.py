@@ -1,5 +1,5 @@
 #%pip install crunch-cli lightgbm xgboost catboost onnxruntime skl2onnx onnx --upgrade --quiet --progress-bar off
-#!crunch setup-notebook structural-break-real-time HaFr9ZHI3wji1g6WUGt3hLIh
+#!crunch setup-notebook structural-break-real-time EaYXndGIvcQUzXnCXXMW4kgN
 
 
 import os
@@ -1190,21 +1190,18 @@ def infer(
 
 
 # @crunch/keep:on
-# crunch runs each infer worker in its OWN process; every worker loads its own
-# onnxruntime session from the RF ONNX blob. MEASURED footprint (blob freed after the
-# session is built) is ~3.7 GB/worker for the full ~394 MB model. Total RAM = workers x
-# per-worker, so cap workers by BOTH vCPU count AND physical RAM to avoid an OOM kill.
-# (64 GB -> 15 workers = full parallelism; the OOM'd run held the blob at ~4.1 GB/worker.)
-_PER_WORKER_GB = 3.7
+# Each infer worker is a separate process with its own ONNX random-forest session.
+# Cloud session construction can peak near 8-12 GB even though steady-state RSS is lower.
+# Budget for the peak and leave RAM for Python, model blobs, and scoring infrastructure.
+_PER_WORKER_GB = 12.0
+_RAM_FRACTION = 0.80
 _cpu = max(1, (os.cpu_count() or 4) - 1)
 try:
     _ram_gb = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / (1024 ** 3)
-    _mem_cap = max(1, int(_ram_gb * 0.90 / _PER_WORKER_GB))
+    _mem_cap = max(1, int(_ram_gb * _RAM_FRACTION / _PER_WORKER_GB))
 except (ValueError, OSError):
-    _mem_cap = _cpu
-INFER_PARALLELISM = int(os.environ.get(
-    "INFER_PARALLELISM", max(1, min(_cpu, _mem_cap))
-))
+    _mem_cap = 1
+INFER_PARALLELISM = max(1, min(_cpu, _mem_cap))
 print(f"INFER_PARALLELISM={INFER_PARALLELISM} (cpu_cap={_cpu}, mem_cap={_mem_cap} @ {_PER_WORKER_GB} GB/worker)")
 # INFER_PARALLELISM = 1  # set to 1 while debugging
 

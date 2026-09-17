@@ -1,0 +1,13 @@
+seed 42 raw79 complete in 0s
+seed 42 calibration79 complete in 4s
+seed 42 whitening15 complete in 2s
+seed 42 complete in 0.1m
+seed 7 raw79 complete in 5s
+seed 7 calibration79 complete in 5s
+seed 7 whitening15 complete in 2s
+seed 7 complete in 0.3m
+seed 123 raw79 complete in 5s
+seed 123 calibration79 complete in 5s
+seed 123 whitening15 complete in 3s
+seed 123 complete in 0.3m
+best=raw79 weight=0.075 mean_d=+0.000165 positive=2/3 gate=False

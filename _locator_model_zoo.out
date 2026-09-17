@@ -1,0 +1,22 @@
+seed 42 extra_trees complete in 14s
+seed 42 random_forest complete in 70s
+seed 42 point_lgbm complete in 2s
+seed 42 xgboost complete in 8s
+seed 42 catboost complete in 2s
+seed 42 logistic complete in 0s
+seed 42 complete in 1.7m
+seed 7 extra_trees complete in 13s
+seed 7 random_forest complete in 70s
+seed 7 point_lgbm complete in 2s
+seed 7 xgboost complete in 3s
+seed 7 catboost complete in 3s
+seed 7 logistic complete in 0s
+seed 7 complete in 1.6m
+seed 123 extra_trees complete in 13s
+seed 123 random_forest complete in 70s
+seed 123 point_lgbm complete in 2s
+seed 123 xgboost complete in 3s
+seed 123 catboost complete in 3s
+seed 123 logistic complete in 0s
+seed 123 complete in 1.6m
+best mean_d=+0.000014 positive=2/3 gate=False

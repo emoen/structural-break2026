@@ -13,21 +13,21 @@ Deep experiment history lives in memory (`/memories/repo/structural-break.md`,
 
 ## Champion (current best)
 
-- **Notebook:** `streaming_detector_stack4.ipynb` — **LB 62.97%**.
+- **Notebook:** `streaming_detector_stack4.ipynb` — **LB 63.39%, rank 64** (E116, 2026-09-14).
 - **Ensemble:** 4 ACTIVE members, fixed-CDF **percentile blend**, weights sum to 1:
-  `ranker 0.45, rf 0.40, xgb 0.10, catboost 0.05`. A 5th model (`hgb`) had weight `0.00`.
+  `ranker 0.55, rf 0.30, xgb 0.05, catboost 0.10`. A 5th model (`hgb`) had weight `0.00`.
   As of 2026-09-09 `hgb` is **no longer trained** (quota optimization; it was fit-but-unused).
-- **Features:** `base79` (79 cols) + **calibration block** = 158 cols. Calib = robust
-  studentization (median / 1.4826·MAD) of each `base79` feature vs that series' own pre-break
-  null (32 sliding history windows). `czrb_all79` is the shipped calib arm. Base79 first,
-  byte-unchanged, then the 79 studentized cols.
+- **Features:** 173 generated columns: `base79` + robust calibration79 + additive whitened
+  `WBLOCK8` + white-GLOC7. Ranker and random forest consume all 173; XGBoost and CatBoost
+  retain the original 166-column prefix. Base79 remains first and byte-unchanged.
 - **Key config:** `WINDOW=250`, `MS_SCALES=(40,100,250)`, `HIST_CAP=150`, `STEPS_PER_SERIES=30`,
   `DENSE_K=60`, `PREDICT_EVERY=1`, `MAX_TRAIN_SERIES=10**9` (all platform series).
 - **RF served as ONNX** (`skl2onnx`) in `infer()` — sklearn per-row `predict_proba` is ~300x
   slower and caused cloud timeouts. Keep RF as ONNX.
 
 ## Champion lineage (LB): 57.50 (multiscale) → 57.72 (tuned) → 58.78 (ensemble) →
-60.56 → 61.32 → 61.58 → 62.50 (ranker+rf) → 62.70 → 62.76 (base79) → 62.93 (calib) → **62.97 (HIST_CAP)**.
+60.56 → 61.32 → 61.58 → 62.50 (ranker+rf) → 62.70 → 62.76 (base79) → 62.93 (calib) →
+62.97 (HIST_CAP) → 63.17 (WBLOCK) → **63.39 (E116 white GLOC + ensemble refinement)**.
 
 ---
 

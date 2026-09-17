@@ -1,0 +1,67 @@
+{
+  "baseline_auc": 0.644042901088061,
+  "chronos_version": "2.3.2",
+  "embedding_dimensions": 256,
+  "experiment": "E124b_smoke",
+  "fold_count": 2,
+  "model": "amazon/chronos-bolt-tiny",
+  "parameter_count": 8652672,
+  "ranker_artifact_bytes": 172628,
+  "representation": "encoder_reg_token",
+  "residual_auc": 0.5098008129131288,
+  "residual_fold_aucs": [
+    0.4916893891484211,
+    0.5279122366778366
+  ],
+  "spearman": {
+    "E116": 0.14546621128889714,
+    "catboost": 0.10098429516379007,
+    "ranker": 0.12917407889505345,
+    "rf": 0.14136604054157847,
+    "xgb": 0.10725826109559417
+  },
+  "standalone_auc": 0.5323003652948477,
+  "standalone_fold_aucs": [
+    0.5269782512468921,
+    0.5376224793428034
+  ],
+  "train_rows": 311156,
+  "validation_active_rows": [
+    103509,
+    99455
+  ],
+  "weights": {
+    "0.025": {
+      "candidate_auc": 0.6442204026301894,
+      "delta": 0.00017750154212842206,
+      "fold_deltas": [
+        -0.00032886955170274845,
+        0.0006838726359595926
+      ]
+    },
+    "0.05": {
+      "candidate_auc": 0.6441957353248229,
+      "delta": 0.00015283423676187846,
+      "fold_deltas": [
+        -0.0009093286037942239,
+        0.0012149970773179808
+      ]
+    },
+    "0.075": {
+      "candidate_auc": 0.643970022836786,
+      "delta": -7.287825127505476e-05,
+      "fold_deltas": [
+        -0.0017306438158142257,
+        0.0015848873132641161
+      ]
+    },
+    "0.1": {
+      "candidate_auc": 0.6434504921444218,
+      "delta": -0.0005924089436391,
+      "fold_deltas": [
+        -0.002916463269864944,
+        0.001731645382586744
+      ]
+    }
+  }
+}

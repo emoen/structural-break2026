@@ -1,0 +1,13 @@
+  [cache] seed 42 built in 1003s  Xtr(79037, 556) Rr(311156, 556) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_curve2_192_wblock/seed_42.pkl
+seed 42 cache alignment exact; established prefix maxdiff=0.0
+seed 42 curve2_ranker complete in 8s
+seed 42 complete in 16.9m
+  [cache] seed 7 built in 1048s  Xtr(79113, 556) Rr(311442, 556) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_curve2_192_wblock/seed_7.pkl
+seed 7 cache alignment exact; established prefix maxdiff=0.0
+seed 7 curve2_ranker complete in 7s
+seed 7 complete in 17.7m
+  [cache] seed 123 built in 1029s  Xtr(79068, 556) Rr(311143, 556) -> /home/endrem/project/ADIA-Lab-Structural-Break/structural-break2026/_calib_cache_gloc6_curve2_192_wblock/seed_123.pkl
+seed 123 cache alignment exact; established prefix maxdiff=0.0
+seed 123 curve2_ranker complete in 9s
+seed 123 complete in 17.4m
+best weight=0.050 mean_d=+0.000212 positive=3/3 gate=False

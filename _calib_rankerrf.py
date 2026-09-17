@@ -49,6 +49,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from scipy.special import gammaln
 
 warnings.filterwarnings("ignore")
 
@@ -113,8 +114,14 @@ NGLOC = NLOC
 _GLOC6 = os.environ.get("GLOC6") == "1"
 _GLOC_COMBOS = os.environ.get("GLOC_COMBOS") == "1"
 _BAYES_GLOC = os.environ.get("BAYES_GLOC") == "1"
+_BAYES_REFINE = os.environ.get("BAYES_REFINE") == "1"
+_GLOC_CURVE = os.environ.get("GLOC_CURVE") == "1"
+_GLOC_CURVE2 = os.environ.get("GLOC_CURVE2") == "1"
 NWHITE_GLOC = 7
+NGLOC_CURVE = 48
+NGLOC_CURVE2 = 4 * NGLOC_CURVE
 NBAYES_GLOC = 8
+NBAYES_UNCERT = 5
 NAGREE_GLOC = 3
 NASYM_GLOC = NLOC
 NVAR_GLOC = 7
@@ -146,7 +153,10 @@ CACHE_DIR = os.path.join(HERE, "_calib_cache"
                          + ("_locator" if _LOCATOR else "")
                          + ("_gloc" if _GLOC else "")
                          + ("_gloc6" if _GLOC6 else "")
+                         + ("_curve48" if _GLOC_CURVE else "")
+                         + ("_curve2_192" if _GLOC_CURVE2 else "")
                          + ("_bayes" if _BAYES_GLOC else "")
+                         + ("_bayesref" if _BAYES_REFINE else "")
                          + ("_wblock" if _WBLOCK else ""))
 _OUTPUT_STEM = os.environ.get("CALIB_OUTPUT_STEM", "_calib_rankerrf")
 RAW = os.path.join(HERE, f"{_OUTPUT_STEM}_raw.tsv")
@@ -233,6 +243,13 @@ if _BAYES_GLOC:
     CAND_SLICE["bayes_gloc"] = np.arange(NCOL, NCOL + NBAYES_GLOC)
     NCOL += NBAYES_GLOC
 
+if _BAYES_REFINE:
+    if not _GLOC6:
+        raise ValueError("BAYES_REFINE requires GLOC6=1 for the shared whitened full prefix")
+    for _name in ("gauss_uncert", "student_uncert"):
+        CAND_SLICE[_name] = np.arange(NCOL, NCOL + NBAYES_UNCERT)
+        NCOL += NBAYES_UNCERT
+
 if _WBLOCK:                                         # ADDITIVE whitened readout block (E112)
     CAND_SLICE["wblock"] = np.arange(NCOL, NCOL + WBLOCK_N)
     NCOL = NCOL + WBLOCK_N
@@ -240,6 +257,18 @@ if _WBLOCK:                                         # ADDITIVE whitened readout 
         ("wblock", ["wblock"]),                            # base79 + whitened block (isolated)
         ("czrb_wblock", ["czrb_all79", "wblock"]),         # SHIPPED arm + whitened block (incremental)
     ]
+
+if _GLOC_CURVE:
+    if not _GLOC6:
+        raise ValueError("GLOC_CURVE requires GLOC6=1 for the whitened full prefix")
+    CAND_SLICE["gloc_curve"] = np.arange(NCOL, NCOL + NGLOC_CURVE)
+    NCOL += NGLOC_CURVE
+
+if _GLOC_CURVE2:
+    if not _GLOC6:
+        raise ValueError("GLOC_CURVE2 requires GLOC6=1 for the whitened full prefix")
+    CAND_SLICE["gloc_curve2"] = np.arange(NCOL, NCOL + NGLOC_CURVE2)
+    NCOL += NGLOC_CURVE2
 
 if _GLOC6:
     _champ = ["czrb_all79", "wblock"]
@@ -263,6 +292,14 @@ if _GLOC6:
 if _BAYES_GLOC:
     _white_champ = ["czrb_all79", "wblock", "white_gloc"]
     CANDIDATES = [("white_bayes", _white_champ + ["bayes_gloc"])]
+
+if _BAYES_REFINE:
+    _white_champ = ["czrb_all79", "wblock", "white_gloc"]
+    CANDIDATES = [
+        ("white_gauss_cal", _white_champ + ["gauss_uncert"]),
+        ("white_student_cal", _white_champ + ["student_uncert"]),
+        ("white_both_cal", _white_champ + ["gauss_uncert", "student_uncert"]),
+    ]
 
 if os.environ.get("CANDIDATES"):
     _selected = set(os.environ["CANDIDATES"].split(","))
@@ -441,6 +478,55 @@ def white_gloc_feats(wh):
     return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
 
 
+def white_gloc_curve(wh, bins=NGLOC_CURVE):
+    """Fixed-width normalized Gaussian split-likelihood curve."""
+    parts = _locator_parts(wh)
+    if parts is None:
+        return np.zeros(bins, dtype=np.float64)
+    w, n, ks, _m1, _m2, v1, v2, _tstat, _lvr = parts
+    var0 = max(float(w.var()), _EPS)
+    left = ks.astype(np.float64)
+    right = (n - ks).astype(np.float64)
+    gain = np.maximum(
+        0.5 * (n * math.log(var0) - left * np.log(v1) - right * np.log(v2)),
+        0.0,
+    )
+    positions = ks.astype(np.float64) / n
+    targets = np.linspace(float(positions[0]), float(positions[-1]), bins)
+    curve = np.log1p(np.interp(targets, positions, gain) / n)
+    return np.nan_to_num(curve, nan=0.0, posinf=0.0, neginf=0.0)
+
+
+def white_gloc_curve2(wh, bins=NGLOC_CURVE):
+    """Fixed-position amplitude, shape, posterior, and support channels."""
+    out = np.zeros((4, bins), dtype=np.float64)
+    parts = _locator_parts(wh)
+    if parts is None:
+        return out.ravel()
+    w, n, ks, _m1, _m2, v1, v2, _tstat, _lvr = parts
+    var0 = max(float(w.var()), _EPS)
+    left = ks.astype(np.float64)
+    right = (n - ks).astype(np.float64)
+    gain = np.maximum(
+        0.5 * (n * math.log(var0) - left * np.log(v1) - right * np.log(v2)),
+        0.0,
+    )
+    positions = ks.astype(np.float64) / n
+    targets = np.linspace(0.05, 0.95, bins)
+    valid = (targets >= positions[0]) & (targets <= positions[-1])
+    sampled = np.zeros(bins, dtype=np.float64)
+    sampled[valid] = np.interp(targets[valid], positions, gain)
+    peak = float(sampled[valid].max()) if np.any(valid) else 0.0
+    out[0, valid] = np.log1p(sampled[valid] / n)
+    if peak > _EPS:
+        out[1, valid] = sampled[valid] / peak
+        logits = sampled[valid] - peak
+        posterior = np.exp(np.clip(logits, -700.0, 0.0))
+        out[2, valid] = posterior / max(float(posterior.sum()), _EPS)
+    out[3] = valid.astype(np.float64)
+    return np.nan_to_num(out.ravel(), nan=0.0, posinf=0.0, neginf=0.0)
+
+
 def bayes_white_gloc_feats(wh, break_prior=0.5):
     """BIC-regularized posterior over one break in the whitened full prefix."""
     parts = _locator_parts(wh)
@@ -481,6 +567,102 @@ def bayes_white_gloc_feats(wh, break_prior=0.5):
     avg_effect = float(np.dot(conditional, (m2 - m1) / pooled_sd))
     out = [break_prob, mean_pos, map_pos, post_sd, q95 - q05, entropy, mode_gap, avg_effect]
     return [float(np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)) for v in out]
+
+
+def _nig_log_marginal(n, total, total_sq):
+    """Normal-inverse-gamma marginal likelihood; predictive/marginal law is Student-t."""
+    n = np.asarray(n, dtype=np.float64)
+    total = np.asarray(total, dtype=np.float64)
+    total_sq = np.asarray(total_sq, dtype=np.float64)
+    kappa0, alpha0, beta0 = 0.01, 2.0, 1.0
+    safe_n = np.maximum(n, 1.0)
+    mean = total / safe_n
+    centered_ss = np.maximum(total_sq - total * total / safe_n, 0.0)
+    kappa_n = kappa0 + n
+    alpha_n = alpha0 + 0.5 * n
+    beta_n = beta0 + 0.5 * centered_ss + 0.5 * kappa0 * n * mean * mean / kappa_n
+    return (gammaln(alpha_n) - gammaln(alpha0)
+            + alpha0 * math.log(beta0) - alpha_n * np.log(beta_n)
+            + 0.5 * (math.log(kappa0) - np.log(kappa_n))
+            - 0.5 * n * math.log(math.pi))
+
+
+def posterior_uncertainty_feats(wh, likelihood="gaussian", break_prior=0.5):
+    """Five uncertainty-only posterior summaries before per-series null calibration."""
+    parts = _locator_parts(wh)
+    if parts is None:
+        return np.zeros(NBAYES_UNCERT, dtype=np.float64)
+    w, n, ks, m1, m2, v1, v2, _tstat, _lvr = parts
+    a = ks.astype(np.float64)
+    b = (n - ks).astype(np.float64)
+    if likelihood == "gaussian":
+        var0 = max(float(w.var()), _EPS)
+        evidence = 0.5 * (n * math.log(var0) - a * np.log(v1) - b * np.log(v2)) - math.log(n)
+    elif likelihood == "student":
+        csum = np.cumsum(w)
+        csq = np.cumsum(w * w)
+        left_sum = csum[ks - 1]
+        left_sq = csq[ks - 1]
+        right_sum = csum[-1] - left_sum
+        right_sq = csq[-1] - left_sq
+        whole = float(_nig_log_marginal(n, csum[-1], csq[-1]))
+        evidence = (_nig_log_marginal(a, left_sum, left_sq)
+                    + _nig_log_marginal(b, right_sum, right_sq) - whole)
+    else:
+        raise ValueError(f"unknown posterior likelihood: {likelihood}")
+
+    prior = float(np.clip(break_prior, 1e-6, 1.0 - 1e-6))
+    log_split = evidence + math.log(prior) - math.log(len(ks))
+    log_null = math.log1p(-prior)
+    shift = max(log_null, float(np.max(log_split)))
+    null_weight = math.exp(log_null - shift)
+    split_weight = np.exp(np.clip(log_split - shift, -745.0, 0.0))
+    normalizer = null_weight + float(split_weight.sum())
+    split_post = split_weight / max(normalizer, _EPS)
+    break_prob = float(split_post.sum())
+    conditional = split_post / max(break_prob, _EPS)
+
+    pos = ks.astype(np.float64) / n
+    cdf = np.cumsum(conditional)
+    q05 = float(pos[min(np.searchsorted(cdf, 0.05), len(pos) - 1)])
+    q95 = float(pos[min(np.searchsorted(cdf, 0.95), len(pos) - 1)])
+    all_post = np.concatenate([[null_weight / normalizer], split_post])
+    entropy = float(-np.sum(all_post * np.log(all_post + _EPS)) / math.log(len(all_post)))
+    ordered = np.sort(conditional)
+    mode_gap = float(ordered[-1] - ordered[-2]) if len(ordered) > 1 else float(ordered[-1])
+    effect = (m2 - m1) / np.sqrt(0.5 * (v1 + v2) + _EPS)
+    effect_mean = float(np.dot(conditional, effect))
+    effect_sd = float(math.sqrt(max(np.dot(conditional, (effect - effect_mean) ** 2), 0.0)))
+    logit_break = math.log((break_prob + _EPS) / (1.0 - break_prob + _EPS))
+    return np.nan_to_num(np.asarray([logit_break, entropy, q95 - q05, mode_gap, effect_sd]),
+                         nan=0.0, posinf=50.0, neginf=-50.0)
+
+
+def fit_bayes_uncert_ref(x_h):
+    """Robust null bands for posterior uncertainty from 32 whitened history windows."""
+    wh_hist = np.asarray(whiten_pair(x_h, x_h)[1], dtype=np.float64)
+    refs = {}
+    for likelihood in ("gaussian", "student"):
+        rows = []
+        if len(wh_hist) >= _CALIB_WIN + 10:
+            starts = np.linspace(0, len(wh_hist) - _CALIB_WIN, _CALIB_NULL_WINS).astype(int)
+            rows = [posterior_uncertainty_feats(wh_hist[s:s + _CALIB_WIN], likelihood)
+                    for s in starts]
+        if len(rows) >= 3:
+            values = np.asarray(rows, dtype=np.float64)
+            med = np.median(values, axis=0)
+            mad = 1.4826 * np.median(np.abs(values - med), axis=0) + _EPS
+        else:
+            med = np.zeros(NBAYES_UNCERT)
+            mad = np.ones(NBAYES_UNCERT)
+        refs[likelihood] = (med, mad)
+    return refs
+
+
+def calibrated_posterior_uncertainty(wh, refs, likelihood):
+    raw = posterior_uncertainty_feats(wh, likelihood)
+    med, mad = refs[likelihood]
+    return np.clip((raw - med) / mad, -50.0, 50.0)
 
 
 def agree_gloc_feats(raw, white):
@@ -634,6 +816,8 @@ def _refs(x_h, ctx):
     base = {"champ": fit_champ_refs(x_h), "dep": fit_dep_refs(x_h),
             "base_span": {name: _fit_span(x_h, spec) for name, spec in BASE_SPAN_SPECS}}
     base["calib"] = fit_calib_ref(x_h, ctx, base)   # needs champ/dep/base_span above
+    if _BAYES_REFINE:
+        base["bayes_uncert"] = fit_bayes_uncert_ref(x_h)
     return base
 
 
@@ -661,9 +845,20 @@ def _row(w, ctx, refs, full=None, wh=None, wh_full=None):
         ])
         if _BAYES_GLOC:
             feats.append(np.asarray(bayes_white_gloc_feats(wseq), dtype=np.float64))
+        if _BAYES_REFINE:
+            feats.extend([
+                calibrated_posterior_uncertainty(wseq, refs["bayes_uncert"], "gaussian"),
+                calibrated_posterior_uncertainty(wseq, refs["bayes_uncert"], "student"),
+            ])
     if _WBLOCK:                                         # whitened-window readout (additive)
         wseq = w if wh is None else np.asarray(wh, dtype=np.float64)
         feats.append(np.asarray(wblock_feats(wseq, ctx), dtype=np.float64))
+    if _GLOC_CURVE:
+        wseq = w if wh_full is None else np.asarray(wh_full, dtype=np.float64)
+        feats.append(white_gloc_curve(wseq))
+    if _GLOC_CURVE2:
+        wseq = w if wh_full is None else np.asarray(wh_full, dtype=np.float64)
+        feats.append(white_gloc_curve2(wseq))
     return np.concatenate(feats)
 
 
